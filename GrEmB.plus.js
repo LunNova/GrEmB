@@ -36,9 +36,11 @@ var passFunction = function () {
 
 		var isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes");
 		var mdElement = 'md';
+		var isMulti = false;//Uses both MD and plain-text for user areas. This runs global conversion and markdown conversion mode.
 		
 		if((/(?:www\.)?github\.com$/).test(window.location.host)){
 			isReddit = true;
+			isMulti = true;
 			mdElement = 'markdown-body';
 		}
 		
@@ -1115,7 +1117,7 @@ var passFunction = function () {
 		var goEmote = true;
 
 		function convertDefaultGlobalEmotes(target) {
-			if(!goEmote||!getConf("emoteManagerEverywhere")||target == null || isReddit || !(/\[\]\(\/.*?\)/).test(target.innerHTML)) {
+			if(!goEmote||!getConf("emoteManagerEverywhere")||target == null || (isReddit&&!isMulti) || !(/\[\]\(\/.*?\)/).test(target.innerHTML)) {
 				return;
 			}
 			goEmote = false;
