@@ -1308,9 +1308,9 @@ var passFunction = function () {
 									if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||emElem.clientWidth == 0)) {
 										emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 										if(href.length > 20) {
-											emElem.className += " G_unknownEmote G_largeUnknown";
+											emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
 										}else{
-											emElem.className += " G_unknownEmote";
+											emElem.className += " G_unknownEmote G_" + href + "_";
 										}
 										if(hrefss[2] != undefined){
 											emElem.href = "/" + href;
@@ -1349,7 +1349,7 @@ var passFunction = function () {
 									}//End ArbitraryEntity's code
 									if(imageAlt){
 										var copyImage = document.createElement("img");
-										copyImage.alt = "[](/" + href + ((hrefss[3] != undefined) ? hrefss[3] : "") + ' "' + emElem.title + '")';
+										copyImage.alt = "[](/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
 										copyImage.style.fontSize = '0px';
 										emElem.parentNode.insertBefore(copyImage,emElem);
 									}
