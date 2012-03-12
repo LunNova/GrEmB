@@ -1073,9 +1073,6 @@ var passFunction = function () {
 							}
 							emoteElement.className = 'convertedEmote convertedEmote_';
 							beforeNode.parentNode.insertBefore(emoteElement, beforeNode);
-							if(v[2] && revAlt) {
-								expandConvertedEmotes(emoteElement);
-							}
 							var emoteInfo = (/^([\-a-zA-Z0-9_]+?)(-[\-a-zA-Z0-9_]+)?$/).exec(v[1]);
 							if(emoteInfo){
 								if(dispUn && (!emoteNames[emoteInfo[1]])&&emoteElement.clientWidth == 0){
@@ -1090,6 +1087,9 @@ var passFunction = function () {
 								}else if((/^[\-a-zA-Z0-9_]+$/).test(emoteInfo[1])) {
 									emoteElement.className += " G_" + emoteInfo[1] + "_";
 								}
+							}
+							if(v[2] && revAlt) {
+								expandConvertedEmotes(emoteElement,false,emoteInfo[1]);
 							}
 						}
 						text = beforeNode;
@@ -1128,14 +1128,10 @@ var passFunction = function () {
 		//START ArbitraryEntity's code!
 		var linkRegex = new RegExp("\\b(?:(http(?:s?)\://)|(?:www\\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}/))(?:\\S*)\\b", "i")
 
-		function inBlacklist(theLink) {
-				if(theLink.href.substr(-2, 2) == "/b") { // Don't expand the spoiler tags from r/gameofthrones
-					return true;
-				}
-				if(theLink.href.substr(-2, 2) == "/s") { // Don't expand the spoiler tags from r/falloutequestria
-					return true;
-				}
-				if(theLink.href.substr(-8, 8) == "/spoiler") { // Don't expand alt-text on spoiler tags from r/mylittlepony
+		var noExpand = {'b': true, 's':true, 'spoiler':true};
+		
+		function inBlacklist(emote) {
+				if(noExpand[emote]){
 					return true;
 				}
 				return false;
@@ -1143,14 +1139,14 @@ var passFunction = function () {
 
 		var goExpand = true;
 		//START MESS OF MY CODE+ArbitraryEntity's CODE
-		function expandConvertedEmotes(anchor, onReddit) {
+		function expandConvertedEmotes(anchor, onReddit, emName) {
 			if(!goExpand) {
 				return;
 			}
 			goExpand = false;
 			var innerLinks = new Array(anchor);
 			var j = 0;
-			if(innerLinks[j].title && innerLinks[j].title != " " && !inBlacklist(innerLinks[j]) && innerLinks[j].className.indexOf("emoteTextExpanded") == -1) {
+			if(innerLinks[j].title && innerLinks[j].title != " " && !inBlacklist(emName) && innerLinks[j].className.indexOf("emoteTextExpanded") == -1) {
 				var altText = innerLinks[j].title
 
 				var theDiv = document.createElement("div")
