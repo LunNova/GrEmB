@@ -753,15 +753,15 @@ var passFunction = function () {
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs" style="' + lss + '"><li  style="' + ls + '" class="GrEmBtabs"><a tabID="0" style="' + lsa + '" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList'>";
-			emotes += "/*INCLUDE 'rmlp.html'*/";
+			emotes += "/*INCLUDE 'rmlp.js'*/";
 			emotes += "</div><div id='GrEmBMLAS1container' class='GrEmBEmoteList closedTab'>";
 			if(!getConf("nsfwMLAS1Emotes")) {
-				emotes += "/*INCLUDE 'rmlas1.html'*/";
+				emotes += "/*INCLUDE 'rmlas1.js'*/";
 			} else {
-				emotes += "/*INCLUDE 'rmlas1nsfw.html'*/";
+				emotes += "/*INCLUDE 'rmlas1nsfw.js'*/";
 			}
 			emotes += "</div><div id='GrEmBILTBATcontainer' class='GrEmBEmoteList closedTab'>";
-			emotes += "/*INCLUDE 'riltbat.html'*/";
+			emotes += "/*INCLUDE 'riltbat.js'*/";
 			emotes += "</div>";
 
 
