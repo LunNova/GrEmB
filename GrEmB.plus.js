@@ -35,7 +35,14 @@ var passFunction = function () {
 		var subs = [/*INCLUDE 'subs.list'*/];
 
 		var isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes");
-
+		var mdElement = 'md';
+		
+		if((/(?:www\.)?github\.com$/).test(window.location.host)){
+			isReddit = true;
+			mdElement = 'markdown-body';
+		}
+		
+		
 		var defaultConfs = {};
 
 		defaultConfs['defaultEmoteContainer'] = true;
@@ -1273,7 +1280,7 @@ var passFunction = function () {
 					var dispUn = (getConf("displayUnknownEmotes") && !doRefresh), reveal = getConf("revealAltText"), inSub = (/^\/r\//).test(window.location.pathName), imageAlt = getConf('emoteCopy'), ytExpand = true;
 					if(true) {
 						if(isReddit) {
-							var msgs = evt.target.getElementsByClassName("md");
+							var msgs = evt.target.getElementsByClassName(mdElement);
 							if(msgs.length == 0 && (evt.target !== document.body)) {
 								msgs = [];
 								msgs[0] = evt.target;
