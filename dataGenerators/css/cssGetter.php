@@ -1,14 +1,16 @@
 <?php
 if(@$argv[1] == "nsfw"){
 	$backup = "nsfw.min.css";
-	$css = file_get_contents("http://reddit.com/r/futemotes/stylesheet.css");
+	$url = "http://reddit.com/r/futemotes/stylesheet.css";
+	$css = file_get_contents($url);
 }else{
 	$backup = @$ARGV[2]?:"out4.min.css";
-	$css = file_get_contents("temp.css");
+	$url = "temp.css";
+	$css = file_get_contents($url);
 }
 if(!$css){
 	sleep(60);
-	$css = file_get_contents("http://reddit.com/r/futemotes/stylesheet.css");
+	$css = file_get_contents($url);
 }
 if(!$css){
 	readfile($backup);
