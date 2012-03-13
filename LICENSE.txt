@@ -1,1 +1,3 @@
 http://creativecommons.org/licenses/by-nc-sa/3.0/ - This work is licensed under a CC-BY-NC-SA license.  Code marked as ArbitraryEntity's is exluded from this, you must get permission from /u/ArbitraryEntity on reddit to include it in your code.
+
+If you do wish to use it in a manner which this license does not allow, please contact me! If it's sensible, I'll probably allow it/also release it under a license allowing it. :)

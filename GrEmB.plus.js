@@ -820,7 +820,7 @@ var passFunction = function () {
 				var cssElem = document.createElement('div');
 				cssElem.id = 'debugWindow';
 				var tmpp;
-				cssElem.innerHTML = tmpp = "<a href=\"#\" id='debugWindowClose' style='text-decoration: underline; font-weight: bold;'>X</a><br />"+insertUnicodeVariableNameHere+"<br />Debug info: <br /><textarea style=\"width: 98%;min-height:90%;max-height:95%\">" + ((JSON.stringify(GM_safeGetValue("confArray"))).replace(/\\n/g, "\n")) + "\n\n/**Emote Names:**/\n\n" + (JSON.stringify(emoteNames).replace(/\\n/g, "\n")) + "\n\n/**Emote Names_:**/\n\n" + "</textarea>";
+				cssElem.innerHTML = tmpp = "<a href=\"#\" id='debugWindowClose' style='text-decoration: underline; font-weight: bold;'>X</a><br />"+insertUnicodeVariableNameHere+"<br />Debug info: <br /><textarea style=\"width: 98%;min-height:90%;max-height:95%\">" + ((JSON.stringify(GM_safeGetValue("confArray"))).replace(/\\n/g, "\n")) + "\n</textarea>";
 				document.body.appendChild(cssElem);
 				document.getElementById("debugWindowClose").addEventListener("click", hideDebugWindow);
 			}
