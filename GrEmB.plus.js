@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.97
+// @version		%%Version%%
 // @namespace	http://nallar.me
 // @run-at		document-start
 // @description	Emotes, everywhere. Mostly CC-BY-NC-SA, see @license.
@@ -11,21 +11,25 @@
 // @include		http://*/*
 // @_include	https://*/*
 // @exclude		http://www.redditmedia.com/*
+// @exclude		http://pagead2.googlesyndication.com/*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
 //Report bugs at the 'Send me a message!' link at the homepage.
-var local_version = 1.97;
+var local_version = %%Version%%;
 
 var insertUnicodeVariableNameHere = 'Sorry about the implementation of this script, really. It works though, and it\'s fast... I tried to make it look nice, but it also ended up being slow.';
 var doNotUse = '';
 
 var ranPassFunction = false;
-var mainStylesheet = "http://nallar.me/scripts/out4.min.css";
-var otherStylesheet = "http://nallar.me/scripts/other.min.css";
+var mainStylesheet = "http://nallar.me/scripts/out4";
+var nsfwStylesheet = "http://nallar.me/scripts/nsfw";
+var otherStylesheet = "http://nallar.me/scripts/other";
 var confStore = undefined;
+
+console.log(window.location.pathname);
 
 var passFunction = function () {
 		if(ranPassFunction||document.getElementById("noGlobalPonymotes")) {
@@ -86,10 +90,9 @@ var passFunction = function () {
 		defaultConfs['lastVersion'] = local_version;
 		defaultConfs['lastUpdate'] = 0;
 		defaultConfs['wideReddit'] = false;
-		defaultConfs['justReset'] = false;
 		defaultConfs['emoteCopy'] = false;
 
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false;
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, superBundlePrefs;
 		
 		var isWebKit = navigator.userAgent.indexOf('WebKit/') != -1;
 		var isChrome = navigator.userAgent.indexOf('Chrome/') != -1;
@@ -145,11 +148,11 @@ var passFunction = function () {
 				return retV;
 			};
 		//ENDIF
-
+		
 		var trim = function (str) {
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		};
-		//IF extension
+		//IF !extension
 		if((!GM_getValue || (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") > -1))){
 			console.log("Unsupported browser :(");
 			unsupported = true;
@@ -255,8 +258,9 @@ var passFunction = function () {
 				return;
 			}
 			//IF extension
-			GM_setValue("confArray", JSON.stringify(temp));
+			
 			//ELSE
+			GM_setValue("confArray", JSON.stringify(temp));
 			//ENDIF
 		};
 		var removeDefunctConfs = function () {
@@ -268,8 +272,9 @@ var passFunction = function () {
 				}
 				confStore = temp;
 				//IF extension
-				return GM_setValue("confArray", JSON.stringify(temp));
+				
 				//ELSE
+				return GM_setValue("confArray", JSON.stringify(temp));
 				//ENDIF
 			};
 		var updateTime = ((!getConf("internalUpdateCheck")) || getConf("updateCheckWeekly")) ? 604800000 : (86400000);
@@ -312,8 +317,16 @@ var passFunction = function () {
 		} catch(err) {
 			console.log(err);
 		}
-		var superBundlePrefs;
 
+		function resetCachedData(){
+			setConf("lastVersion", local_version, true);
+			setConf('csssstore', {}, true);
+			setConf('emoteNames', defaultConfs['emoteNames']);
+			emoteNames = defaultConfs['emoteNames'];
+			emoteNames_ = defaultConfs['emoteNames'];
+			window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
+		}
+		
 		function makeInput(id, type, dis, q) {
 			if(defaultConfs[id] === undefined) {
 				debug(103, "makeInput(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
@@ -407,13 +420,7 @@ var passFunction = function () {
 			document.getElementById('settingsForm').addEventListener("change", onChange);
 		};
 		if((/csscachereset=1/).test(window.location.href) || getConf("lastVersion") != local_version) {
-			setConf("lastVersion", local_version, true);
-			setConf('csssstore', {}, true);
-			setConf('emoteNames', defaultConfs['emoteNames']);
-			setConf('justReset',true);
-			emoteNames = defaultConfs['emoteNames'];
-			emoteNames_ = defaultConfs['emoteNames'];
-			window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
+			resetCachedData();
 			if(doNotUse != ""){
 				alert(doNotUse);
 			}
@@ -833,13 +840,9 @@ var passFunction = function () {
 					evt.preventDefault()
 				}
 			}
-		var showNotice = getConf('justReset');
-		if(showNotice){
-			setConf('justReset', false);
-		}
 		var incLoadedStyles = function () {
 				loadedStyles++;
-				if(window.top === window && (getConf("displayReloadingNotice")||showNotice || window.location.host == "nallar.me")) {
+				if(window.top === window && (getConf("displayReloadingNotice") || window.location.host == "nallar.me")) {
 					if(!document.getElementById("loadingNotice") && doRefresh) {
 						var cssElem = document.createElement('div');
 						cssElem.id = 'loadingNotice';
@@ -887,12 +890,13 @@ var passFunction = function () {
 					initRefresh = true;
 					emoteNames_ = emoteNames;
 				}
-				var tm = timeOutCounter;
+				var tm = timeOutCounter, jsonList = false;
 				if(urll == undefined) {
 					var urll = "http://reddit.com/r/" + subname + "/stylesheet.css?v=" + d.getTime();
 				} else {
 					urll = urll + "?v=" + d.getTime();
 					tm = tm / 3;
+					jsonList = true;
 				}
 				setTimeout(function () {
 					GM_xmlhttpRequest({
@@ -903,7 +907,7 @@ var passFunction = function () {
 							'Accept': 'text/plain,text/html,text/css',
 						},
 						onload: function (res) {
-							styles = false;
+							var styles = false;
 							if(!noParse) {
 								var tempText = res.responseText.replace(/\/\*(?:[^]+?)\*\//g, "");
 								tempText = tempText.replace(/\s+/g, " ");
@@ -915,16 +919,13 @@ var passFunction = function () {
 									emoteNames = emoteNames_;
 								}
 							} else if(getConf("displayUnknownEmotes")) {
-								var tempText = res.responseText.replace(/\/\*(?:[^]+?)\*\//g, "");
-								tempText = tempText.replace(/\s+/g, " ");
-								execAll(/\.G_([0-9a-zA-Z]+)_/ig, tempText);
-								execAll(/a\[href[\*\^\|]?=['"]\/([^'"]+?)['"]/g, tempText);
+								emoteNames_ = JSON.parse(res.responseText);
 								setConf('emoteNames', emoteNames_, true);
 								emoteNames = emoteNames_;
 							}
 
 							if(!noParse) {
-								var styles = tempText.match(/a\[href[\*\^\|]?=['"]\/[^}]+}/g);
+								styles = tempText.match(/a\[href[\*\^\|]?=['"]\/[^}]+}/g);
 								if(styles == null){
 									styles = tempText.match(/.G_[a-zA-Z0-9_\-]+?_[^}]+}/g);
 								}else{
@@ -952,13 +953,13 @@ var passFunction = function () {
 			}
 		if(isReddit||getConf("emoteManagerEverywhere")||getConf("defaultEmoteContainerEverywhere")){
 			if(getConf("manySubCSS")) {
-				extractSubredditCSS('manysubcss', false, mainStylesheet, true, true);
+				extractSubredditCSS('manysubcss', false, mainStylesheet+".json", true, true);
 			}
-			loadStyleSheet(mainStylesheet);
+			loadStyleSheet(mainStylesheet+".min.css");
 		}
 		if(getConf("otherSubCSS")&&(isReddit||getConf("emoteManagerEverywhere")||getConf("defaultEmoteContainerEverywhere"))){
-			extractSubredditCSS('othersubs', false, otherStylesheet, true, true);
-			loadStyleSheet(otherStylesheet);
+			extractSubredditCSS('othersubs', false, otherStylesheet+".json", true, true);
+			loadStyleSheet(otherStylesheet+".min.css");
 		}
 		var i = getConf("additionalSubreddits_");
 		if(i) {
@@ -971,7 +972,8 @@ var passFunction = function () {
 			}
 		}
 		if(getConf("nsfwDefunctEmotes")) {
-			extractSubredditCSS('nsfwcss', false, 'http://nallar.me/scripts/nsfw.min.css', true);
+			extractSubredditCSS('nsfwcss', false, nsfwStylesheet+".json", true, true);
+			loadStyleSheet(nsfwStylesheet+".min.css");
 		}
 		if(true) {
 			if(getConf('searchbarSpikeEverywhere') || (isReddit && getConf("searchbarSpike"))) {
@@ -1300,7 +1302,7 @@ var passFunction = function () {
 									}
 									var href = hrefss[1];
 									emElem.className += " convertedEmote_";
-									if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0)) {
+									if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0))){
 										emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 										if(href.length > 20) {
 											emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
