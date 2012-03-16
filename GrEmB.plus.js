@@ -36,8 +36,9 @@ var passFunction = function () {
 			return;
 		}
 		ranPassFunction = true;
-		var subs = [/*INCLUDE 'subs.list'*/];
-
+		
+		var subs = {mlpSubs: {icon: '', subs: [/*INCLUDE 'mlpSubs.list'*/]}, nsfwMLPSubs: {icon: '', subs: ['mylittlecombiners','futemotes']}, generalSubs: {icon: '', subs: ['']}};
+		
 		var isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes");
 		var mdElement = 'md';
 		var isMulti = false;//Uses both MD and plain-text for user areas. This runs global conversion and markdown conversion mode.
@@ -859,98 +860,6 @@ var passFunction = function () {
 				}
 			}
 		var doSave = 0;
-		var extractSubredditCSS = function (subname, doForce, urll, noParse, noLoad) {
-				if(!cssRun && !doForce) {
-					return;
-				}
-				requiredStyles++;
-				var d = new Date();
-				var cacheTime = cssAr[subname + "csstttt"];
-				if(cacheTime === undefined) {
-					cacheTime = 0;
-				}
-				if(!noParse) {
-					var cacheData = cssAr[subname + "cssd"];
-					if(cacheData === undefined) {
-						cacheData = "";
-					}
-					cssStore += (cacheData);
-				} else if(!noLoad) {
-					loadStyleSheet(urll);
-				}
-				if((!doRefresh && ((cacheTime + 28800000) > d.getTime()) && (cacheData || noParse)) || window.top != window) {
-					return incLoadedStyles();
-				}
-				if(subname != "MLPLounge"&&!doRefresh) {
-					doRefresh = true;
-					loadedStyles--;
-					incLoadedStyles();
-				}
-				if(!initRefresh && getConf("displayUnknownEmotes")) {
-					initRefresh = true;
-					emoteNames_ = emoteNames;
-				}
-				var tm = timeOutCounter, jsonList = false;
-				if(urll == undefined) {
-					var urll = "http://reddit.com/r/" + subname + "/stylesheet.css?v=" + d.getTime();
-				} else {
-					urll = urll + "?v=" + d.getTime();
-					tm = tm / 3;
-					jsonList = true;
-				}
-				setTimeout(function () {
-					GM_xmlhttpRequest({
-						method: 'GET',
-						url: urll,
-						headers: {
-							'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey nallar.me/scripts/ GrEmB',
-							'Accept': 'text/plain,text/html,text/css',
-						},
-						onload: function (res) {
-							var styles = false;
-							if(!noParse) {
-								var tempText = res.responseText.replace(/\/\*(?:[^]+?)\*\//g, "");
-								tempText = tempText.replace(/\s+/g, " ");
-								tempText = tempText.replace(/a\[href[\^|]?\=['"]\/([a-zA-Z0-9_\-]+?)['"]\]/g,".G_$1_");
-								if(getConf("displayUnknownEmotes")) {
-									execAll(/\.G_([0-9a-zA-Z]+)_/ig, tempText);
-									execAll(/a\[href[\*\^\|]?=['"]\/([^'"]+?)['"]/g, tempText);
-									setConf('emoteNames', emoteNames_, true);
-									emoteNames = emoteNames_;
-								}
-							} else if(getConf("displayUnknownEmotes")) {
-								emoteNames_ = JSON.parse(res.responseText);
-								setConf('emoteNames', emoteNames_, true);
-								emoteNames = emoteNames_;
-							}
-
-							if(!noParse) {
-								styles = tempText.match(/a\[href[\*\^\|]?=['"]\/[^}]+}/g);
-								if(styles == null){
-									styles = tempText.match(/.G_[a-zA-Z0-9_\-]+?_[^}]+}/g);
-								}else{
-									styles = styles.concat(tempText.match(/.G_[a-zA-Z0-9_\-]+?_[^}]+}/g));
-								}
-							}
-							var d1 = new Date();
-							if(styles) {
-								styles = styles.join(" ");
-								styles = styles.replace(/\[href\=/g, "[href|=");
-								cssAr[subname + "cssd"] = styles;
-								cssStore += (styles);
-								showCSS();
-							}
-							console.log("ct < dt, got new for sn: " + subname + "\t" + cacheTime + "\t" + d.getTime());
-							cssAr[subname + "csstttt"] = String((+d1.getTime()));
-							if(doSave++ > 3 || loadedStyles >= (requiredStyles - 1)) {
-								setConf('csssstore', cssAr);
-							}
-							return incLoadedStyles();
-						}
-					});
-				}, tm);
-				timeOutCounter += 2050;
-			}
 		if(isReddit||getConf("emoteManagerEverywhere")||getConf("defaultEmoteContainerEverywhere")){
 			if(getConf("manySubCSS")) {
 				extractSubredditCSS('manysubcss', false, mainStylesheet+".json", true, true);
