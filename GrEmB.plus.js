@@ -171,7 +171,7 @@ var passFunction = function () {
 			unsupported = true;
 			undefined.crashMe();
 		}
-		G_safeGetValue2 = function (name) {
+		G_safeGetValue2 = function () {
 			var ret = GM_getValue("confArray");
 			if(ret) {
 				ret = JSON.parse(ret);
@@ -184,10 +184,10 @@ var passFunction = function () {
 			return ret;
 		};
 		//ENDIF
-		G_safeGetValue = function (name) {
+		G_safeGetValue = function () {
 			var temp;
 			if(confStore === undefined) {
-				temp = G_safeGetValue2("confArray");
+				temp = G_safeGetValue2();
 				confStore = temp;
 			} else {
 				temp = confStore;
@@ -195,40 +195,24 @@ var passFunction = function () {
 
 			return temp;
 		};
-		var getKeys = function (obj) {
-				var keys = [];
-				for(var key in obj) {
-					keys.push(key);
-					keys.push(obj[key]);
-				}
-				return keys;
-			};
-		injectStyle = function (css, id) {
-			var style, head = document.getElementsByTagName('head')[0];
-			if(!head) {
-				return;
-			}
-			style = document.createElement('style');
-			style.setAttribute('id', id);
-			style.setAttribute('type', 'text/css');
-			style.innerHTML = css;
-			head.appendChild(style);
-		};
 		getConf = function (id) {
 			if(defaultConfs[id] === undefined) {
-				debug(103, "getConf(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
+				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id];
 			}
 			var temp;
-			temp = G_safeGetValue("confArray");
+			temp = G_safeGetValue();
 			if(temp[id] === undefined) {
 				setConf(id, defaultConfs[id]);
 				temp[id] = defaultConfs[id];
 			}
 			return temp[id];
 		};
+		//IF !extension
+		G_safeGetValue();
+		//ENDIF
 		var getConfForm = function (id) {
 				var temp;
-				temp = getConf(id);
+				temp = confStore[id];
 				if(temp !== false) {
 					temp = "checked='yes'";
 				} else {
@@ -238,7 +222,7 @@ var passFunction = function () {
 			};
 		var getConfForm2 = function (id) {
 				var temp;
-				temp = getConf(id);
+				temp = confStore[id];
 				if(temp === false) {
 					temp = "checked='yes'";
 				} else {
@@ -290,11 +274,11 @@ var passFunction = function () {
 				return GM_setValue("confArray", JSON.stringify(temp));
 				//ENDIF
 			};
-		var updateTime = ((!getConf("internalUpdateCheck")) || getConf("updateCheckWeekly")) ? 604800000 : (86400000);
+		var updateTime = ((!confStore["internalUpdateCheck"]) || confStore["updateCheckWeekly"]) ? 604800000 : (86400000);
 		try //Thanks, Jarett! http://userscripts.org/scripts/show/20145
 		{
 			function updateCheck(forced) {
-				if(!(/http:\/\/nallar\.me\/scripts/).test(window.location) && ((forced) || ((getConf('lastUpdate') + updateTime) <= (new Date().getTime()))))
+				if(!(/http:\/\/nallar\.me\/scripts/).test(window.location) && ((forced) || ((confStore['lastUpdate'] + updateTime) <= (new Date().getTime()))))
 				{
 					try {
 						GM_xmlhttpRequest({
@@ -308,7 +292,7 @@ var passFunction = function () {
 								remote_version = parseFloat(remote_version[1]);
 								setConf('lastUpdate',+(new Date()).getTime());
 								if(remote_version > local_version) {
-									if((getConf("internalUpdateCheck") || ((remote_version - local_version) > 0.2)) && confirm('There is an update available for GrEmB.\nWould you like to go to the install page now so you can install it?\n\nYou can make these update notices less frequent in the config.')) {
+									if((confStore["internalUpdateCheck"] || ((remote_version - local_version) > 0.2)) && confirm('There is an update available for GrEmB.\nWould you like to go to the install page now so you can install it?\n\nYou can make these update notices less frequent in the config.')) {
 										GM_openInTab('http://nallar.me/scripts/');
 									}
 								} else if(forced) {
@@ -351,7 +335,7 @@ var passFunction = function () {
 				return '<span style=\'float: right !important;\'><input id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
 			}
 			if(type == 'text') {
-				return '<span style=\'float: right !important;\'><input id="' + id + '" style="height: 18px;" name="conf" value="' + getConf(id) + '" type="textarea" ' + dis + '"/></span>';
+				return '<span style=\'float: right !important;\'><input id="' + id + '" style="height: 18px;" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
 			}
 			if(type == 'radio2') {
 				return '<span style=\'float: right !important;\'>' + q + '<input id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
@@ -411,7 +395,7 @@ var passFunction = function () {
 						}
 					}
 				}
-				if(getConf("emoteManagerWindowStyleType")) {
+				if(confStore["emoteManagerWindowStyleType"]) {
 					setConf("emoteManagerWindowStyle", defaultConfs["emoteManagerWindowStyle"], true);
 				}
 				var conf = G_safeGetValue("confArray");
@@ -421,7 +405,7 @@ var passFunction = function () {
 					setConf('csssstore', {}, true);
 					refreshPage = true;
 				}
-				setConf('manySubCSS', getConf('manySubCSS')); //hack to force saving
+				setConf('manySubCSS', confStore['manySubCSS']); //hack to force saving
 				if(!compareAssociativeArrays(conf, oconf)) {
 					makeWindow();
 				}
@@ -432,7 +416,7 @@ var passFunction = function () {
 		addListenersAgain = function() {
 			document.getElementById('settingsForm').addEventListener("change", onChange);
 		};
-		if((/csscachereset=1/).test(window.location.href) || getConf("lastVersion") != local_version) {
+		if((/csscachereset=1/).test(window.location.href) || confStore["lastVersion"] != local_version) {
 			resetCachedData();
 			if(doNotUse != ""){
 				alert(doNotUse);
@@ -452,14 +436,14 @@ var passFunction = function () {
 				disE = dis;
 				disG = dis;
 			}
-			if(!getConf("defaultEmoteContainer")) {
+			if(!confStore["defaultEmoteContainer"]) {
 				disE = " disabled='disabled'";
 			}
-			if(!getConf("emoteManagerEverywhere")) {
+			if(!confStore["emoteManagerEverywhere"]) {
 				disG = " disabled='disabled'";
 				disF = disG;
 			}
-			if(getConf("emoteManagerWindowStyleType")) {
+			if(confStore["emoteManagerWindowStyleType"]) {
 				disS = " disabled='disabled'";
 			}
 			if(isFF){
@@ -477,8 +461,8 @@ var passFunction = function () {
 		var addSBConf = function () {
 				superBundlePrefs = document.getElementById("superBundleConfAnchor");
 				if(superBundlePrefs) {
-					var style = ".confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 18px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 48% !important; position: relative !important; float: right;}";
-					injectStyle(style, "superBundleConf");
+					cssStore += ".confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 18px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 48% !important; position: relative !important; float: right;}";
+					showCSS();
 					superBundlePrefs.setAttribute("id", "superBundleConfPanel");
 					superBundlePrefs.setAttribute("class", "confPanel");
 					superBundlePrefs.setAttribute("style", "margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px;");
@@ -613,7 +597,7 @@ var passFunction = function () {
 		}
 
 		function updateCurrentForm() {
-			if(!setUpTabs && (getConf("defaultEmoteContainerMLAS1") || getConf("defaultEmoteContainerILTBAT"))) {
+			if(!setUpTabs && (confStore["defaultEmoteContainerMLAS1"] || confStore["defaultEmoteContainerILTBAT"])) {
 				if(!document.getElementById("GrEmBtablist")) {
 					debug(104, "Still no element? :S");
 					return;
@@ -726,7 +710,7 @@ var passFunction = function () {
 			document.getElementById("closeEmoteWindow" + id).addEventListener("click", function (evt) {
 				toggleEmoteWindow(evt, id, 1);
 			}, false);
-			if(getConf("defaultEmoteContainerMouseleave")) {
+			if(confStore["defaultEmoteContainerMouseleave"]) {
 				var closeFunc = function (evt) {
 						evt.stopPropagation();
 						evt.cancelBubble = true;
@@ -754,26 +738,26 @@ var passFunction = function () {
 			var emotes = "";
 			var mlas1 = "";
 			var iltbat = "";
-			if(getConf('defaultEmoteContainerMLAS1')) {
+			if(confStore['defaultEmoteContainerMLAS1']) {
 				mlas1 = '<li style="' + ls + '"><a style="' + lsa + '" href="#" tabID="2">mlas</a></li>';
 			}
-			if(getConf('defaultEmoteContainerILTBAT')) {
+			if(confStore['defaultEmoteContainerILTBAT']) {
 				iltbat = '<li style="' + ls + '" id="selected"><a style="' + lsa + '" href="#" tabID="1">iltbat</a></li>';
 			}
-			if(getConf('defaultEmoteContainerMLAS1') || getConf('defaultEmoteContainerILTBAT')) {
+			if(confStore['defaultEmoteContainerMLAS1'] || confStore['defaultEmoteContainerILTBAT']) {
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs" style="' + lss + '"><li  style="' + ls + '" class="GrEmBtabs"><a tabID="0" style="' + lsa + '" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList'>";
 			emotes += "/*INCLUDE 'rmlp.js'*/";
-			if(getConf('defaultEmoteContainerMLAS1')){
+			if(confStore['defaultEmoteContainerMLAS1']){
 				emotes += "</div><div id='GrEmBMLAS1container' class='GrEmBEmoteList closedTab'>";
-				if(!getConf("nsfwMLAS1Emotes")) {
+				if(!confStore["nsfwMLAS1Emotes"]) {
 					emotes += "/*INCLUDE 'rmlas1.js'*/";
 				} else {
 					emotes += "/*INCLUDE 'rmlas1nsfw.js'*/";
 				}
 			}
-			if(getConf('defaultEmoteContainerILTBAT')){
+			if(confStore['defaultEmoteContainerILTBAT']){
 				emotes += "</div><div id='GrEmBILTBATcontainer' class='GrEmBEmoteList closedTab'>";
 				emotes += "/*INCLUDE 'riltbat.js'*/";
 			}
@@ -784,7 +768,7 @@ var passFunction = function () {
 		}
 
 		var timeOutCounter = 60;
-		var cssAr = getConf('csssstore');
+		var cssAr = confStore['csssstore'];
 		GM_registerMenuCommand('GrEmB - Clear CSS Cache', function () {
 			setConf('csssstore', {});
 			cssAr = {};
@@ -799,8 +783,8 @@ var passFunction = function () {
 		var cssRun = true; //(/(?:www\.)?reddit\.com/i).test(window.location.href)||(document.getElementsByClassName("forceGrEmB")[0])||(/\[\]\(\/.*?\)/).test(document.body.innerHTML);
 		var initRefresh = false;
 		var doRefresh = false;
-		if(getConf("displayUnknownEmotes")) {
-			var emoteNames = getConf('emoteNames');
+		if(confStore["displayUnknownEmotes"]) {
+			var emoteNames = confStore['emoteNames'];
 			if((emoteNames instanceof Array)) {
 				emoteNames = defaultConfs['emoteNames'];
 			}
@@ -852,7 +836,7 @@ var passFunction = function () {
 			}
 		var incLoadedStyles = function () {
 				loadedStyles++;
-				if(!inFrame && (getConf("displayReloadingNotice") || window.location.host == "nallar.me")) {
+				if(!inFrame && (confStore["displayReloadingNotice"] || window.location.host == "nallar.me")) {
 					if(!document.getElementById("loadingNotice") && doRefresh) {
 						var cssElem = document.createElement('div');
 						cssElem.id = 'loadingNotice';
@@ -869,35 +853,44 @@ var passFunction = function () {
 				}
 			}
 		
-		var loadCSS = function(){
+		var loadData = function(){
 			requiredStyles++;
 			incLoadedStyles();
+			var request = {
+				method: 'GET',
+				url: mainDataPage + '&subs=' + confStore['activeSubs'].join(","),
+				headers: {
+					'Accept': 'text/plain,text/json',
+				},
+				onload: function (res) {
+			};
+			
 		}
 		
 		if(true) {
-			if(getConf('searchbarSpikeEverywhere') || (isReddit && getConf("searchbarSpike"))) {
+			if(confStore['searchbarSpikeEverywhere'] || (isReddit && confStore["searchbarSpike"])) {
 				cssStore += ('#search input[type="text"] {background: url(http://thumbs.reddit.com/t5_2s8bl_4.png) top left no-repeat !important; padding: 13px 2px 13px 50px !important;height: 22px !important; width: 245px !important}');
 			}
 			if(isReddit&&(/\/r\/MLPLounge/i).test(window.location.href)) {
 				cssStore += ('code{font-family: monospace !important;} ');
 			}
-			cssStore += ('.convertedEmote_{cursor: default}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList{overflow-y: scroll !important; overflow-x: hidden; height: ' + (getConf("defaultEmoteContainerHeight") - 22) + 'px; width: ' + (getConf("defaultEmoteContainerWidth") - 2) + 'px;} .GrEmBEmoteList a{cursor: pointer;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
-			if(isReddit||getConf('emoteManagerEverywhere')) {
+			cssStore += ('.convertedEmote_{cursor: default}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList{overflow-y: scroll !important; overflow-x: hidden; height: ' + (confStore["defaultEmoteContainerHeight"] - 22) + 'px; width: ' + (confStore["defaultEmoteContainerWidth"] - 2) + 'px;} .GrEmBEmoteList a{cursor: pointer;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
+			if(isReddit||confStore['emoteManagerEverywhere']) {
 				cssStore += ("a.convertedEmote_{-ms-interpolation-mode: nearest-neighbor; image-rendering: -moz-crisp-edges; image-rendering: -webkit-optimize-contrast; } a.convertedEmote_[href^='/'][href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href^='/'][href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href^='/'][href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href^='/'][href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href^='/'][href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href^='/'][href$='-r'][href$='-d']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-45'],a.convertedEmote_:hover[href^='/'][href*='-45'][href*='-r'][href*='-d']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href^='/'][href*='-90'],a.convertedEmote_:hover[href^='/'][href*='-90'][href*='-r'][href*='-d']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-135'],a.convertedEmote_:hover[href^='/'][href*='-135'][href*='-r'][href*='-d']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href^='/'][href*='-180'],a.convertedEmote_:hover[href^='/'][href*='-180'][href*='-r'][href*='-d']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-225'],a.convertedEmote_:hover[href^='/'][href*='-225'][href*='-r'][href*='-d']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href^='/'][href*='-270'],a.convertedEmote_:hover[href^='/'][href*='-270'][href*='-r'][href*='-d']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-315'],a.convertedEmote_:hover[href^='/'][href*='-315'][href*='-r'][href*='-d']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href^='/'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-d']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-45'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-45'][href*='-d']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href^='/'][href*='-90'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-90'][href*='-d']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-135'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-135'][href*='-d']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href^='/'][href*='-180'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-180'][href*='-d']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-225'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-225'][href*='-d']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href^='/'][href*='-270'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-270'][href*='-d']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-315'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-315'][href*='-d']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href^='/'][href*='-225'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-225'][href*='-f'][href*='-d']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href^='/'][href*='-270'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-270'][href*='-f'][href*='-d']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-315'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-315'][href*='-f'][href*='-d']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href^='/'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-f'][href*='-d']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-45'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-45'][href*='-f'][href*='-d']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href^='/'][href*='-90'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-90'][href*='-f'][href*='-d']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-135'][href*='-f'][href*='-r'],a.convertedEmote_:hover[href^='/'][href*='-135'][href*='-f'][href*='-d']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href^='/'][href*='-225'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-225'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href^='/'][href*='-270'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-270'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-315'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-315'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href^='/'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-45'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-45'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href^='/'][href*='-90'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-90'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href*='-135'][href*='-f'],a.convertedEmote_:hover[href^='/'][href*='-135'][href*='-f'][href*='-r'][href*='-d']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href^='/'][href$='-rd']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-90d'],a.convertedEmote_:hover[href^='/'][href$='-90rd']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-180d'],a.convertedEmote_:hover[href^='/'][href$='-fd']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-270d'],a.convertedEmote_:hover[href^='/'][href$='-270rd']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-rd']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-90r'],a.convertedEmote_[href^='/'][href$='-90rd'],a.convertedEmote_:hover[href^='/'][href$='-90d']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-fd'],a.convertedEmote_:hover[href^='/'][href$='-180d']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href^='/'][href$='-270r'],a.convertedEmote_[href^='/'][href$='-270rd'],a.convertedEmote_:hover[href^='/'][href$='-270d']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href='/sp']{display:inline-block;padding-right:100%}");
 			}
 
-			if(!getConf("disableEmoteSpin")&&(isReddit||getConf('emoteManagerEverywhere'))) {
+			if(!confStore["disableEmoteSpin"]&&(isReddit||confStore['emoteManagerEverywhere'])) {
 				cssStore += ('a.convertedEmote_[href*=-spin-],  a.convertedEmote_[href$=-spin]{ -moz-transform-style: flat; -moz-animation: spin 2s infinite ease; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: spin 2s infinite ease; -webkit-transform: translateZ(-360px) rotateX(360deg);}a.convertedEmote_[href*=-ispin-], a.convertedEmote_[href$=-ispin] { -moz-transform-style: flat; -moz-animation: ispin 2s infinite linear; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: ispin 2s infinite linear; -webkit-transform: translateZ(-360px) rotateX(360deg);} a.convertedEmote_[href*=-yspin] {-moz-transform: translateZ(50px); -moz-transform-style: flat; -moz-animation: yspin 2s infinite linear; -webkit-transform: translateZ(50px); -webkit-transform-style: flat; -webkit-animation: yspin 2s infinite linear;} a.convertedEmote_[href*=-xspin] {-moz-transform-style: flat; -moz-transform: rotateX(0deg); -moz-animation: xspin 2s infinite ease; -webkit-transform: rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: xspin 2s infinite ease;}a.convertedEmote_[href*=-rotate-], a.convertedEmote_[href$=-rotate] { -moz-transform-style: flat; -moz-animation: rotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotate 2s infinite ease;}a.convertedEmote_[href*=-rrotate] { -moz-transform-style: flat; -moz-animation: rrotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotater 2s infinite ease;}a.convertedEmote_[href*=-lrotate] { -moz-transform-style: flat; -moz-animation: lrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatel 2s infinite linear;}a.convertedEmote_[href*=-lrrotate] { -moz-transform-style: flat; -moz-animation: lrrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatelr 2s infinite linear;}@-moz-keyframes xspin { from { -moz-transform: rotateX(0deg);} to { -moz-transform: rotateX(360deg); } }@-webkit-keyframes spin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes ispin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-moz-keyframes spin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes xspin { from { -webkit-transform: rotateX(0deg);} to { -webkit-transform: rotateX(360deg); } }@-moz-keyframes ispin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes yspin { from { -webkit-transform: rotateY(0)} to { -webkit-transform: rotateY(360deg);} }@-moz-keyframes yspin { from { -moz-transform: rotateY(0)} to { -moz-transform: rotateY(360deg);} }@-moz-keyframes rotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes rrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-moz-keyframes lrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes lrrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-webkit-keyframes rotate { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotater { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } }@-webkit-keyframes rotatel { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotatelr { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } }');
 			}
 			cssStore += ("a.convertedEmote_[href$='-i']{ -o-filter: invert(); -moz-filter: invert();-webkit-filter: hue-rotate(190deg) !important;} a.convertedEmote_[href*='-inp-'], a.convertedEmote_[href*='-in-'],a.convertedEmote_[href$='-in']a.convertedEmote_[href$='-inp']{ float: none !important; display: inline-block !important;}");
 
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
-			if(getConf("rbText")&&isReddit) {
+			if(confStore["rbText"]&&isReddit) {
 				cssStore += ('.rainbowTextMod{-webkit-background-clip: text;color: white;-webkit-text-fill-color: transparent;background-color:#FFFFFF;background-image: -webkit-gradient(linear,left top,right top,from(#ea8711), to(#d96363));background-image: -webkit-linear-gradient(left,#ea8711,#d96363,#73a6df,#9085fb,#52ca79); background-image: -moz-linear-gradient(left,#ea8711,#d96363,#73a6df,#9085fb,#52ca79);background-image: -ms-linear-gradient(left,#ea8711,#d96363,#73a6df,#9085fb,#52ca79); background-image: -o-linear-gradient(left,#ea8711,#d96363,#73a6df,#9085fb,#52ca79);} a.author[href$="/nallar"],a.author[href$="/RogueDarkJedi"],a.author[href$="/Snivian_Moon"],a.convertedEmote_[href$="-RB"],a.convertedEmote_[href$="-RB/"],a.convertedEmote_[href*="_rbtxt"],a.author[href$="/IllusionOf_Integrity"],a.author[href$="/RainbowCrah"],a.author[href$="/Chinch335"],a.author[href$="/Orschmann"],a.author[href$="/optimistic_outcome"],a.author[href$="/yagi_takeru"],a.author[href$="/The_Velour_Fog"],a.author[href$="/cheesemoo"],a.author[href$="/Speedingturtle"],a.author[href$="/trypsonite"],a.author[href$="/andysonic2"],a.author[href$="Lebal"],a.author[href$="megadeus"],a.author[href$="RainbowCrash"],a.author[href$="/derram"],a.author[href$="/EvilHom3r"]{-moz-background-clip: text; -moz-text-fill-color: transparent; -webkit-background-clip: text;color: white;-webkit-text-fill-color: transparent;background-color:#FFFFFF;background-image: -webkit-gradient(linear,left top,right top,from(#ea8711), to(#d96363));background-image: -webkit-linear-gradient(left,#ea8711,#d96363,#73a6df,#9085fb,#52ca79);}a.convertedEmote_[href$="-RB"],a.convertedEmote_[href$="-RB/"]{cursor: none !important;} ');
 			}
-			var redditSize = (getConf("wideReddit") ? 'max-width: none !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} .GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			var redditSize = (confStore["wideReddit"] ? 'max-width: none !important;' : '');
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} .GrEmBWindow{height: auto !important; width: auto !important;' + confStore["emoteManagerWindowStyle"] + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 
 		showCSS();
@@ -907,7 +900,7 @@ var passFunction = function () {
 		//SEE http://jsperf.com/get-text-nodes-non-recursive
 		
 		function iterativeTreeWalker(root) {
-			var noNsfw = !getConf("nsfwMLAS1Emotes"), revAlt = getConf("revealAltText"), dispUn = (getConf("displayUnknownEmotes")&&!doRefresh), node = root.firstChild, nonRedditS = !getConf("emoteManagerRedditStyle"), multiReg = false;
+			var noNsfw = !confStore["nsfwMLAS1Emotes"], revAlt = confStore["revealAltText"], dispUn = (confStore["displayUnknownEmotes"]&&!doRefresh), node = root.firstChild, nonRedditS = !confStore["emoteManagerRedditStyle"], multiReg = false;
 			if(isMulti){
 				multiReg = new RegExp('(\\s|^)' + markdownClass + '(\\s|$)');
 			}
@@ -1018,7 +1011,7 @@ var passFunction = function () {
 		var goEmote = true;
 
 		function convertDefaultGlobalEmotes(target) {
-			if(!goEmote||!getConf("emoteManagerEverywhere")||target == null || (isReddit&&!isMulti) || !(/\[\]\(\/.*?\)/).test(target.innerHTML)) {
+			if(!goEmote||!confStore["emoteManagerEverywhere"]||target == null || (isReddit&&!isMulti) || !(/\[\]\(\/.*?\)/).test(target.innerHTML)) {
 				return;
 			}
 			goEmote = false;
@@ -1169,7 +1162,7 @@ var passFunction = function () {
 					if(!isReddit&&goEmote) {
 						convertDefaultGlobalEmotes(evt.target);
 					};
-					var dispUn = (getConf("displayUnknownEmotes") && !doRefresh), reveal = getConf("revealAltText"), inSub = (/^\/r\//).test(window.location.pathname), imageAlt = getConf('emoteCopy'), ytExpand = true;
+					var dispUn = (confStore["displayUnknownEmotes"] && !doRefresh), reveal = confStore["revealAltText"], inSub = (/^\/r\//).test(window.location.pathname), imageAlt = confStore['emoteCopy'], ytExpand = true;
 					if(true) {
 						if(isReddit) {
 							var msgs = evt.target.getElementsByClassName(markdownClass);
@@ -1277,7 +1270,7 @@ var passFunction = function () {
 			domInsertFunction({
 				target: document.body
 			});
-			if(getConf("defaultEmoteContainer") && (isReddit||getConf("defaultEmoteContainerEverywhere"))) {
+			if(confStore["defaultEmoteContainer"] && (isReddit||confStore["defaultEmoteContainerEverywhere"])) {
 				createDefWindow();
 			}
 			wt += endSSection("initial conversion pass");
@@ -1298,7 +1291,7 @@ var passFunction = function () {
 			}
 		};
 		var createDefWindow = function () {
-				createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("defaultEmoteContainerX"), getConf("defaultEmoteContainerY"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 1, getConf("defaultEmoteContainerWidth"), getConf("defaultEmoteContainerHeight"), getDefaultEmoteHTML(), ((!getConf("emoteText")) ? "Emotes" : ""));
+				createEmoteWindow(0, confStore["defaultEmoteContainerSide"] ? "left" : "right", confStore["defaultEmoteContainerX"], confStore["defaultEmoteContainerY"], (confStore["defaultEmoteContainerOnTop"] || !isReddit) ? 99999 : 1, confStore["defaultEmoteContainerWidth"], confStore["defaultEmoteContainerHeight"], getDefaultEmoteHTML(), ((!confStore["emoteText"]) ? "Emotes" : ""));
 			};
 		wt += endSSection("Added styles and initialised");
 		properOnLoadEvent_(initialEmotePass);
