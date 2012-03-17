@@ -19,6 +19,8 @@
 // @exclude		http://*facebook.com/extern/*
 // @exclude		http://*connect.facebook.com/*
 // @exclude		http://nwidget.networkedblogs.com/*
+// @exclude		http://static.ak.fbcdn.net/connect/*
+// @exclude		http://*facebook.com/dialog/oauth*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
@@ -35,8 +37,11 @@ var mainStylesheet = "http://nallar.me/scripts/out4";
 var nsfwStylesheet = "http://nallar.me/scripts/nsfw";
 var otherStylesheet = "http://nallar.me/scripts/other";
 var confStore = undefined;
+var inFrame = (window.top != window);
 
-console.log(window.location.pathname);
+if(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200)){
+	ranPassFunction = true;
+}
 
 var passFunction = function () {
 		if(ranPassFunction||document.getElementById("noGlobalPonymotes")) {
@@ -1358,10 +1363,11 @@ function fakeTimeout(callback) {
 	document.head.dispatchEvent(ev);});
 }
 
-
-var runScript = function(){fakeTimeout(passFunction);}
-//IF extension
-chrome.extension.sendRequest({method: "getConf"},function(response){confStore = response.data; runScript();});
-//ELSE
-runScript();
+if(!ranPassFunction){
+	var runScript = function(){fakeTimeout(passFunction);}
+	//IF extension
+	chrome.extension.sendRequest({method: "getConf"},function(response){confStore = response.data; runScript();});
+	//ELSE
+	runScript();
+}
 //ENDIF
