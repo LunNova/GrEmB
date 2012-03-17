@@ -485,7 +485,7 @@ var passFunction = function () {
 					makeWindow();
 				}
 			};
-		if(window.top === window) {
+		if(!inFrame) {
 			properOnLoadEvent(addSBConf);
 		}
 		var cssStore = '';
@@ -687,10 +687,7 @@ var passFunction = function () {
 		}
 
 		function createEmoteWindow(id, side, x, y, z, w, h, emotes, name) { //Window ID,side,xPos,Ypos,zPos(Depth/zIndex),width,height,innerHTML for the emotes.
-			if(window !== window.top) {
-				return;
-			}
-			if(document.getElementById("GrEmBEmoteToggle" + id)) {
+			if(inFrame || document.getElementById("GrEmBEmoteToggle" + id)) {
 				return;
 			}
 			var windowToggler = document.createElement("div");
@@ -855,7 +852,7 @@ var passFunction = function () {
 			}
 		var incLoadedStyles = function () {
 				loadedStyles++;
-				if(window.top === window && (getConf("displayReloadingNotice") || window.location.host == "nallar.me")) {
+				if(!inFrame && (getConf("displayReloadingNotice") || window.location.host == "nallar.me")) {
 					if(!document.getElementById("loadingNotice") && doRefresh) {
 						var cssElem = document.createElement('div');
 						cssElem.id = 'loadingNotice';
@@ -1350,7 +1347,7 @@ function properOnLoadEvent__(cb) {
 	}
 }
 function fakeTimeout(callback) {
-	if(window.top === window) {
+	if(!inFrame) {
 		properOnLoadEvent__(callback);
 		return;
 	}
