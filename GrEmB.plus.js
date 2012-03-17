@@ -12,6 +12,10 @@
 // @_include	https://*/*
 // @exclude		http://www.redditmedia.com/*
 // @exclude		http://pagead2.googlesyndication.com/*
+// @exclude		http://google.com/reviews/widgets*
+// @exclude		http://www.google.com/reviews/widgets*
+// @exclude		http://www.blogger.com/navbar.*
+// @exclude		http://googleads.g.doubleclick.net/*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
@@ -37,16 +41,16 @@ var passFunction = function () {
 		}
 		ranPassFunction = true;
 		
-		var subs = {mlpSubs: {icon: '', subs: [/*INCLUDE 'mlpSubs.list'*/]}, nsfwMLPSubs: {icon: '', subs: ['mylittlecombiners','futemotes']}, generalSubs: {icon: '', subs: ['']}};
+		var subs = {mlpSubs: {icon: 'http://e.thumbs.redditmedia.com/149HuNFgP_1s4vmL.png', subs: [/*INCLUDE 'mlpSubs.list'*/]}, nsfwMLPSubs: {icon: '', subs: ['mylittlecombiners','futemotes']}, generalSubs: {icon: '', subs: ['']}};
 		
 		var isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes");
-		var mdElement = 'md';
-		var isMulti = false;//Uses both MD and plain-text for user areas. This runs global conversion and markdown conversion mode.
+		var markdownClass = 'md';
+		var isMulti = false;//Uses both MD and plain-text for user areas. This runs both global conversion and markdown conversion mode.
 		
 		if((/(?:www\.)?github\.com$/).test(window.location.host)){
 			isReddit = true;
 			isMulti = true;
-			mdElement = 'markdown-body';
+			markdownClass = 'markdown-body';
 		}
 		
 		
@@ -859,31 +863,6 @@ var passFunction = function () {
 					}
 				}
 			}
-		var doSave = 0;
-		if(isReddit||getConf("emoteManagerEverywhere")||getConf("defaultEmoteContainerEverywhere")){
-			if(getConf("manySubCSS")) {
-				extractSubredditCSS('manysubcss', false, mainStylesheet+".json", true, true);
-			}
-			loadStyleSheet(mainStylesheet+".min.css");
-		}
-		if(getConf("otherSubCSS")&&(isReddit||getConf("emoteManagerEverywhere")||getConf("defaultEmoteContainerEverywhere"))){
-			extractSubredditCSS('othersubs', false, otherStylesheet+".json", true, true);
-			loadStyleSheet(otherStylesheet+".min.css");
-		}
-		var i = getConf("additionalSubreddits_");
-		if(i) {
-			i = i.split(",");
-			for(var n = 0, llen = i.length; n < llen;n++) {
-				i[n] = trim(i[n]).toLowerCase();
-				if(subs.indexOf(i[n]) == -1) {
-					extractSubredditCSS(i[n]);
-				}
-			}
-		}
-		if(getConf("nsfwDefunctEmotes")) {
-			extractSubredditCSS('nsfwcss', false, nsfwStylesheet+".json", true, true);
-			loadStyleSheet(nsfwStylesheet+".min.css");
-		}
 		if(true) {
 			if(getConf('searchbarSpikeEverywhere') || (isReddit && getConf("searchbarSpike"))) {
 				cssStore += ('#search input[type="text"] {background: url(http://thumbs.reddit.com/t5_2s8bl_4.png) top left no-repeat !important; padding: 13px 2px 13px 50px !important;height: 22px !important; width: 245px !important}');
@@ -919,7 +898,11 @@ var passFunction = function () {
 		//SEE http://jsperf.com/get-text-nodes-non-recursive
 		
 		function iterativeTreeWalker(root) {
-			var noNsfw = !getConf("nsfwMLAS1Emotes"), revAlt = getConf("revealAltText"), dispUn = (getConf("displayUnknownEmotes")&&!doRefresh), node = root.firstChild, nonRedditS = !getConf("emoteManagerRedditStyle");
+			var noNsfw = !getConf("nsfwMLAS1Emotes"), revAlt = getConf("revealAltText"), dispUn = (getConf("displayUnknownEmotes")&&!doRefresh), node = root.firstChild, nonRedditS = !getConf("emoteManagerRedditStyle"), multiReg = false;
+			if(isMulti){
+				multiReg = new RegExp('(\\s|^)' + markdownClass + '(\\s|$)');
+			}
+			
 			while(node != null) {
 				if(node.nodeType == 3) {
 					var text = node;
@@ -1005,7 +988,7 @@ var passFunction = function () {
 					}
 				}
 				if (node.hasChildNodes()) {
-					if (node.tagName && noGlobalTags[node.tagName]) {
+					if ((node.tagName && noGlobalTags[node.tagName])||(isMulti&&multiReg.test(node.className))) {
 						node = node.nextSibling;
 					} else {
 						node = node.firstChild;
@@ -1180,7 +1163,7 @@ var passFunction = function () {
 					var dispUn = (getConf("displayUnknownEmotes") && !doRefresh), reveal = getConf("revealAltText"), inSub = (/^\/r\//).test(window.location.pathname), imageAlt = getConf('emoteCopy'), ytExpand = true;
 					if(true) {
 						if(isReddit) {
-							var msgs = evt.target.getElementsByClassName(mdElement);
+							var msgs = evt.target.getElementsByClassName(markdownClass);
 							if(msgs.length == 0 && (evt.target !== document.body)) {
 								msgs = [];
 								msgs[0] = evt.target;
