@@ -12,10 +12,13 @@
 // @_include	https://*/*
 // @exclude		http://www.redditmedia.com/*
 // @exclude		http://pagead2.googlesyndication.com/*
-// @exclude		http://google.com/reviews/widgets*
-// @exclude		http://www.google.com/reviews/widgets*
+// @exclude		http://*google.com/reviews/widgets*
 // @exclude		http://www.blogger.com/navbar.*
 // @exclude		http://googleads.g.doubleclick.net/*
+// @exclude		http://badge.stumbleupon.com/*
+// @exclude		http://*facebook.com/extern/*
+// @exclude		http://*connect.facebook.com/*
+// @exclude		http://nwidget.networkedblogs.com/*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
@@ -822,7 +825,7 @@ var passFunction = function () {
 			return r;
 		};
 		var requiredStyles = 0;
-		var loadedStyles = 0;
+		var loadedStyles = -1;
 		var showDebugWindow = function () {
 				if(document.getElementById("debugWindow")) {
 					return;
@@ -863,14 +866,18 @@ var passFunction = function () {
 					}
 				}
 			}
+		
+		var loadCSS = function(){
+			requiredStyles++;
+			incLoadedStyles();
+		}
+		
 		if(true) {
 			if(getConf('searchbarSpikeEverywhere') || (isReddit && getConf("searchbarSpike"))) {
 				cssStore += ('#search input[type="text"] {background: url(http://thumbs.reddit.com/t5_2s8bl_4.png) top left no-repeat !important; padding: 13px 2px 13px 50px !important;height: 22px !important; width: 245px !important}');
 			}
-			if((/\/r\/MLPLounge/i).test(window.location.href)) {
-				//extractSubredditCSS("MLPLounge");
+			if(isReddit&&(/\/r\/MLPLounge/i).test(window.location.href)) {
 				cssStore += ('code{font-family: monospace !important;} ');
-				/*cssStore += ('pre code {font-family: "arial,sans-serif"}');*/
 			}
 			cssStore += ('.convertedEmote_{cursor: default}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList{overflow-y: scroll !important; overflow-x: hidden; height: ' + (getConf("defaultEmoteContainerHeight") - 22) + 'px; width: ' + (getConf("defaultEmoteContainerWidth") - 2) + 'px;} .GrEmBEmoteList a{cursor: pointer;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
 			if(isReddit||getConf('emoteManagerEverywhere')) {
