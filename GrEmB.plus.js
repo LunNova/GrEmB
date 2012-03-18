@@ -867,8 +867,14 @@ var passFunction = function () {
 				},
 				onload: function (res) {
 			};
-			
+			//IF extension
+			chrome.extension.sendRequest({method: "getConf", request: request});
+			//ELSE
+			GM_xmlHttpRequest(request);
+			//ENDIF
 		}
+		
+		loadData();
 		
 		if(true) {
 			if(confStore['searchbarSpikeEverywhere'] || (isReddit && confStore["searchbarSpike"])) {

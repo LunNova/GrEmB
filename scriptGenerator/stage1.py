@@ -27,13 +27,14 @@ def readConfig(file):
 
 parser = argparse.ArgumentParser(description='Run stage 1 JS+ preprocessor.')
 parser.add_argument('inputFile',help='Input JS+ file')
-parser.add_argument('envFile',help='Environment data file')
+parser.add_argument('envFile',help='Environment data files. Comma delimited.')
 parser.add_argument('-o --outputFile',dest='outFile',help='Output file. (defaults to stdout)')
 parser.add_argument('-e --envDir',dest='envDir',help='Environments directory. Defaults to env',default='env')
 args = parser.parse_args()
 
 readConfig('global.env')
-readConfig(args.envFile)
+for envFile in args.envFile.split(","):
+	readConfig(envFile)
 
 d = open(args.inputFile,'rb').read()
 def error(s):
@@ -54,7 +55,7 @@ def parseJS(d,depth):
 		except KeyError:
 			error("[Options]->incDir must be set in environment file to use includes.");exit(1)
 		except IOError:
-			error("Could not read "+fName+" check the incDir and included file exist.");exit(1)
+			error("Could not read "+fName+", check the incDir and included file exist.");exit(1)
 	while 1:
 		m = re.search("%%([^%]{1,20})%%", d,re.DOTALL)
 		if m == None: break
@@ -62,7 +63,7 @@ def parseJS(d,depth):
 		try:
 			d = d.replace(m.group(0),parseJS(conf['Vars'][vName],depth+1))
 		except KeyError:
-			error("[Vars]->"+vName+" must be set in environment file to use includes.");exit(1)
+			error("[Vars]->"+vName+" was not found in environment.");exit(1)
 	while 1:
 		m = re.search("//IF (\!?)([a-zA-Z0-9_]+)(.+?)(?://ELSE(.+?))?//END ?IF", d,re.DOTALL)
 		if m == None: break;
@@ -76,15 +77,17 @@ def parseJS(d,depth):
 		if m.group(1):
 			trueCode, falseCode = falseCode, trueCode
 		try:
-			if conf['Vars'][var]==True:
+			if conf['Vars'][var]=='True':
 				code = trueCode
 			elif falseCode:
 				code = falseCode
 			else:
 				code = ''
-		except KeyError: error("[Vars]->"+var+" must be set in environment file to use includes.");exit(1)
+		except KeyError: error("[Vars]->"+var+" was not found in environment.");exit(1)
 		#if args.outFile:
 		#	print(var+conf['Vars'][var])
+		if code == None:
+			code = ''
 		d = d.replace(m.group(0),code)
 	return d;
 d = parseJS(d,0)
