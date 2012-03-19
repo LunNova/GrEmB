@@ -185,6 +185,9 @@ var passFunction = function () {
 		};
 		//ENDIF
 		G_safeGetValue = function () {
+			//IF extension
+			return confStore;
+			//ELSE
 			var temp;
 			if(confStore === undefined) {
 				temp = G_safeGetValue2();
@@ -194,6 +197,7 @@ var passFunction = function () {
 			}
 
 			return temp;
+			//ENDIF
 		};
 		getConf = function (id) {
 			if(defaultConfs[id] === undefined) {
@@ -248,7 +252,7 @@ var passFunction = function () {
 			if(nosave === undefined) {
 				nosave = false;
 			}
-			var temp = G_safeGetValue("confArray");
+			var temp = G_safeGetValue();
 			temp[name] = value;
 			confStore = temp;
 			if(nosave === true) {
@@ -282,7 +286,7 @@ var passFunction = function () {
 				if(!(/http:\/\/nallar\.me\/scripts/).test(window.location) && ((forced) || ((confStore['lastUpdate'] + updateTime) <= (new Date().getTime()))))
 				{
 					try {
-						GM_xmlhttpRequest({
+						var request = {
 							method: 'GET',
 							url: 'http://nallar.me/scripts/gremb.php?noinc=1',
 							onload: function (resp) {
@@ -300,7 +304,12 @@ var passFunction = function () {
 									alert('No update is available for GrEmB, version: ' + remote_version);
 								}
 							}
-						});
+						};
+						//IF extension
+						
+						//ELSE
+						GM_xmlhttpRequest(request);
+						//ENDIF
 					} catch(err) {
 						if(forced) {
 							alert('An error occurred while checking for updates:\n' + err);
@@ -864,6 +873,7 @@ var passFunction = function () {
 				url: mainDataPage + '&subs=' + confStore['activeSubs'].join(","),
 				headers: {
 					'Accept': 'text/plain,text/json',
+					'User-Agent': '',
 				},
 				onload: function (res) {
 			};
@@ -1172,92 +1182,86 @@ var passFunction = function () {
 						convertDefaultGlobalEmotes(evt.target);
 					};
 					var dispUn = (confStore["displayUnknownEmotes"] && !doRefresh), reveal = confStore["revealAltText"], inSub = (/^\/r\//).test(window.location.pathname), imageAlt = confStore['emoteCopy'], ytExpand = true;
-					if(true) {
-						if(isReddit) {
-							var msgs = evt.target.getElementsByClassName(markdownClass);
-							if(msgs.length == 0 && (evt.target !== document.body)) {
-								msgs = [];
-								msgs[0] = evt.target;
-							}
-							for(var j = 0, len = msgs.length; j < len; j++) {
-								var elems = msgs[j].getElementsByTagName("A");
-								for(var i = 0, len2 = elems.length; i < len2; i++) {
-									var emElem = elems[i];
-									if(ytExpand&&!((/ytExpand/).test(emElem.className))){
-										var ytData = (/(?:http:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)*v=([a-zA-Z0-9\-_]+)(?:#t=(.*)$)?|http:\/\/(?:www\.)?youtu.be\/([^\?]+))/).exec(emElem.getAttribute('href'));
-										if(ytData){
-											if(ytData[3]){
-												youtubeInlineExpand(emElem,ytData[3],ytData[4]);
-											}else{
-												youtubeInlineExpand(emElem,ytData[1],ytData[2]);
-											}
-											continue;
-										}
-									}
-									if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)) {
-										continue;
-									}
-									var hrefs = emElem.getAttribute('href');
-									emElem.className += " convertedEmote";
-									var hrefss = (/^\/([a-zA-Z0-9_!]+)(-[^\/]+?)?$/).exec(hrefs);
-									if(!hrefss) {
-										continue;
-									}
-									var href = hrefss[1];
-									emElem.className += " convertedEmote_";
-									if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0)||(!window.getComputedStyle(emElem,"after")))){
-										emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
-										if(href.length > 20) {
-											emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
+					if(isReddit) {
+						var msgs = evt.target.getElementsByClassName(markdownClass);
+						for(var j = 0, len = msgs.length; j < len; j++) {
+							var elems = msgs[j].getElementsByTagName("A");
+							for(var i = 0, len2 = elems.length; i < len2; i++) {
+								var emElem = elems[i];
+								if(ytExpand&&!((/ytExpand/).test(emElem.className))){
+									var ytData = (/(?:http:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)*v=([a-zA-Z0-9\-_]+)(?:#t=(.*)$)?|http:\/\/(?:www\.)?youtu.be\/([^\?]+))/).exec(emElem.getAttribute('href'));
+									if(ytData){
+										if(ytData[3]){
+											youtubeInlineExpand(emElem,ytData[3],ytData[4]);
 										}else{
-											emElem.className += " G_unknownEmote G_" + href + "_";
+											youtubeInlineExpand(emElem,ytData[1],ytData[2]);
 										}
-										if(hrefss[2] != undefined){
-											emElem.href = "/" + href;
-										}
-									} else if((/^[\-a-zA-Z0-9_]+$/).test(href)) {
-										emElem.className += " G_" + href + "_G_";
+										continue;
 									}
-									if(reveal&&emElem.title!="") {//This block is derived from ArbitraryEntity's code.
-									//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
-									//Or, code your own replacement for it!
-										var altText = emElem.title;
-										var theDiv = document.createElement("div");
-										theDiv.className = "SuperRedditAltTextDisplay_Text";
-										if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))) {
-											theDiv.setAttribute("style", "display: inline-block !important;");
-										}
-										while(altText) {
-											linkResult = linkRegex.exec(altText);
-											if(linkResult) {
-												theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)));
-												var newLinkElement = document.createElement("a");
-												if(linkResult[1]) {
-													newLinkElement.href = linkResult[0];
-												} else {
-													newLinkElement.href = "http://" + linkResult[0];
-												}
-												newLinkElement.appendChild(document.createTextNode(linkResult[0]));
-												theDiv.appendChild(newLinkElement);
-												altText = altText.substr(linkResult.index + linkResult[0].length);
+								}
+								if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)) {
+									continue;
+								}
+								var hrefs = emElem.getAttribute('href');
+								emElem.className += " convertedEmote";
+								var hrefss = (/^\/([a-zA-Z0-9_!]+)(-[^\/]+?)?$/).exec(hrefs);
+								if(!hrefss) {
+									continue;
+								}
+								var href = hrefss[1];
+								emElem.className += " convertedEmote_";
+								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0)||(!window.getComputedStyle(emElem,"after")))){
+									emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
+									if(href.length > 20) {
+										emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
+									}else{
+										emElem.className += " G_unknownEmote G_" + href + "_";
+									}
+									if(hrefss[2] != undefined){
+										emElem.href = "/" + href;
+									}
+								} else if((/^[\-a-zA-Z0-9_]+$/).test(href)) {
+									emElem.className += " G_" + href + "_G_";
+								}
+								if(reveal&&emElem.title!="") {//This block is derived from ArbitraryEntity's code.
+								//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
+								//Or, code your own replacement for it!
+									var altText = emElem.title;
+									var theDiv = document.createElement("div");
+									theDiv.className = "SuperRedditAltTextDisplay_Text";
+									if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))) {
+										theDiv.setAttribute("style", "display: inline-block !important;");
+									}
+									while(altText) {
+										linkResult = linkRegex.exec(altText);
+										if(linkResult) {
+											theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)));
+											var newLinkElement = document.createElement("a");
+											if(linkResult[1]) {
+												newLinkElement.href = linkResult[0];
 											} else {
-												theDiv.appendChild(document.createTextNode(altText));
-												altText = "";
+												newLinkElement.href = "http://" + linkResult[0];
 											}
+											newLinkElement.appendChild(document.createTextNode(linkResult[0]));
+											theDiv.appendChild(newLinkElement);
+											altText = altText.substr(linkResult.index + linkResult[0].length);
+										} else {
+											theDiv.appendChild(document.createTextNode(altText));
+											altText = "";
 										}
-										if((/(?:-lalt(?:-|$))/).test(emElem.getAttribute('href'))){
-											emElem.parentNode.insertBefore(theDiv, emElem);
-											theDiv.setAttribute("style",theDiv.getAttribute("style")+"float: left !important;");
-										}else{
-											emElem.parentNode.insertBefore(theDiv, emElem.nextSibling);
-										}
-									}//End ArbitraryEntity's code
-									if(imageAlt){
-										var copyImage = document.createElement("img");
-										copyImage.alt = "[](/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
-										copyImage.style.fontSize = '0px';
-										emElem.parentNode.insertBefore(copyImage,emElem);
 									}
+									if((/(?:-lalt(?:-|$))/).test(emElem.getAttribute('href'))){
+										emElem.parentNode.insertBefore(theDiv, emElem);
+										theDiv.setAttribute("style",theDiv.getAttribute("style")+"float: left !important;");
+									}else{
+										emElem.parentNode.insertBefore(theDiv, emElem.nextSibling);
+									}
+								}//End ArbitraryEntity's code
+								if(imageAlt){
+									var copyImage = document.createElement("img");
+									copyImage.alt = "[](/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
+									copyImage.style.fontSize = '0px';
+									emElem.parentNode.insertBefore(copyImage,emElem);
 								}
 							}
 						}

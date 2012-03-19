@@ -74,6 +74,9 @@ def parseJS(d,depth):
 		if ms:
 			trueCode = ms.group(2)
 			falseCode = ms.group(3)
+		
+		trueCode, falseCode = trueCode if trueCode else "", falseCode if falseCode else ""
+		trueCode, falseCode = re.sub(r"\s(.+?)\s",r"\1", trueCode, re.DOTALL), re.sub(r"\s(.+?)\s",r"\1", falseCode, re.DOTALL)
 		if m.group(1):
 			trueCode, falseCode = falseCode, trueCode
 		try:
@@ -86,8 +89,6 @@ def parseJS(d,depth):
 		except KeyError: error("[Vars]->"+var+" was not found in environment.");exit(1)
 		#if args.outFile:
 		#	print(var+conf['Vars'][var])
-		if code == None:
-			code = ''
 		d = d.replace(m.group(0),code)
 	return d;
 d = parseJS(d,0)
