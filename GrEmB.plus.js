@@ -10,6 +10,7 @@
 // @homepage	http://nallar.me/scripts
 // @include		http://*/*
 // @_include	https://*/*
+//LIST('//@exclude\t',exclude.list,'\n')
 // @exclude		http://www.redditmedia.com/*
 // @exclude		http://pagead2.googlesyndication.com/*
 // @exclude		http://*google.com/reviews/widgets*
@@ -105,6 +106,10 @@ var passFunction = function () {
 		defaultConfs['wideReddit'] = false;
 		defaultConfs['emoteCopy'] = false;
 
+		if(!confStore){
+			confStore = defaultConfs;
+		}
+		
 		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, superBundlePrefs;
 		
 		var isWebKit = navigator.userAgent.indexOf('WebKit/') != -1;
@@ -171,7 +176,7 @@ var passFunction = function () {
 			unsupported = true;
 			undefined.crashMe();
 		}
-		G_safeGetValue2 = function () {
+		G_safeGetValue2 = function(){
 			var ret = GM_getValue("confArray");
 			if(ret) {
 				ret = JSON.parse(ret);
@@ -184,7 +189,7 @@ var passFunction = function () {
 			return ret;
 		};
 		//ENDIF
-		G_safeGetValue = function () {
+		G_safeGetValue = function(){
 			//IF extension
 			return confStore;
 			//ELSE
@@ -199,7 +204,7 @@ var passFunction = function () {
 			return temp;
 			//ENDIF
 		};
-		getConf = function (id) {
+		getConf = function(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
 				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id];
 			}
@@ -259,7 +264,7 @@ var passFunction = function () {
 				return;
 			}
 			//IF extension
-			
+			chrome.extension.sendRequest({method: "setConf",data:temp});
 			//ELSE
 			GM_setValue("confArray", JSON.stringify(temp));
 			//ENDIF
@@ -873,12 +878,11 @@ var passFunction = function () {
 				url: mainDataPage + '&subs=' + confStore['activeSubs'].join(","),
 				headers: {
 					'Accept': 'text/plain,text/json',
-					'User-Agent': '',
+					'User-Agent': '%%useragent%%',
 				},
-				onload: function (res) {
 			};
 			//IF extension
-			chrome.extension.sendRequest({method: "getConf", request: request});
+			
 			//ELSE
 			GM_xmlHttpRequest(request);
 			//ENDIF
@@ -1369,7 +1373,7 @@ function fakeTimeout(callback) {
 if(!ranPassFunction){
 	var runScript = function(){fakeTimeout(passFunction);}
 	//IF extension
-	chrome.extension.sendRequest({method: "getConf"},function(response){confStore = response.data; runScript();});
+	chrome.extension.sendRequest({method: "getConf"},function(response){if(response.data){confStore = JSON.parse(response.data);} runScript();});
 	//ELSE
 	runScript();
 }

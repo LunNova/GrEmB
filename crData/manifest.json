@@ -1,0 +1,26 @@
+{
+   "all_frames": true,
+   "background_page": "background.html",
+   "browser_action": {
+      "default_icon": "logo.png",
+      "default_title": "GrEmB",
+      "popup": "action.html"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "content.js" ],
+      "include_globs": [ "file:///*", "http://*/*", "https://*/*" ],
+      "exclude_globs": [ //LIST('"',exclude.list,'", ') ],
+      "run_at": "document_start"
+   } ],
+   "default_locale": "en",
+   "description": "Displays subreddit emotes. Numerous optional style tweaks and emote-related features.",
+   "icons": {
+      "128": "logo.png",
+   },
+   "minimum_chrome_version": "17.0.0.0",
+   "name": "GrEmB",
+   "permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
+   "offline_enabled": true,
+   "version": "%%Version%%"
+}

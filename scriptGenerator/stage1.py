@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import re,sys,argparse,ConfigParser
+import re,sys,argparse,ConfigParser,os
 
 class DictConfigParser(ConfigParser.SafeConfigParser):
 	def get(self, section, option):
