@@ -106,9 +106,11 @@ var passFunction = function () {
 		defaultConfs['wideReddit'] = false;
 		defaultConfs['emoteCopy'] = false;
 
+		//IF extension
 		if(!confStore){
 			confStore = defaultConfs;
 		}
+		//ENDIF
 		
 		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, superBundlePrefs;
 		
