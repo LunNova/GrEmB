@@ -1109,7 +1109,7 @@ var passFunction = function () {
 				if(!e.getElementsByClassName) {
 					continue;
 				}
-				if(e.getElementsByClassName('subreddit')[0] && (/(mylittlepony|mylittleoutofcontext)/i).test(e.getElementsByClassName('subreddit')[0].innerHTML)) {
+				if(e.getElementsByClassName('subreddit')[0] && (/(mylittlepony|mylittleoutofcontext|mlplounge)/i).test(e.getElementsByClassName('subreddit')[0].innerHTML)) {
 					e.getElementsByClassName('nsfw-stamp')[0].setAttribute('style', 'border: #5F99CF 1px solid !important;display: inline-block;font-size: 0px !important;letter-spacing: 0px;overflow: hidden;vertical-align: bottom;margin-bottom: -1px');
 					e.getElementsByClassName('nsfw-stamp')[0].innerHTML = '';
 					var v = document.createElement("div");
@@ -1276,7 +1276,7 @@ var passFunction = function () {
 			} 
 			sSSection();
 			ranInitial = true;
-			if(isReddit&&(/reddit\.com(?:\/r\/[^\/]+?\+|\/?$)/).test(window.location.href)){
+			if(isReddit){
 				fixHomePageNSFW(document.body);
 			}
 			domInsertFunction({
