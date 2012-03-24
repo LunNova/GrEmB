@@ -1097,13 +1097,6 @@ var passFunction = function () {
 				emElem.className += " emoteTextExpanded";
 			}
 		}
-		// hasClass, stolen from the Reddit Enhancement Suite
-		function hasClass(ele, cls) {
-			if((ele == null) || (typeof (ele) == 'undefined') || ele.className === undefined) {
-				return false;
-			}
-			return ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
-		}
 
 		//END ArbitraryEntity's code!
 		function fixHomePageNSFW(target) {
@@ -1137,7 +1130,7 @@ var passFunction = function () {
 				var anchor = evt.target;
 				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == "") {
 					var href = (/\/([a-zA-Z0-9]+)(-[^\/]+?)?$/).exec(anchor.getAttribute('href'));
-					if(href && (emoteNames[href[1]] || hasClass(anchor, "convertedEmote"))) {
+					if(href && ((/convertedEmote_/).test(anchor.className)) {
 						evt.cancelBubble = true;
 						evt.preventDefault();
 						evt.stopPropagation();
