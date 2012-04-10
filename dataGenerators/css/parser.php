@@ -115,6 +115,7 @@ class cssParser{
 	public $tokens = Array();
 	
 	function parseString($css){
+		$css = preg_replace('/\/\*.*?\*\//','',$css);
 		list($this->data,$this->len) = Array($css,strlen($css));
 		while($t = $this->getSelector()){}
 		unset($this->tokens[',']);
