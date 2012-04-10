@@ -13,7 +13,7 @@ class cssParser{
 	
 	private static function parseSelector($s){
 		$c = substr($s,0,1);
-		$mType = preg_match('/a\[href.\=/',$s)?'emote':'elem';
+		$mType = preg_match('/a(?:\:\:?[a-zA-Z]+?)?\[href.\=/',$s)?'emote':'elem';
 		switch($c){
 			case '.':
 				$t = 'class';
