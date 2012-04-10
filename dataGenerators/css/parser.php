@@ -32,14 +32,19 @@ class cssParser{
 
 			}
 			if(in_array(@$s{$i+1},self::$l)){
-				$ret[] = $t;
-				$t = "";
+				if($t){
+					$ret[] = $t;
+					$t = "";
+				}
+				$i++;
 			}
 		}
-		$ret[] = $t;
-		$t = "";
+		if($t){
+			$ret[] = $t;
+			$t = "";
+		}
 		sort($ret);
-		$ret = implode(self::$sl[0],$ret);
+		$ret = implode(self::$l[0],$ret);
 		if($debug){
 			echo "\n$ret\n";
 		}
@@ -81,7 +86,7 @@ class cssParser{
 			else if(in_array(@$this->data{$this->i},self::$o)){
 				$level++;
 				$t = trim($t);
-				if(!$prop) $prop = $t;
+				if(!$prop) $prop = ("^".$t);
 				$this->i++;
 				$this->tokens[$sel][$prop] = $this->getProperties(",",$level);
 				$p[$prop] = $this->tokens[$sel][$prop];
