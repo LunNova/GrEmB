@@ -2,14 +2,29 @@
 
 class cssParser{
 	private $i = 0;
-	private $data = "";
+	private $cssNum = 0;
 	private $len;
-	private static $l = Array(",");
+	private static $l = Array(","," ");
 	private static $sl = Array(";");
 	private static $sd = Array(":");
 	private static $ss = Array("\"");
 	private static $o = Array("{");
 	private static $c = Array("}");
+	
+	private static function parseSelector($s){
+		$c = substr($s,0,1);
+		$mType = preg_match('/a\[href.\=/',$s)?'emote':'elem';
+		switch($c){
+			case '.':
+				$t = 'class';
+				$s = substr($s,1);
+				break;
+			default:
+				$t = $mType;
+		}
+		return Array($t,$s);
+		
+	}
 	
 	private static function selectorFix($s){
 		$i = -1;
@@ -33,7 +48,7 @@ class cssParser{
 			}
 			if(in_array(@$s{$i+1},self::$l)){
 				if($t){
-					$ret[] = $t;
+					$ret[] = $t.$s{$i+1};
 					$t = "";
 				}
 				$i++;
@@ -44,18 +59,28 @@ class cssParser{
 			$t = "";
 		}
 		sort($ret);
-		$ret = implode(self::$l[0],$ret);
-		if($debug){
-			echo "\n$ret\n";
+		$rVal = '';
+		foreach($ret as $r){
+			$dat = self::parseSelector($r);
+			if($dat[0] == 'emote') $rVal .= $dat[1];
 		}
-		return $ret;
+		if($debug){
+			echo "\n$rVal\n";
+		}
+		if(!$rVal){
+			$rVal = ',';
+		}
+		return $rVal;
 	}
 	
-	private function getProperties($sel,&$level_=null){
+	private function getProperties($sel,$root=true,&$level_=null){
 		$level = 1;
 		$t = "";
 		$prop = "";
 		$p = Array();
+		if(!@$this->tokens[$sel]||@$this->tokens[$sel][1] < $this->cssNum){
+			$this->tokens[$sel] = Array('props'=>Array(),'age'=>$this->cssNum);
+		}
 		$add = 0;
 		while($level > 0 && $this->i < $this->len){
 			$this->i += $add;
@@ -69,8 +94,8 @@ class cssParser{
 			else if(in_array(@$this->data{$this->i},self::$sl)||in_array(@$this->data{$this->i},self::$c)){
 				$t = trim($t);
 				if($t){
-					$this->tokens[$sel][$prop] = $t;
-					$p[$prop] = $t;
+					if($root) $this->tokens[$sel]['props'][$prop] = $t;
+					else $p[$prop] = $t;
 				}
 				$t = "";
 				if(in_array(@$this->data{$this->i},self::$sl)){
@@ -88,8 +113,8 @@ class cssParser{
 				$t = trim($t);
 				if(!$prop) $prop = ("^".$t);
 				$this->i++;
-				$this->tokens[$sel][$prop] = $this->getProperties(",",$level);
-				$p[$prop] = $this->tokens[$sel][$prop];
+				if($root)$this->tokens[$sel]['props'][$prop] = $this->getProperties(",",false,$level);
+				else $p[$prop] = $this->getProperties(",",false,$level);
 				$prop = "";
 				$t = "";
 			}
@@ -120,10 +145,12 @@ class cssParser{
 	public $tokens = Array();
 	
 	function parseString($css){
+		$this->cssNum++;
 		$css = preg_replace('/\/\*.*?\*\//','',$css);
 		list($this->data,$this->len) = Array($css,strlen($css));
 		while($t = $this->getSelector()){}
 		unset($this->tokens[',']);
+		ksort($this->tokens);
 	}
 	
 	function parseFile($file){
