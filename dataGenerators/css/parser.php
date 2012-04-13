@@ -10,6 +10,7 @@ class cssParser{
 	private static $ss = Array("\"");
 	private static $o = Array("{");
 	private static $c = Array("}");
+	public $selectorSeparator = "";
 	
 	private static function parseSelector($s){
 		$c = substr($s,0,1);
@@ -62,7 +63,7 @@ class cssParser{
 		$rVal = '';
 		foreach($ret as $r){
 			$dat = self::parseSelector($r);
-			if($dat[0] == 'emote') $rVal .= $dat[1];
+			if($dat[0] == 'emote') $rVal .= ($dat[1].$this->selectorSeparator);
 		}
 		if($debug){
 			echo "\n$rVal\n";
@@ -155,6 +156,14 @@ class cssParser{
 	
 	function parseFile($file){
 		$this->parseString(file_get_contents($file));
+	}
+	
+	function selectorToString($s){
+		return $ret;
+	}
+	
+	function toString(){
+		
 	}
 }
 if($argv[1] == "-d"){

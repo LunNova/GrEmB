@@ -63,48 +63,8 @@ var passFunction = function () {
 		}
 		
 		
-		var defaultConfs = {};
-
-		defaultConfs['defaultEmoteContainer'] = true;
-		defaultConfs['defaultEmoteContainerMLAS1'] = true;
-		defaultConfs['defaultEmoteContainerILTBAT'] = true;
-		defaultConfs['nsfwMLAS1Emotes'] = true;
-		defaultConfs['defaultEmoteContainerMouseleave'] = false;
-		defaultConfs['defaultEmoteContainerEverywhere'] = true;
-		defaultConfs['defaultEmoteContainerOnTop'] = true;
-		defaultConfs['searchbarSpike'] = true;
-		defaultConfs['internalUpdateCheck'] = true;
-		defaultConfs['searchbarSpikeEverywhere'] = false;
-		defaultConfs['emoteManagerEverywhere'] = true;
-		defaultConfs['emoteManagerFixText'] = true;
-		defaultConfs['emoteManagerRedditStyle'] = false;
-		defaultConfs['emoteManagerWindowStyleType'] = true;
-		defaultConfs['emoteManagerWindowStyle'] = 'border: 1px solid #E1B000; background-color: #FFFDCC;';
-		defaultConfs['defaultEmoteContainerY'] = "19";
-		defaultConfs['defaultEmoteContainerX'] = "10";
-		defaultConfs['defaultEmoteContainerWidth'] = "170";
-		defaultConfs['defaultEmoteContainerHeight'] = "375";
-		defaultConfs['defaultEmoteContainerSide'] = false;
-		defaultConfs['defaultEmoteContainerGlobal'] = true;
-		defaultConfs['manySubCSS'] = true;
-		defaultConfs['otherSubCSS'] = true;
-		defaultConfs['disableEmoteSpin'] = true;
-		defaultConfs['displayUnknownEmotes'] = true;
-		defaultConfs['rbText'] = false;
-		defaultConfs['emoteText'] = false;
-		defaultConfs['additionalSubreddits_'] = '';
-		defaultConfs['revealAltText'] = true;
-		defaultConfs['nsfwDefunctEmotes'] = false;
-		defaultConfs['alwaysTrue'] = true;
-		defaultConfs['csssstore'] = {};
-		defaultConfs['emoteNames'] = {'sbf':true};
-		defaultConfs['oldVersion'] = false;
-		defaultConfs['displayReloadingNotice'] = false;
-		defaultConfs['updateCheckWeekly'] = false;
-		defaultConfs['lastVersion'] = local_version;
-		defaultConfs['lastUpdate'] = 0;
-		defaultConfs['wideReddit'] = false;
-		defaultConfs['emoteCopy'] = false;
+		var defaultConfs = {defaultEmoteContainer: true,defaultEmoteContainerMLAS1: true,defaultEmoteContainerILTBAT: true,nsfwMLAS1Emotes: true,defaultEmoteContainerMouseleave: false,defaultEmoteContainerEverywhere: true,defaultEmoteContainerOnTop: true,searchbarSpike: true,internalUpdateCheck: true,searchbarSpikeEverywhere: false,emoteManagerEverywhere: true,emoteManagerFixText: true,emoteManagerRedditStyle: false,emoteManagerWindowStyleType: true,emoteManagerWindowStyle: 'border: 1px solid #E1B000, background-color: #FFFDCC;';
+		defaultEmoteContainerY: "19",defaultEmoteContainerX: "10",defaultEmoteContainerWidth: "170",defaultEmoteContainerHeight: "375",defaultEmoteContainerSide: false,defaultEmoteContainerGlobal: true,manySubCSS: true,otherSubCSS: true,disableEmoteSpin: true,displayUnknownEmotes: true,rbText: false,emoteText: false,additionalSubreddits_: '',revealAltText: true,nsfwDefunctEmotes: false,alwaysTrue: true,csssstore: {},emoteNames: {'sbf':true},oldVersion: false,displayReloadingNotice: false,updateCheckWeekly: false,lastVersion: local_version,lastUpdate: 0,wideReddit: false,emoteCopy: false};
 
 		//IF extension
 		if(!confStore){
@@ -496,32 +456,23 @@ var passFunction = function () {
 		var addCSS = function (rule) {
 				cssStore += ("\r\n \r\n" + rule + "\r\n \r\n");
 			}
-		var cssElem = false;
-
+		var cssElem = null;
+		//IF shadowElements
+		var cssElement = new WebKitShadowRoot(document.createElement('style'));
+		//ELSE
+		var cssElement = document.createElement('style');
+		//ENDIF
+		cssElement.type = 'text/css';
+		document.head.appendChild(cssElement);
+		
 		function showCSS() {
-			/*if(GM_addStyle){
-	GM_addStyle(cssStore);
-	cssStore = "";
-	return;
-	}*/
-			cssElement = document.createElement('style');
-			cssElement.type = 'text/css';
-			if(cssElement.styleSheet) {
-				cssElement.styleSheet.cssText = cssStore;
-			} else {
-				cssElement.appendChild(document.createTextNode(cssStore));
-			}
+			var cssTextNode = document.createTextNode(cssStore);
+			cssElement.insertBefore(cssTextNode, cssElem);
+			cssElem = cssTextNode;
 			cssStore = '';
-			if(cssElem === false) {
-				document.head.appendChild(cssElement);
-				cssElem = cssElement;
-			} else {
-				document.head.insertBefore(cssElement, cssElem);
-			}
 		}
 
 		function setCursor(node, pos) { //Thanks stack overflow! http://stackoverflow.com/questions/1865563/set-cursor-at-a-length-of-14-onfocus-of-a-textbox
-			var node = (typeof node == "string" || node instanceof String) ? document.getElementById(node) : node;
 			if(!node) {
 				return false;
 			} else if(node.createTextRange) {
@@ -693,7 +644,11 @@ var passFunction = function () {
 			if(inFrame || document.getElementById("GrEmBEmoteToggle" + id)) {
 				return;
 			}
+			//IF shadowElements
+			var windowToggler = new WebKitShadowRoot(document.createElement("div"));
+			//ELSE
 			var windowToggler = document.createElement("div");
+			//ENDIF
 			windowToggler.id = "GrEmBEmoteToggle" + id;
 			windowToggler.className = "GrEmBWindow";
 			windowToggler.setAttribute("style", "color: black; z-index: " + z + "; position: fixed !important; top: " + y + "px; " + side + ": 10px;");
@@ -707,7 +662,11 @@ var passFunction = function () {
 			}
 			windowToggler.innerHTML = '<span class="GrEmBTitleText">' + lt + name + rt + '</span>';
 
+			//IF shadowElements
+			var emoteWindow = new WebKitShadowRoot(document.createElement("div"));
+			//ELSE
 			var emoteWindow = document.createElement("div");
+			//ENDIF
 			emoteWindow.id = "GrEmBEmoteWindow" + id;
 			emoteWindow.className = closedWindowClasses + " closedTab";
 			emoteWindow.setAttribute("style", "color: black; z-index: " + (z + 1) + "; position: fixed !important; top: " + y + "px; " + side + ": 10px; width: " + w + "px; height: " + h + "px; max-width: " + ((+w) + 30) + "px; max-height: " + ((+h) + 30) + "px;");
@@ -835,11 +794,10 @@ var passFunction = function () {
 				if(document.getElementById("debugWindow")) {
 					return;
 				}
-				var cssElem = document.createElement('div');
-				cssElem.id = 'debugWindow';
-				var tmpp;
-				cssElem.innerHTML = tmpp = "<a href=\"#\" id='debugWindowClose' style='text-decoration: underline; font-weight: bold;'>X</a><br />"+insertUnicodeVariableNameHere+"<br />Debug info: <br /><textarea style=\"width: 98%;min-height:90%;max-height:95%\">" + ((JSON.stringify(GM_safeGetValue("confArray"))).replace(/\\n/g, "\n")) + "\n</textarea>";
-				document.body.appendChild(cssElem);
+				var dbgElem = document.createElement('div');
+				dbgElem.id = 'debugWindow';
+				dbgElem.innerHTML = "<a href=\"#\" id='debugWindowClose' style='text-decoration: underline; font-weight: bold;'>X</a><br />"+insertUnicodeVariableNameHere+"<br />Debug info: <br /><textarea style=\"width: 98%;min-height:90%;max-height:95%\">" + ((JSON.stringify(GM_safeGetValue("confArray"))).replace(/\\n/g, "\n")) + "\n</textarea>";
+				document.body.appendChild(dbgElem);
 				document.getElementById("debugWindowClose").addEventListener("click", hideDebugWindow);
 			}
 		var hideDebugWindow = function (evt) {
@@ -970,7 +928,11 @@ var passFunction = function () {
 							default:
 								return;
 							}
+							//IF shadowElements
+							var emoteElement = new WebKitShadowRoot(document.createElement('img'));
+							//ELSE
 							var emoteElement = document.createElement('img');
+							//ENDIF
 							if(nonRedditS) {
 								emoteElement.setAttribute('style', 'display: inline-block !important; float: none !important;');
 							} else {
@@ -982,7 +944,11 @@ var passFunction = function () {
 							emoteElement.setAttribute('src', url);
 							beforeNode.parentNode.insertBefore(emoteElement, beforeNode);
 						} else {
+							//IF shadowElements
+							var emoteElement = new WebKitShadowRoot(document.createElement('a'));
+							//ELSE
 							var emoteElement = document.createElement('a');
+							//ENDIF
 							emoteElement.href =  '/' + v[1];
 							if(nonRedditS) {
 								emoteElement.setAttribute('style', 'display: inline-block !important; float: none !important;');
@@ -1061,8 +1027,11 @@ var passFunction = function () {
 		function expandConvertedEmotes(emElem, onReddit, emName) {
 			if(emElem.title && emElem.title != " " && !inBlacklist(emName) && emElem.className.indexOf("emoteTextExpanded") == -1) {
 				var altText = emElem.title
-
-				var theDiv = document.createElement("div")
+				//IF shadowElements
+				var theDiv = new WebKitShadowRoot(document.createElement('div'));
+				//ELSE
+				var theDiv = document.createElement('div');
+				//ENDIF
 				if(onReddit) {
 					theDiv.className = "SuperRedditAltTextDisplay_Text";
 				} else {
@@ -1112,7 +1081,11 @@ var passFunction = function () {
 				if(e.getElementsByClassName('subreddit')[0] && (/(mylittlepony|mylittleoutofcontext|mlplounge)/i).test(e.getElementsByClassName('subreddit')[0].innerHTML)) {
 					e.getElementsByClassName('nsfw-stamp')[0].setAttribute('style', 'border: #5F99CF 1px solid !important;display: inline-block;font-size: 0px !important;letter-spacing: 0px;overflow: hidden;vertical-align: bottom;margin-bottom: -1px');
 					e.getElementsByClassName('nsfw-stamp')[0].innerHTML = '';
-					var v = document.createElement("div");
+					//IF shadowElements
+					var v = new WebKitShadowRoot(document.createElement('div'));
+					//ELSE
+					var v = document.createElement('div');
+					//ENDIF
 					v.setAttribute("style","color: #336699 !important;display: block;font-size: x-small !important;text-decoration: none;visibility: visible !important");
 					v.innerHTML = "&#160;SPOILER";
 					e.getElementsByClassName('nsfw-stamp')[0].appendChild(v);
@@ -1140,7 +1113,11 @@ var passFunction = function () {
 			
 		var youtubeInlineExpand = function(anchor,id,startTime){
 			anchor.className += 'ytExpand';
-			var ytDiv = document.createElement("div");
+			//IF shadowElements
+			var ytDiv = new WebKitShadowRoot(document.createElement('div'));
+			//ELSE
+			var ytDiv = document.createElement('div');
+			//ENDIF
 			ytDiv.className = "expando-button collapsed video expando-inline";
 			ytDiv.setAttribute('style','vertical-align:top !important;float:none;width:23px !important;height:23px !important; max-width: 23px !important; max-height: 23px !important;display:inline-block;margin-right:6px;cursor:pointer;padding:0px');
 			var videoFrame = false,br = false;
@@ -1226,7 +1203,11 @@ var passFunction = function () {
 								//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
 								//Or, code your own replacement for it!
 									var altText = emElem.title;
-									var theDiv = document.createElement("div");
+									//IF shadowElements
+									var theDiv = new WebKitShadowRoot(document.createElement('div'));
+									//ELSE
+									var theDiv = document.createElement('div');
+									//ENDIF
 									theDiv.className = "SuperRedditAltTextDisplay_Text";
 									if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))) {
 										theDiv.setAttribute("style", "display: inline-block !important;");
@@ -1310,7 +1291,11 @@ var passFunction = function () {
 	};
 
 function loadStyleSheet(filename) {
-	var fileref = document.createElement("link");
+	//IF shadowElements
+	var fileref = new WebKitShadowRoot(document.createElement('link'));
+	//ELSE
+	var fileref = document.createElement('link');
+	//ENDIF
 	fileref.rel = "stylesheet";
 	fileref.type = "text/css";
 	fileref.href = filename;
