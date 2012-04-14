@@ -41,7 +41,7 @@ def error(s):
 	print(s,file=sys.stderr,end='')
 	return;
 
-def parseJS(d,depth):
+def parseJS(d,depth, noRecurse=False):
 	if depth>20:
 		raise Exception("parseJS depth above limit. Check that you have not got an infinitely recursing include cycle...")
 	while 1:
@@ -90,7 +90,18 @@ def parseJS(d,depth):
 		#if args.outFile:
 		#	print(var+conf['Vars'][var])
 		d = d.replace(m.group(0),code)
-	return d;
+	while 1:
+		m = re.search("//_REGEX(.+?)",d)
+		if m == None: m = re.search("//REGEX(.+?)//ENDREGEX",d,re.DOTALL)
+		if m == None: break;
+		d = d.replace(m.group(0),'')
+	newD = '';
+	initialPass = True;
+	while not noRecurse and newD != d:
+		if initialPass: initialPass = False
+		else: d = newD
+		newD = parseJS(d,0,True)
+	return newD;
 d = parseJS(d,0)
 if args.outFile:
 	open(args.outFile,'wb').write(d)

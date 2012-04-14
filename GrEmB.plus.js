@@ -22,8 +22,11 @@
 // @exclude		http://nwidget.networkedblogs.com/*
 // @exclude		http://static.ak.fbcdn.net/connect/*
 // @exclude		http://*facebook.com/dialog/oauth*
+// @exclude		http://showadsak.pubmatic.com/*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
+
+//_REGEX 
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -63,8 +66,7 @@ var passFunction = function () {
 		}
 		
 		
-		var defaultConfs = {defaultEmoteContainer: true,defaultEmoteContainerMLAS1: true,defaultEmoteContainerILTBAT: true,nsfwMLAS1Emotes: true,defaultEmoteContainerMouseleave: false,defaultEmoteContainerEverywhere: true,defaultEmoteContainerOnTop: true,searchbarSpike: true,internalUpdateCheck: true,searchbarSpikeEverywhere: false,emoteManagerEverywhere: true,emoteManagerFixText: true,emoteManagerRedditStyle: false,emoteManagerWindowStyleType: true,emoteManagerWindowStyle: 'border: 1px solid #E1B000, background-color: #FFFDCC;';
-		defaultEmoteContainerY: "19",defaultEmoteContainerX: "10",defaultEmoteContainerWidth: "170",defaultEmoteContainerHeight: "375",defaultEmoteContainerSide: false,defaultEmoteContainerGlobal: true,manySubCSS: true,otherSubCSS: true,disableEmoteSpin: true,displayUnknownEmotes: true,rbText: false,emoteText: false,additionalSubreddits_: '',revealAltText: true,nsfwDefunctEmotes: false,alwaysTrue: true,csssstore: {},emoteNames: {'sbf':true},oldVersion: false,displayReloadingNotice: false,updateCheckWeekly: false,lastVersion: local_version,lastUpdate: 0,wideReddit: false,emoteCopy: false};
+		var defaultConfs = {defaultEmoteContainer: true,defaultEmoteContainerMLAS1: true,defaultEmoteContainerILTBAT: true,nsfwMLAS1Emotes: true,defaultEmoteContainerMouseleave: false,defaultEmoteContainerEverywhere: true,defaultEmoteContainerOnTop: true,searchbarSpike: true,internalUpdateCheck: true,searchbarSpikeEverywhere: false,emoteManagerEverywhere: true,emoteManagerFixText: true,emoteManagerRedditStyle: false,emoteManagerWindowStyleType: true,emoteManagerWindowStyle: 'border: 1px solid #E1B000, background-color: #FFFDCC;',defaultEmoteContainerY: "19",defaultEmoteContainerX: "10",defaultEmoteContainerWidth: "170",defaultEmoteContainerHeight: "375",defaultEmoteContainerSide: false,defaultEmoteContainerGlobal: true,manySubCSS: true,otherSubCSS: true,disableEmoteSpin: true,displayUnknownEmotes: true,rbText: false,emoteText: false,additionalSubreddits_: '',revealAltText: true,nsfwDefunctEmotes: false,alwaysTrue: true,csssstore: {},emoteNames: {'sbf':true},oldVersion: false,displayReloadingNotice: false,updateCheckWeekly: false,lastVersion: local_version,lastUpdate: 0,wideReddit: false,emoteCopy: false};
 
 		//IF extension
 		if(!confStore){
@@ -1186,7 +1188,7 @@ var passFunction = function () {
 								}
 								var href = hrefss[1];
 								emElem.className += " convertedEmote_";
-								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0)||(!window.getComputedStyle(emElem,"after")))){
+								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&(window.getComputedStyle(emElem,'after').backgroundImage==window.getComputedStyle(emElem).backgroundImage)))){
 									emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 									if(href.length > 20) {
 										emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
