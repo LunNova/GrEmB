@@ -26,7 +26,11 @@
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
-//_REGEX 
+//IF shadowElements
+//_MACRO GrEmB.rootElement(elem_) new WebKitShadowRoot(document.createElement(elem_))
+//ELSE
+//_MACRO GrEmB.rootElement(elem_) document.createElement(elem_)
+//ENDIF
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 

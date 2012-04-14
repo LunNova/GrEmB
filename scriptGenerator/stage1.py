@@ -76,7 +76,7 @@ def parseJS(d,depth, noRecurse=False):
 			falseCode = ms.group(3)
 		
 		trueCode, falseCode = trueCode if trueCode else "", falseCode if falseCode else ""
-		trueCode, falseCode = re.sub(r"\s(.+?)\s",r"\1", trueCode, re.DOTALL), re.sub(r"\s(.+?)\s",r"\1", falseCode, re.DOTALL)
+		trueCode, falseCode = re.sub(r"\s(.+)\s",r"\1", trueCode, re.DOTALL), re.sub(r"\s(.+)\s",r"\1", falseCode, re.DOTALL)
 		if m.group(1):
 			trueCode, falseCode = falseCode, trueCode
 		try:
@@ -91,17 +91,26 @@ def parseJS(d,depth, noRecurse=False):
 		#	print(var+conf['Vars'][var])
 		d = d.replace(m.group(0),code)
 	while 1:
-		m = re.search("//_REGEX(.+?)",d)
-		if m == None: m = re.search("//REGEX(.+?)//ENDREGEX",d,re.DOTALL)
+		m = re.search("//_REGEX\s+",d)
+		if m == None: m = re.search("//REGEX\s+(.+?)//ENDREGEX",d,re.DOTALL)
 		if m == None: break;
 		d = d.replace(m.group(0),'')
+	while 1:
+		m = re.search("//_MACRO\s+\(\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?\)",d)
+		if m == None: m = re.search("//MACRO\s+\(\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?\)\s+?(.+?)//ENDMACRO",d,re.DOTALL)
+		if m == None: break;
+		d = d.replace(m.group(0),'')
+		params = m.groupdict(None)
+		#for key in params:
+		#	#
 	newD = '';
 	initialPass = True;
-	while not noRecurse and newD != d:
+	while (not noRecurse) and newD != d:
 		if initialPass: initialPass = False
 		else: d = newD
 		newD = parseJS(d,0,True)
-	return newD;
+	if noRecurse: return d
+	else: return newD
 d = parseJS(d,0)
 if args.outFile:
 	open(args.outFile,'wb').write(d)
