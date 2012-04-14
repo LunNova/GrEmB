@@ -948,6 +948,7 @@ var passFunction = function () {
 								emoteElement.setAttribute('title', v[2])
 							}
 							emoteElement.setAttribute('src', url);
+							emoteElement.href+='-';
 							beforeNode.parentNode.insertBefore(emoteElement, beforeNode);
 						} else {
 							//IF shadowElements
@@ -963,7 +964,6 @@ var passFunction = function () {
 								emoteElement.title = v[2];
 							}
 							emoteElement.className = 'convertedEmote convertedEmote_';
-							beforeNode.parentNode.insertBefore(emoteElement, beforeNode);
 							var emoteInfo = (/^([\-a-zA-Z0-9_]+?)(-[\-a-zA-Z0-9_]+)?$/).exec(v[1]);
 							if(emoteInfo){
 								if(dispUn && (!emoteNames[emoteInfo[1]])&&emoteElement.clientWidth == 0){
@@ -979,8 +979,10 @@ var passFunction = function () {
 									emoteElement.className += " G_" + emoteInfo[1] + "_G_";
 								}
 							}
+							beforeNode.parentNode.insertBefore(emoteElement, beforeNode);
+							emoteElement.href+='-';
 							if(v[2] && revAlt) {
-								expandConvertedEmotes(emoteElement,false,emoteInfo[1]);
+								expandConvertedEmotes(emoteElement,emoteInfo[1]);
 							}
 						}
 						text = beforeNode;
@@ -1030,7 +1032,7 @@ var passFunction = function () {
 
 		var goExpand = true;
 		//START MESS OF MY CODE+ArbitraryEntity's CODE
-		function expandConvertedEmotes(emElem, onReddit, emName) {
+		function expandConvertedEmotes(emElem, emName) {
 			if(emElem.title && emElem.title != " " && !inBlacklist(emName) && emElem.className.indexOf("emoteTextExpanded") == -1) {
 				var altText = emElem.title
 				//IF shadowElements
@@ -1038,12 +1040,8 @@ var passFunction = function () {
 				//ELSE
 				var theDiv = document.createElement('div');
 				//ENDIF
-				if(onReddit) {
-					theDiv.className = "SuperRedditAltTextDisplay_Text";
-				} else {
-					theDiv.className = "GlobalEmoteAltTextDisplay_Text";
-				}
-				if((/(?:-inp-|-inp$)/).test(emElem.getAttribute('href'))) {
+				theDiv.className = "GlobalEmoteAltTextDisplay_Text";
+				if((/(?:-inp-$)/).test(emElem.getAttribute('href'))) {
 					theDiv.setAttribute("style", "display: inline-block !important;");
 				}
 				while(altText) {
@@ -1064,7 +1062,7 @@ var passFunction = function () {
 						altText = ""
 					}
 				}
-				if((/(?:-lalt-|-lalt$)/).test(emElem.getAttribute('href'))) {
+				if((/(?:-lalt-$)/).test(emElem.getAttribute('href'))) {
 					emElem.parentNode.insertBefore(theDiv, emElem)
 				}else{
 					emElem.parentNode.insertBefore(theDiv, emElem.nextSibling)
@@ -1192,8 +1190,13 @@ var passFunction = function () {
 								}
 								var href = hrefss[1];
 								emElem.className += " convertedEmote_";
-								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&(window.getComputedStyle(emElem,'after').backgroundImage==window.getComputedStyle(emElem).backgroundImage)))){
-									emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
+								//IF extension
+								//Stupid Chrome bug...
+								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&(window.getComputedStyle(emElem,':after').backgroundImage==window.getComputedStyle(emElem).backgroundImage)))){
+								//ELSE
+								if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&(!window.getComputedStyle(emElem,':after'))))){
+								//ENDIF
+								emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 									if(href.length > 20) {
 										emElem.className += " G_unknownEmote G_largeUnknown G_" + href + "_";
 									}else{
@@ -1215,7 +1218,7 @@ var passFunction = function () {
 									var theDiv = document.createElement('div');
 									//ENDIF
 									theDiv.className = "SuperRedditAltTextDisplay_Text";
-									if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))) {
+									if((/(?:(-inp?-)|(?:-lalt-))/).test(emElem.getAttribute('href'))) {
 										theDiv.setAttribute("style", "display: inline-block !important;");
 									}
 									while(altText) {
@@ -1236,7 +1239,7 @@ var passFunction = function () {
 											altText = "";
 										}
 									}
-									if((/(?:-lalt(?:-|$))/).test(emElem.getAttribute('href'))){
+									if((/(?:-lalt-)/).test(emElem.getAttribute('href'))){
 										emElem.parentNode.insertBefore(theDiv, emElem);
 										theDiv.setAttribute("style",theDiv.getAttribute("style")+"float: left !important;");
 									}else{
@@ -1249,6 +1252,7 @@ var passFunction = function () {
 									copyImage.style.fontSize = '0px';
 									emElem.parentNode.insertBefore(copyImage,emElem);
 								}
+								emElem.href+='-';
 							}
 						}
 					}
