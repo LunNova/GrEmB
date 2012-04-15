@@ -1,6 +1,6 @@
 <?php
 
-class cssParser{
+class cssEmoteParser{
 	private $i = 0;
 	private $cssNum = 0;
 	private $len;
@@ -10,7 +10,7 @@ class cssParser{
 	private static $ss = Array("\"");
 	private static $o = Array("{");
 	private static $c = Array("}");
-	public $selectorSeparator = "";
+	public static $selectorSeparator = "";
 	
 	private static function parseSelector($s){
 		$c = substr($s,0,1);
@@ -23,12 +23,14 @@ class cssParser{
 			default:
 				$t = $mType;
 		}
+		//echo "$s is $mType\n";
 		return Array($t,$s);
 		
 	}
 	
 	private static function selectorFix($s){
 		$i = -1;
+		$s = trim($s);
 		$l = strlen($s);
 		$debug = false;//stripos($s,":")!==false;
 		if($debug){
@@ -56,20 +58,22 @@ class cssParser{
 			}
 		}
 		if($t){
-			$ret[] = $t;
+			$ret[] = "$t,";
 			$t = "";
 		}
 		sort($ret);
 		$rVal = '';
 		foreach($ret as $r){
 			$dat = self::parseSelector($r);
-			if($dat[0] == 'emote') $rVal .= ($dat[1].$this->selectorSeparator);
+			if($dat[0] == 'emote') $rVal .= ($dat[1].self::$selectorSeparator);
 		}
 		if($debug){
 			echo "\n$rVal\n";
 		}
 		if(!$rVal){
 			$rVal = ',';
+		}elseif(substr($rVal,-1,1)==","){
+			$rVal = substr($rVal,0,strlen($rVal)-1);
 		}
 		return $rVal;
 	}
@@ -112,7 +116,7 @@ class cssParser{
 			else if(in_array(@$this->data{$this->i},self::$o)){
 				$level++;
 				$t = trim($t);
-				if(!$prop) $prop = ("^".$t);
+				if(!$prop) $prop = ($t);
 				$this->i++;
 				if($root)$this->tokens[$sel]['props'][$prop] = $this->getProperties(",",false,$level);
 				else $p[$prop] = $this->getProperties(",",false,$level);
@@ -147,7 +151,7 @@ class cssParser{
 	
 	function parseString($css){
 		$this->cssNum++;
-		$css = preg_replace('/\/\*.*?\*\//','',$css);
+		$css = preg_replace('/\/\*[\s\S]*?\*\//','',$css);
 		list($this->data,$this->len) = Array($css,strlen($css));
 		while($t = $this->getSelector()){}
 		unset($this->tokens[',']);
@@ -162,14 +166,38 @@ class cssParser{
 		return $ret;
 	}
 	
+	static function propertiesToString($p){
+		if(@is_array($p["props"])){
+			$p = $p["props"];
+		}
+		$str = "";
+		foreach($p as $pp => $pv){
+			$str .= "$pp:$pv;";
+		}
+		return $str;
+		if(is_array($p[1])){
+			$str = "{";
+			foreach($p as $pp => $pv){
+				$str .= "$pp".self::propertiesToString($pv);
+			}
+			return ($str . "}");
+		}
+		return ":$p;";
+	}
+	
 	function toString(){
-		
+		$str = "";
+		foreach($this->tokens as $sel => $value){
+			$str .= "$sel{".self::propertiesToString($value)."}";
+		}
+		return $str;
 	}
 }
 if($argv[1] == "-d"){
-	$cT = new cssParser();
-	$cT->parseFile("http://nallar.me/scripts/out4.min.css");
-	var_dump($cT->tokens);
+	$cT = new cssEmoteParser();
+	$cT->parseFile("http://reddit.com/r/mylittlepony/stylesheet.css");
+	//var_dump($cT->tokens);
+	echo @$cT->toString();
 	unset($cT);
 }
 ?>
