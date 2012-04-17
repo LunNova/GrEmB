@@ -14,6 +14,8 @@ class cssEmoteParser{
 	private $c = Array("}");
 	public $selectorSeparator = "";
 	public $data = "";
+	public $errorPos = 0;
+	public $tokenLen = 0;
 	
 	public static $testStr = null;
 	
@@ -100,27 +102,45 @@ class cssEmoteParser{
 		$level = 1;
 		$t = "";
 		$prop = "";
+		$errorData = ["startPos"=>$this->i,"tokenLen"=>-1,"niceName"=>"unknown"];
+		$isError = false;
+		$resetToken = false;
 		$p = Array();
 		if(!@$this->tokens[$sel]||@$this->tokens[$sel][1] < $this->cssNum){
 			$this->tokens[$sel] = Array('props'=>Array(),'age'=>$this->cssNum);
 		}
 		do{
-			if(in_array(@$this->data{$this->i},$this->sd)&&!$prop){
+			$endPropertyValue = in_array(@$this->data{$this->i},$this->sl);
+			$endProperties = in_array(@$this->data{$this->i},$this->c);
+			$endPropertyName = in_array(@$this->data{$this->i},$this->sd);
+			$openPropertyValue = in_array(@$this->data{$this->i},$this->o);
+			if($endPropertyName&&!$prop){
 				$prop = trim($t);
-				$t = "";
-			}
-			else if(in_array(@$this->data{$this->i},$this->sl)||in_array(@$this->data{$this->i},$this->c)){
-				$t = trim($t);
-				if(!$t||!$prop)break;
-				if($t){
+				if(!$prop){
+					$errorData['startPos'] = $this->i;
+					$errorData['tokenLen'] = 1;
+					$errorData['niceName'] = ':';
+					$isError = true;
+					break;
+				}
+				$resetToken = true;
+			}else if($endPropertyValue||$endProperties){
+				if($t&&$prop){
 					if($root) $this->tokens[$sel]['props'][$prop] = $t;
 					else $p[$prop] = $t;
+					$resetToken = true;
+				}else{
+					if(trim($t) && !$prop){
+						$errorData['startPos'] = $this->i;
+						$errorData['tokenLen'] = 1;
+						$errorData['niceName'] = $endProperties ? '}' : ';';
+						$isError = true;
+						break;
+					}
 				}
-				$t = "";
-				if(in_array(@$this->data{$this->i},$this->c))$level--;
+				if($endProperties)$level--;
 				$prop = "";
-			}
-			else if(in_array(@$this->data{$this->i},$this->o)){
+			}else if($openPropertyValue){
 				$level++;
 				$t = trim($t);
 				if(!$prop) $prop = ($t);
@@ -128,15 +148,28 @@ class cssEmoteParser{
 				if($root)$this->tokens[$sel]['props'][$prop] = $this->getProperties(",",false,$level);
 				else $p[$prop] = $this->getProperties(",",false);
 				$prop = "";
-				$t = "";
+				$resetToken = true;
 			}else{
 				$t .= $this->data{$this->i};
 			}
+			$errorData['tokenLen']++;
+			if($resetToken){
+				$resetToken = false;
+				$t = "";
+				$errorData['startPos'] = $this->i+1;
+				$errorData['tokenLen'] = -1;
+			}
+			
 		}while($level > 0 &&$this->i++ < $this->len);
-		if($t||($t=$prop)){
-			$left = substr($this->data,($this->i-strlen($t)-5),6);
-			$right = substr($this->data,($this->i),6);
-			throw new cssParseException("Unexpected $left\033[1;4;31m$t\033[00m$right at ".$this->nicePos($this->i-strlen($t)));
+		if(!$isError&&($t||($t = $prop))){
+			$errorData['niceName'] = $prop ? 'propertyValue':'propertyName';
+			$isError = true;
+		}
+		if($isError){
+			$left = substr($this->data,($errorData['startPos']-11),11);
+			$right = substr($this->data,($errorData['startPos']+$errorData['tokenLen']),10);
+			$errorToken = substr($this->data,$errorData['startPos'],$errorData['tokenLen']);
+			throw new cssParseException("Unexpected {$errorData['niceName']} at ".$this->nicePos($errorData['startPos'])."\n$left\033[1;34m".$errorToken."\033[00m$right");
 		}else if($level > 0){
 			throw new cssParseException("Mismatched parens!");
 		}
@@ -211,10 +244,14 @@ if($argv[1] == "-ilcss"){
 }
 if($argv[1] == "-cssd"){
 	$cT = new cssEmoteParser();
-	if(cssEmoteParser::$testStr === null){
-		$cT->parseFile("http://reddit.com/r/mylittlepony/stylesheet.css");
-	}else{
-		$cT->parseString(cssEmoteParser::$testStr);
+	try{
+		if(cssEmoteParser::$testStr === null){
+			$cT->parseFile("http://reddit.com/r/mylittlepony/stylesheet.css");
+		}else{
+			$cT->parseString(cssEmoteParser::$testStr);
+		}
+	}catch(cssParseException $e){
+		die($e->getMessage());
 	}
 	//var_dump($cT->tokens);
 	echo @$cT->toString();
