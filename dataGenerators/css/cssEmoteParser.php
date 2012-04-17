@@ -25,7 +25,7 @@ class cssEmoteParser{
 		$n = 0;
 		do{
 			$linePos++;
-			if($this->data{$i}==="\n"){
+			if(@$this->data{$i}==="\n"){
 				$line++;
 				$linePos = 0;
 			}
@@ -125,7 +125,7 @@ class cssEmoteParser{
 				}
 				$resetToken = true;
 			}else if($endPropertyValue||$endProperties){
-				if($t&&$prop){
+				if(trim($t)&&$prop){
 					if($root) $this->tokens[$sel]['props'][$prop] = $t;
 					else $p[$prop] = $t;
 					$resetToken = true;
@@ -164,14 +164,14 @@ class cssEmoteParser{
 		if(!$isError&&($t||($t = $prop))){
 			$errorData['niceName'] = $prop ? 'propertyValue':'propertyName';
 			$isError = true;
+		}else if(!$isError && $level > 0){
+			throw new cssParseException("Unexpected end of file - check that you haven't forgotten a closing \"}\"");
 		}
 		if($isError){
 			$left = substr($this->data,($errorData['startPos']-11),11);
 			$right = substr($this->data,($errorData['startPos']+$errorData['tokenLen']),10);
 			$errorToken = substr($this->data,$errorData['startPos'],$errorData['tokenLen']);
 			throw new cssParseException("Unexpected {$errorData['niceName']} at ".$this->nicePos($errorData['startPos'])."\n$left\033[1;34m".$errorToken."\033[00m$right");
-		}else if($level > 0){
-			throw new cssParseException("Mismatched parens!");
 		}
 		return $p;
 	}
