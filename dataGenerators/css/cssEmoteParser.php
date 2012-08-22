@@ -10,7 +10,7 @@ class token{
 	public $endChar = "";
 	public $t = '';
 	public $niceName = null;
-	public $parts = [];
+	public $parts = Array();
 	public function a($s){
 		$this->len+=strlen($s);
 		$this->t.=$s;
@@ -21,18 +21,27 @@ class token{
 	}
 }
 
+function strca($haystack, $needles, $offset = 0){
+	foreach($needles as $needle) {
+		if(strpos($haystack, $needle, $offset)!==false) return true;
+	}
+	return false;
+}
+
 class cssEmoteParser{
-	static $debug = ["superfine"=>0,"fine"=>1,"warning"=>2];
+	static $debug = Array("superfine"=>0,"fine"=>1,"warning"=>2);
 	private $logLevel = 0;
 	private $i = 0;
 	private $cssNum = 0;
 	private $len;
-	private $whiteSpace = ["\n"=>true,"\r"=>true];
-	private $stringChars = ['"'=>true,"'"=>true];
+	private $whiteSpace = Array("\n"=>true,"\r"=>true);
+	private $stringChars = Array('"'=>true,"'"=>true);
 	public $selectorSeparator = "";
 	public $data = "";
-	public $tokens = [];
-	public $emotePriorities = [];
+	public $tokens = Array();
+	public $emotePriorities = Array();
+	public $nsfw = Array();
+	public $names = Array();
 	
 	public static $testFile = "http://reddit.com/r/mylittlepony/stylesheet.css";
 	public static $testStr = null;
@@ -77,7 +86,7 @@ class cssEmoteParser{
 		
 	}
 	
-	private function getToken($open=[],$close=false,$str=false,$ws=false,$split=false){
+	private function getToken($open=Array(),$close=false,$str=false,$ws=false,$split=false){
 		$t = "";
 		$sPos = $this->i;
 		$t = new token();
@@ -88,7 +97,7 @@ class cssEmoteParser{
 			$str = $this->stringChars;
 		}
 		if($split === false){
-			$split = [];
+			$split = Array();
 		}
 		$t->start = $this->i;
 		if($close === false){
@@ -155,42 +164,57 @@ class cssEmoteParser{
 	private function getSelector(){
 		if($this->i >= $this->len) return false;
 		$ret = false;
-		$s = $this->getToken(["{"],false,false,false,[","=>true]);
+		$s = $this->getToken(Array("{"),false,false,false,Array(","=>true));
 		if(!$s){
 			return false;
 		}
 		$s->split();
 		//$this->debug('SUPERFINE', "Got selector <{$s->t}> (endchar <{$s->endChar}>)");
-		$p = $this->getToken(["{"],["}"]);
+		$p = $this->getToken(Array("{"),Array("}"));
+		if($p->t == ""){
+			return true;
+		}
 		//$this->debug('SUPERFINE', "Got properties <{$p->t}> (endchar <{$p->endChar}>)");
-		$emoteSel = [];
+		$emoteSel = Array();
 		sort($s->parts);
 		foreach($s->parts as &$emote){
 			if(!self::isEmote($emote)){
 				continue;
 			}
 			$emote = self::grembify($emote);
+			
 			$emoteSel[] = $emote;
-			$this->emotePriorities[$emote] = $this->cssNum;
+			$this->emotePriorities[self::cleanName($emote)] = $this->cssNum;
 			
 		}
 		unset($emote);
 		if(count($emoteSel)){
-			$this->tokens[] = [
+			$this->tokens[] = Array(
 				"selectors"		=>	$emoteSel,
 				"properties"	=>	$p->t,
 				"priority"		=>	$this->cssNum,
-			];
+			);
 		}
 
 		return true;
 	}
 	
+	private static function cleanName($emote){
+		return str_replace(array("::after","::before",":after",":before"),"",$emote);
+	}
+	
 	public function finalize(){
-		foreach($this->tokens as $k => $t){
-			foreach($t["selectors"] as $ek => $emoteName){
-				if($this->emotePriorities[$emoteName] > $t["priority"]){
+		foreach($this->tokens as $k => &$t){
+			foreach($t["selectors"] as $ek => &$emoteName){
+				
+				if($this->emotePriorities[self::cleanName($emoteName)] > $t["priority"] || strca($emoteName,$this->nsfw)){
 					unset($t["selectors"][$ek]);
+				}else if(stripos($emoteName,"/],")!== false){
+					
+					echo $this->names[$t["priority"]]."\t"."\n";
+					var_dump($this->emotePriorities[$emoteName]);
+					var_dump($t);
+					file_put_contents("borked.min.css",$this->data);
 				}
 			}
 			if(count($t["selectors"])==0){
@@ -201,29 +225,35 @@ class cssEmoteParser{
 	
 	private static function isEmote($s){
 	//echo $s;
-		if(preg_match("/a\[href[\^\|]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0){
+		if(preg_match("/a\[href[\^\|\*]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0){
 			return true;
 		}
 		return false;
 	}
 	
-	function parseString($css){
+	function parseString($css,$name=""){
 		$this->cssNum++;
+		$this->names[$this->cssNum] = $name;
+		$css = str_replace(" !important","",$css);
+		$css = str_replace("!important","",$css);
 		$css = CssMin::minify(preg_replace('/\/\*[\s\S]*?\*\//','',$css));
-		list($this->data,$this->len) = [$css,strlen($css)-1];
+		//$css = str_replace("background-position:0 0","",$css);
+		list($this->data,$this->len) = Array($css,strlen($css)-1);
 		$this->i = 0;
 		while($t = $this->getSelector()){}
-		ksort($this->tokens);
 	}
 	
 	function parseFile($file){
-		$this->parseString(file_get_contents($file));
+		$this->parseString(file_get_contents($file),$file);
 	}
 
 	function toString(){
 		$str = "";
 		foreach($this->tokens as $t){
-			$str .= implode(",",$t["selectors"]);
+			$sel = implode(",",$t["selectors"]);
+			//if(stripos($sel,"/],")!==false || stripos($t["properties"],"/],")!==false){ echo $this->names[$t["priority"]]."\t"."\n";
+			//var_dump($t);}
+			$str .= $sel;
 			$str .= "{" . $t["properties"] ."}\n";
 		}
 		return $str;
