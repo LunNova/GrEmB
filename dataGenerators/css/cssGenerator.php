@@ -43,7 +43,7 @@ foreach($css as $sub => $data){
 	}
 	
 	$cT = new cssEmoteParser();
-	$cT->parseString($css[$sub],$s);
+	$cT->parseString($css[$sub],$sub);
 	$cT->finalize();
 	file_put_contents("subs/$sub.min.css", $css[$sub]=$cT->toString());
 	file_put_contents("subs/$sub.count", $cT->emoteCount);
@@ -53,6 +53,9 @@ foreach($css as $sub => $data){
 unset($subsss);
 unset($sub);
 unset($k);
+unset($data);
+unset($cT);
+unset($i);
 
 echo "Retrieved " . $count["subs"] . " subs, failed " . $count["fails"] . " times.\n";
 
@@ -64,7 +67,7 @@ foreach($subss as $k => $subs){
 		$cT->nsfw = Array("cock", "dick", "jizz", "/fut", "dashurbate");
 	}
 	foreach($subs as $s){
-		$cT->parseString($css[$s],$s);
+		$cT->parseString($css[$s],$s,false);
 	}
 	$cT->finalize();
 	file_put_contents("$k.min.css", $cT->toString());

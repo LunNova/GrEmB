@@ -220,18 +220,20 @@ class cssEmoteParser{
 	
 	private static function isEmote($s){
 	//echo $s;
-		if(preg_match("/a\[href[\^\|\*]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0){
+		if(stripos($s,".G_")!==false || preg_match("/a\[href[\^\|\*]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0){
 			return true;
 		}
 		return false;
 	}
 	
-	function parseString($css,$name=""){
+	function parseString($css,$name="",$clean=true){
 		$this->cssNum++;
 		$this->names[$this->cssNum] = $name;
-		$css = str_replace(" !important","",$css);
-		$css = str_replace("!important","",$css);
-		$css = CssMin::minify(preg_replace('/\/\*[\s\S]*?\*\//','',$css));
+		if($clean){
+			$css = str_replace(" !important","",$css);
+			$css = str_replace("!important","",$css);
+			$css = CssMin::minify(preg_replace('/\/\*[\s\S]*?\*\//','',$css));
+		}
 		//$css = str_replace("background-position:0 0","",$css);
 		list($this->data,$this->len) = Array($css,strlen($css)-1);
 		$this->i = 0;
