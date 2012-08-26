@@ -34,26 +34,30 @@ foreach($subss as $subsss){
 
 echo "\n";
 
-
+$fails = Array();
 
 foreach($css as $sub => $data){
 	$i = 0;
+	echo ".";
 	while(!$data && (++$i < 6)){
 		$count["fails"]++;
 		sleep($i * 24);
 		if(!@$css[$sub])$css[$sub] = file_get_contents("http://reddit.com/r/$sub/stylesheet.css?r=".rand(0,999999));
+		echo "\e[0;35m.";
 	}
-	echo "$sub failed $i times. Retrying\n";
+	if($i){
+		echo "\e[00m"; 
+		$fails[] = "\e[00m$sub failed $i times.";
+	}
 	
 	$cT = new cssEmoteParser();
 	$cT->parseString($css[$sub],$sub);
 	$cT->finalize();
 	file_put_contents("subs/$sub.min.css", $css[$sub]=$cT->toString());
 	file_put_contents("subs/$sub.count", $cT->emoteCount);
-	echo ".";
 }
 
-echo "\n";
+echo implode("\n",$fails) . "\n";
 
 unset($subsss);
 unset($sub);

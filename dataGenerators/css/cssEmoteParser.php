@@ -40,7 +40,7 @@ class cssEmoteParser{
 	public $data = "";
 	public $tokens = Array();
 	public $emotePriorities = Array();
-	public $nsfw = Array('/o21h4/');
+	public $nsfw = Array('/o21h4/','.domain');
 	public $names = Array();
 	public $emoteCount = 0;
 	
