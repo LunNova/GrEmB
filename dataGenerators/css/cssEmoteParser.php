@@ -40,8 +40,9 @@ class cssEmoteParser{
 	public $data = "";
 	public $tokens = Array();
 	public $emotePriorities = Array();
-	public $nsfw = Array();
+	public $nsfw = Array('/o21h4/');
 	public $names = Array();
+	public $emoteCount = 0;
 	
 	public static $testFile = "http://reddit.com/r/mylittlepony/stylesheet.css";
 	public static $testStr = null;
@@ -156,7 +157,7 @@ class cssEmoteParser{
 	}
 	
 	private static function grembify($selector){
-		$selector = preg_replace("/a\[href[\^|]?=['\"]?\/([\-a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
+		$selector = preg_replace("/a\[href[|]?=['\"]?\/([\-a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
 		$selector = str_replace("a[href","a.convertedEmote_[href",$selector);
 		return $selector;
 	}
@@ -206,20 +207,14 @@ class cssEmoteParser{
 	public function finalize(){
 		foreach($this->tokens as $k => &$t){
 			foreach($t["selectors"] as $ek => &$emoteName){
-				
 				if($this->emotePriorities[self::cleanName($emoteName)] > $t["priority"] || strca($emoteName,$this->nsfw)){
 					unset($t["selectors"][$ek]);
-				}else if(stripos($emoteName,"/],")!== false){
-					
-					echo $this->names[$t["priority"]]."\t"."\n";
-					var_dump($this->emotePriorities[$emoteName]);
-					var_dump($t);
-					file_put_contents("borked.min.css",$this->data);
 				}
 			}
 			if(count($t["selectors"])==0){
 				unset($this->tokens[$k]);
 			}
+			$this->emoteCount += count($t["selectors"]);
 		}
 	}
 	
@@ -248,7 +243,7 @@ class cssEmoteParser{
 	}
 
 	function toString(){
-		$str = "";
+		$str = "/*Parsed {$this->emoteCount} emote aliases.*/\n";
 		foreach($this->tokens as $t){
 			$sel = implode(",",$t["selectors"]);
 			//if(stripos($sel,"/],")!==false || stripos($t["properties"],"/],")!==false){ echo $this->names[$t["priority"]]."\t"."\n";
