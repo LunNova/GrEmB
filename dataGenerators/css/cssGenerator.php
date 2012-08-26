@@ -34,13 +34,20 @@ echo "\n";
 
 $i = 0;
 
-foreach($css as $sub => &$data){
+foreach($css as $sub => $data){
 	while(!$data && (++$i < 3)){
 		echo "$k failed $i times. Retrying\n";
 		$count["fails"]++;
 		sleep($i * 18);
 		if(!@$css[$sub])$css[$sub] = file_get_contents("http://reddit.com/r/$sub/stylesheet.css?r=".rand(0,999999));
 	}
+	
+	$cT = new cssEmoteParser();
+	$cT->parseString($css[$sub],$s);
+	$cT->finalize();
+	file_put_contents("subs/$sub.min.css", $css[$sub]=$cT->toString());
+	file_put_contents("subs/$sub.count", $cT->emoteCount);
+	
 }
 
 unset($subsss);
