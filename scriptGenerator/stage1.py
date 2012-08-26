@@ -41,12 +41,18 @@ def error(s):
 	print(s,file=sys.stderr,end='')
 	return;
 
+def join_(a,s):
+	ret = ""
+	for thing in a:
+		ret += s.replace("%S%", thing)
+	return ret
+
 def parseJS(d,depth, noRecurse=False):
 	if depth>20:
 		raise Exception("parseJS depth above limit. Check that you have not got an infinitely recursing include cycle...")
 	while 1:
-		m = re.search("//INCLUDE ['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]", d,re.DOTALL)
-		if m == None: m = re.search("/\*INCLUDE ['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]\*/", d,re.DOTALL)
+		m = re.search("//INCLUDE\s+?['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]", d,re.DOTALL)
+		if m == None: m = re.search("/\*INCLUDE\s+?['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]\*/", d,re.DOTALL)
 		if m == None: break
 		fName = m.group(1)
 		try:
@@ -65,7 +71,7 @@ def parseJS(d,depth, noRecurse=False):
 		except KeyError:
 			error("[Vars]->"+vName+" was not found in environment.\n");exit(1)
 	while 1:
-		m = re.search("//IF (\!?)([a-zA-Z0-9_]+)(.+?)(?://ELSE(.+?))?//END ?IF", d,re.DOTALL)
+		m = re.search("//IF\s+?(\!?)([a-zA-Z0-9_]+)(.+?)(?://ELSE(.+?))?//END ?IF", d,re.DOTALL)
 		if m == None: break;
 		var = m.group(2)
 		trueCode = m.group(3)
@@ -96,13 +102,12 @@ def parseJS(d,depth, noRecurse=False):
 		if m == None: break;
 		d = d.replace(m.group(0),'')
 	while 1:
-		m = re.search("//_MACRO\s+\(\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?\)",d)
-		if m == None: m = re.search("//MACRO\s+\(\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?(?:,\s*?([a-zA-Z_][a-zA-Z0-9_]?)\s*?)?\)\s+?(.+?)//ENDMACRO",d,re.DOTALL)
+		m = re.search("//ILIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d)
+		imp = True
+		if m == None: m = re.search("//LIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d,re.DOTALL); imp = False
 		if m == None: break;
-		d = d.replace(m.group(0),'')
-		params = m.groupdict(None)
-		#for key in params:
-		#	#
+		list = open(m.group(2),'rb').read().split("\n")
+		d = d.replace(m.group(0),list.join(m.group(1)) if imp else join(list, m.group(1)))
 	newD = '';
 	initialPass = True;
 	while (not noRecurse) and newD != d:
