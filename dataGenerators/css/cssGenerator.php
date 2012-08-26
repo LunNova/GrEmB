@@ -23,32 +23,37 @@ function getStyle($name){
 
 foreach($subss as $subsss){
 	foreach($subsss as $sub){
-		if(!isset($css[$sub]))$css[$sub] = getStyle($sub);
-		echo ".";
-		$count["subs"]++;
+		if(!isset($css[$sub])){
+			$css[$sub] = getStyle($sub);
+			echo ".";
+			$count["subs"]++;
+		} 
 		sleep(6);
 	}
 }
 
 echo "\n";
 
-$i = 0;
+
 
 foreach($css as $sub => $data){
-	while(!$data && (++$i < 3)){
-		echo "$k failed $i times. Retrying\n";
+	$i = 0;
+	while(!$data && (++$i < 6)){
 		$count["fails"]++;
-		sleep($i * 18);
+		sleep($i * 24);
 		if(!@$css[$sub])$css[$sub] = file_get_contents("http://reddit.com/r/$sub/stylesheet.css?r=".rand(0,999999));
 	}
+	echo "$sub failed $i times. Retrying\n";
 	
 	$cT = new cssEmoteParser();
 	$cT->parseString($css[$sub],$sub);
 	$cT->finalize();
 	file_put_contents("subs/$sub.min.css", $css[$sub]=$cT->toString());
 	file_put_contents("subs/$sub.count", $cT->emoteCount);
-	
+	echo ".";
 }
+
+echo "\n";
 
 unset($subsss);
 unset($sub);
@@ -67,10 +72,12 @@ foreach($subss as $k => $subs){
 		$cT->nsfw = Array("cock", "dick", "jizz", "/fut", "dashurbate");
 	}
 	foreach($subs as $s){
-		$cT->parseString($css[$s],$s,false);
+		$cT->parseString($css[$s],$s);
 	}
 	$cT->finalize();
-	file_put_contents("$k.min.css", $cT->toString());
-	file_put_contents("$k.count", $cT->emoteCount);
+	if($cT->emoteCount > 0){
+		file_put_contents("$k.min.css", $cT->toString());
+		file_put_contents("$k.count", $cT->emoteCount);
+	}
 }
 ?>
