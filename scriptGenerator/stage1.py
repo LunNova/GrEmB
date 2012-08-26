@@ -63,7 +63,7 @@ def parseJS(d,depth, noRecurse=False):
 		try:
 			d = d.replace(m.group(0),parseJS(conf['Vars'][vName],depth+1))
 		except KeyError:
-			error("[Vars]->"+vName+" was not found in environment.");exit(1)
+			error("[Vars]->"+vName+" was not found in environment.\n");exit(1)
 	while 1:
 		m = re.search("//IF (\!?)([a-zA-Z0-9_]+)(.+?)(?://ELSE(.+?))?//END ?IF", d,re.DOTALL)
 		if m == None: break;
