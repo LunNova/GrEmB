@@ -180,13 +180,11 @@ class cssEmoteParser{
 		$emoteSel = Array();
 		sort($s->parts);
 		foreach($s->parts as &$emote){
-			if(!self::isEmote($emote)){
+			if(!self::isEmote($emote) || @$this->emotePriorities[$cn=self::cleanName($emote = self::grembify($emote))] > $this->cssNum){
 				continue;
 			}
-			$emote = self::grembify($emote);
-			
 			$emoteSel[] = $emote;
-			$this->emotePriorities[self::cleanName($emote)] = $this->cssNum;
+			$this->emotePriorities[$cn] = $this->cssNum;
 			
 		}
 		unset($emote);
@@ -209,8 +207,12 @@ class cssEmoteParser{
 		$byProperties = Array();
 		foreach($this->tokens as $k => &$t){
 			foreach($t["selectors"] as $ek => &$emoteName){
-				if($this->emotePriorities[self::cleanName($emoteName)] > $t["priority"] || strca($emoteName,$this->nsfw)){
+				if(@$this->emotePriorities[self::cleanName($emoteName)] > $t["priority"]){
 					unset($t["selectors"][$ek]);
+				}
+				if(strca($emoteName,$this->nsfw)){
+					unset($t["selectors"][$ek]);
+					unset($this->emotePriorities[self::cleanName($emoteName)]);
 				}
 			}
 			if(count($t["selectors"])==0){
@@ -251,7 +253,7 @@ class cssEmoteParser{
 		$this->cssNum++;
 		$this->names[$this->cssNum] = $name;
 		if($clean){
-			$css = str_replace(array(" !important","!important","display:ssblock;","float:ssleft;","clear:none;"),"",$css);
+			$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;"),"",$css);
 			$css = CssMin::minify(preg_replace('/\/\*[\s\S]*?\*\//','',$css));
 		}
 		list($this->data,$this->len) = Array($css,strlen($css)-1);

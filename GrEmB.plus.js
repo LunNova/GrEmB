@@ -9,20 +9,8 @@
 // @credits		Super Reddit Alt-Text display by ArbritaryEntity is included in this script. Emote Manager was inspired by RogueDarkJedi's Easy Emotes and My Global Ponies,duh! Color scheme used for user familiarity reasons, you can set your own in the config.)
 // @homepage	http://nallar.me/scripts
 // @include		http://*/*
-// @_include	https://*/*
-//LIST('//@exclude\t',exclude.list,'\n')
-// @exclude		http://www.redditmedia.com/*
-// @exclude		http://pagead2.googlesyndication.com/*
-// @exclude		http://*google.com/reviews/widgets*
-// @exclude		http://www.blogger.com/navbar.*
-// @exclude		http://googleads.g.doubleclick.net/*
-// @exclude		http://badge.stumbleupon.com/*
-// @exclude		http://*facebook.com/extern/*
-// @exclude		http://*connect.facebook.com/*
-// @exclude		http://nwidget.networkedblogs.com/*
-// @exclude		http://static.ak.fbcdn.net/connect/*
-// @exclude		http://*facebook.com/dialog/oauth*
-// @exclude		http://showadsak.pubmatic.com/*
+// @include	https://*/*
+//LIST // @exclude		%S%\n	"excludes.list"
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 

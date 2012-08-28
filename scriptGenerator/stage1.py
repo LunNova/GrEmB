@@ -44,8 +44,8 @@ def error(s):
 def join_(a,s):
 	ret = ""
 	for thing in a:
-		ret += s.replace("%S%", thing)
-	return ret
+		ret += s.replace("%S%", thing).replace("\\n","\n")
+	return ret.rstrip()
 
 def parseJS(d,depth, noRecurse=False):
 	if depth>20:
@@ -106,8 +106,14 @@ def parseJS(d,depth, noRecurse=False):
 		imp = True
 		if m == None: m = re.search("//LIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d,re.DOTALL); imp = False
 		if m == None: break;
-		list = open(m.group(2),'rb').read().split("\n")
-		d = d.replace(m.group(0),list.join(m.group(1)) if imp else join(list, m.group(1)))
+		try:
+			incName = (conf['Options']['incDir']+'/'+m.group(2))
+			list = open(incName,'rb').read().split("\n")
+			d = d.replace(m.group(0),list.join(m.group(1)) if imp else join_(list, m.group(1)))
+		except KeyError:
+			error("[Options]->incDir must be set in environment file to use includes.");exit(1)
+		except IOError:
+			error("Could not read "+m.group(2)+", check the incDir and included file exist.");exit(1)
 	newD = '';
 	initialPass = True;
 	while (not noRecurse) and newD != d:
