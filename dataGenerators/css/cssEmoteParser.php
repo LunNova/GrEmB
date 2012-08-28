@@ -40,7 +40,7 @@ class cssEmoteParser{
 	public $data = "";
 	public $tokens = Array();
 	public $emotePriorities = Array();
-	public $nsfw = Array('/o21h4/','.domain');
+	public $nsfw = Array('/o21h4/','/yqm7o/','.domain');
 	public $names = Array();
 	public $emoteCount = 0;
 	
@@ -157,8 +157,9 @@ class cssEmoteParser{
 	}
 	
 	private static function grembify($selector){
-		$selector = preg_replace("/a\[href[|]?=['\"]?\/([\-a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
-		$selector = str_replace("a[href","a.convertedEmote_[href",$selector);
+		$selector = preg_replace("/a(?:.md)?\[href[|]?=['\"]?\/([a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
+		$selector = str_replace("a[href",".md a[href",$selector);
+		$selector = str_replace(".md .md",".md",$selector);
 		return $selector;
 	}
 	
@@ -205,6 +206,7 @@ class cssEmoteParser{
 	}
 	
 	public function finalize(){
+		$byProperties = Array();
 		foreach($this->tokens as $k => &$t){
 			foreach($t["selectors"] as $ek => &$emoteName){
 				if($this->emotePriorities[self::cleanName($emoteName)] > $t["priority"] || strca($emoteName,$this->nsfw)){
@@ -213,8 +215,27 @@ class cssEmoteParser{
 			}
 			if(count($t["selectors"])==0){
 				unset($this->tokens[$k]);
+				continue;
 			}
 			$this->emoteCount += count($t["selectors"]);
+			if(!isset($byProperties[$t["properties"]])){
+				$byProperties[$t["properties"]] = Array($t);
+			}else{
+				$byProperties[$t["properties"]][] = $t;
+			}
+		}
+		//return;
+		$this->tokens = Array();
+		$i = 0;
+		foreach($byProperties as $props => $s){
+			$this->tokens[$i] = array_shift($s);
+			if(count($s) >= 1){
+				foreach($s as $ss){
+					$this->tokens[$i]["selectors"] = array_merge($this->tokens[$i]["selectors"],$ss["selectors"]);
+				}
+				$this->tokens[$i]["selectors"] = array_unique($this->tokens[$i]["selectors"]);
+			}
+			$i++;
 		}
 	}
 	
