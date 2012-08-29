@@ -9,16 +9,15 @@
    "content_scripts": [ {
       "all_frames": true,
       "js": [ "content.js" ],
-      "include_globs": [ "file:///*", "http://*/*", "https://*/*" ],
-      "exclude_globs": [ //LIST('"',exclude.list,'", ') ],
+      "matches": [ "file:///*", "http://*/*", "https://*/*" ],
+      "exclude_globs": [ //IILIST "%S%"	"excludes.list" ", "],
       "run_at": "document_start"
    } ],
-   "default_locale": "en",
-   "description": "Displays subreddit emotes. Numerous optional style tweaks and emote-related features.",
+   "description": "Displays emotes from reddit globally. Numerous optional style tweaks and emote-related features.",
    "icons": {
-      "128": "logo.png",
+      "128": "logo.png"
    },
-   "minimum_chrome_version": "17.0.0.0",
+   "minimum_chrome_version": "20.0.0.0",
    "name": "GrEmB",
    "permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
    "offline_enabled": true,

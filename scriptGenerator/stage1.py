@@ -41,10 +41,12 @@ def error(s):
 	print(s,file=sys.stderr,end='')
 	return;
 
-def join_(a,s):
+def join_(a,s,i):
 	ret = ""
+	first = True
 	for thing in a:
-		ret += s.replace("%S%", thing).replace("\\n","\n")
+		ret += ("" if first else i) + s.replace("%S%", thing).replace("\\n","\n")
+		first = False
 	return ret.rstrip()
 
 def parseJS(d,depth, noRecurse=False):
@@ -103,13 +105,15 @@ def parseJS(d,depth, noRecurse=False):
 		d = d.replace(m.group(0),'')
 	while 1:
 		m = re.search("//ILIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d)
-		imp = True
-		if m == None: m = re.search("//LIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d,re.DOTALL); imp = False
+		imp = 1
+		if m == None: m = re.search("//LIST\s+(.+?)\s+['\"]([a-zA-Z0-9_/\\.\\\\]+)['\"]",d,re.DOTALL); imp = 0
+		if m == None: m = re.search("//IILIST\s+(.+?)\s+?['\"]([a-zA-Z0-9_/\\.\\\\]+?)['\"]\s+?['\"]([^\n\"']+?)['\"]",d,re.DOTALL); imp = 2
 		if m == None: break;
 		try:
 			incName = (conf['Options']['incDir']+'/'+m.group(2))
 			list = open(incName,'rb').read().split("\n")
-			d = d.replace(m.group(0),list.join(m.group(1)) if imp else join_(list, m.group(1)))
+			joinedList = join_(list, m.group(1), "") if imp == 0 else m.group(1).join(list) if imp == 1 else join_(list, m.group(1), m.group(3))
+			d = d.replace(m.group(0),joinedList)
 		except KeyError:
 			error("[Options]->incDir must be set in environment file to use includes.");exit(1)
 		except IOError:

@@ -9,7 +9,7 @@
 // @credits		Super Reddit Alt-Text display by ArbritaryEntity is included in this script. Emote Manager was inspired by RogueDarkJedi's Easy Emotes and My Global Ponies,duh! Color scheme used for user familiarity reasons, you can set your own in the config.)
 // @homepage	http://nallar.me/scripts
 // @include		http://*/*
-// @include	https://*/*
+// @include		https://*/*
 // @exclude		http://www.redditmedia.com/*
 // @exclude		http://pagead2.googlesyndication.com/*
 // @exclude		http://*google.com/reviews/widgets*
@@ -72,7 +72,7 @@ function passFunction(){
 		//START STATIC VARS
 		var subs = ["mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"];
 		
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeSBConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, confStore = undefined,	globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, emoteNames_, requiredStyles = 0, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1,'csssstore':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeSBConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, emoteNames_, requiredStyles = 0, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1,'csssstore':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -133,17 +133,18 @@ function passFunction(){
 		//END STATIC VARS
 		
 		////////////////////////////START FUNCTIONS////////////////////////////
+				function GM_xmlhttpRequest(request){		var onComplete = request.onload;		delete(request.onload);		chrome.extension.sendMessage({method: "xhr", request: request},function(response){console.log(response);onComplete(response.data)});	}		
 		function trim(str){
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		};
 		
-		
+				if(confStore == undefined || !confStore['alwaysTrue']){		console.log("Conf store was: "+confStore);		confStore = defaultConfs;	}		
 		function G_safeGetValue(){
 						return confStore;	
 		};
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
-				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id];
+				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
 			}
 			var temp;
 			temp = G_safeGetValue();
@@ -151,8 +152,10 @@ function passFunction(){
 				setConf(id, defaultConfs[id]);
 				temp[id] = defaultConfs[id];
 			}
+			console.log("Returned " + id + " as :" + temp[id]);
 			return temp[id];
 		};
+		console.log(confStore);
 		
 		function getConfForm(id){
 			if(confStore[id]!==false){
@@ -186,7 +189,7 @@ function passFunction(){
 		};
 		
 		function saveConf(){
-						chrome.extension.sendRequest({method: "setConf",data:temp});	
+						chrome.extension.sendMessage({method: "setConf",data:confStore});	
 		}
 		
 		function removeDefunctConfs(){
@@ -282,7 +285,8 @@ function passFunction(){
 			if(!compareAssociativeArrays(confStore, oconf)){
 				saveConf();
 				if(refreshPage){
-					window.location.replace('http://nallar.me/scripts/');
+					console.log("Reloaded due to config");
+					//window.location.replace('http://nallar.me/scripts/');
 				}else{
 					makeWindow();
 				}
@@ -710,7 +714,8 @@ function passFunction(){
 					ln.innerHTML = "Reloading cached CSS - " + loadedStyles + "/" + requiredStyles;
 				}
 				if(loadedStyles >= requiredStyles && doRefresh){
-					window.location.reload();
+					console.log("Reloaded due to incLoadedStyles");
+					//window.location.reload();
 				}
 			}
 		}
@@ -1251,7 +1256,8 @@ function passFunction(){
 		
 		if(getConf("lastVersion") != localVersion){
 			resetCache();
-			window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
+			console.log("Reloaded due to old version.");
+			//window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
 			if(doNotUse != ""){
 				alert(doNotUse);
 			}
@@ -1404,5 +1410,5 @@ function fakeTimeout(callback){
 
 if(!ranPassFunction){
 	var runScript = function(){fakeTimeout(passFunction);}
-		chrome.extension.sendRequest({method: "getConf"},function(response){if(response.data){confStore = JSON.parse(response.data);} runScript();});	
+		chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});	
 }
