@@ -45,7 +45,7 @@ foreach($css as $sub => $data){
 		$count["fails"]++;
 		sleep($i * 24);
 		if(!@$css[$sub])$css[$sub] = getStyle($sub);
-		echo "\e[0;35m.";
+		echo "\e[0;35m."; 
 	}
 	if($i){
 		echo "\e[00m";

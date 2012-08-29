@@ -9,8 +9,7 @@
 // @credits		Super Reddit Alt-Text display by ArbritaryEntity is included in this script. Emote Manager was inspired by RogueDarkJedi's Easy Emotes and My Global Ponies,duh! Color scheme used for user familiarity reasons, you can set your own in the config.)
 // @homepage	http://nallar.me/scripts
 // @include		http://*/*
-// @_include	https://*/*
-//LIST('//@exclude\t',exclude.list,'\n')
+// @include	https://*/*
 // @exclude		http://www.redditmedia.com/*
 // @exclude		http://pagead2.googlesyndication.com/*
 // @exclude		http://*google.com/reviews/widgets*
@@ -20,9 +19,24 @@
 // @exclude		http://*facebook.com/extern/*
 // @exclude		http://*connect.facebook.com/*
 // @exclude		http://nwidget.networkedblogs.com/*
-// @exclude		http://static.ak.fbcdn.net/connect/*
+// @exclude		http://*.ak.fbcdn.net/connect/*
+// @exclude		https://*.ak.fbcdn.net/connect/*
+// @exclude		http://*.ak.facebook.com/connect/*
+// @exclude		https://*.ak.facebook.com/connect/*
+// @exclude		http://*.facebook.com/ai.php?*
+// @exclude		https://*.facebook.com/ai.php?*
 // @exclude		http://*facebook.com/dialog/oauth*
 // @exclude		http://showadsak.pubmatic.com/*
+// @exclude		https://www.google.com/blank.html
+// @exclude		https://plus.google.com/u/0/_/notifications/frame*
+// @exclude		http://*.doubleclick.net/*
+// @exclude		http://tracking.*
+// @exclude		http://www.youtube.com/embed/*
+// @exclude		http://cdn.turn.com/*
+// @exclude		http://assets.tumblr.com/iframe.html*
+// @exclude		http://w.visualdna.com/analytics/*
+// @exclude		http://*ads*.*.*
+// @exclude		http://www.meebo.com/cim/sandbox.php?*
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
@@ -35,15 +49,13 @@ if(document.mozSyntheticDocument){
 	return;
 }
 
-var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/main.min.css", otherStylesheet = "http://nallar.me/css/other.min.css", nsfwStylesheet = "http://nallar.me/css/main_nsfw.min.css";
+var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/main.min.css", otherStylesheet = "http://nallar.me/css/other.min.css", nsfwStylesheet = "http://nallar.me/css/main_nsfw.min.css", confStore = undefined, inFrame = (window.top != window);
 var wkMutation = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 if(location.protocol === "https:"){
-	mainStylesheet = "https://nallar.me/scripts/out4.min.css";
-	otherStylesheet = "https://nallar.me/scripts/other.min.css";
-	nsfwStylesheet = "https://nallar.me/scripts/nsfw.min.css";
+	mainStylesheet = "https://nallar.me/css/main.min.css";
+	otherStylesheet = "https://nallar.me/css/other.min.css";
+	nsfwStylesheet = "https://nallar.me/css/main_nsfw.min.css";
 }
-var confStore = undefined;
-var inFrame = (window.top != window);
 
 if(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200)){
 	ranPassFunction = true;
@@ -116,6 +128,7 @@ function passFunction(){
 			'wideReddit': false,
 			'justReset': false,
 			'emoteCopy': false,
+			'revealAltText': true,
 		};
 		//END STATIC VARS
 		
@@ -306,7 +319,7 @@ function passFunction(){
 				return;
 			}
 			oldDis = dis;
-			superBundlePrefs.innerHTML = "<h3 style='font-size:110%'>GrEmB Configuration</h3><br /><form action='#' name='settingsForm' id='settingsForm'>" + 'Use script update checker?(set to off if you have GM/TM correctly configured for updating)' + makeInput('internalUpdateCheck', 'checkbox', dis.all) + '<br />&#160;&#160;Check for updates weekly instead of every day?' + makeInput('updateCheckWeekly', 'checkbox', dis.all) + '<br /><br />Include Emote Window?' + makeInput('defaultEmoteContainer', 'checkbox', dis.all) + '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E) + '<br />&#160;&#160;Display emote window above reddit header?' + makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E) + '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E) + '<br />&#160;&#160;Which side of the screen should the Emote Window be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:") + '<br />&#160;&#160;Include r/mylittleandysonic1 emotes?' + makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E) + '<br />&#160;&#160;Include r/idliketobeatree emotes?' + makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E) + '<br />&#160;&#160;Use Easy Emotes style emote window?' + makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S)))) + '<br />&#160;&#160;Emote window vertical position in pixels(41 to line up for RES)' + makeInput("defaultEmoteContainerY", "text", dis.E) + '<br />&#160;&#160;Emote window width in pixels(130 is Easy Emotes default size)' + makeInput("defaultEmoteContainerWidth", "text", dis.E) + '<br />&#160;&#160;Emote window height in pixels(250 is Easy Emotes default size)' + makeInput("defaultEmoteContainerHeight", "text", dis.E) + '<br /><br />Wide reddit mode - messages/posts display across the full width' + makeInput('wideReddit', 'checkbox', dis.all) + '<br />Show pony emotes globally?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all) + '<br />&#160;&#160;Make copy-paste include emote text(FF only)' + makeInput("emoteCopy", "checkbox", dis.FF) + '<br /><br />Make reddit searchbars spike' + makeInput('searchbarSpike', 'checkbox', dis.all) + '<br />&#160;&#160;Try to make all searchbars spike' + makeInput('searchbarSpikeEverywhere', 'checkbox', dis.all) + '<br />&#160;&#160;Include non-mlp subreddits. homestuck,minecraft,f7u12' + makeInput('otherSubCSS', 'checkbox', dis.all) + '<br />&#160;&#160;To add more subreddits, add the names here.<br />&#160;&#160;Separate using commas!eg: sub1,sub2' + makeInput('additionalSubreddits_', 'text', dis.all) + '<br />&#160;&#160;Include <b style="color: red;">NSFW</b> emotes.(You probably don\'t want to)' + makeInput('nsfwDefunctEmotes', 'checkbox', dis.all) + '<br />&#160;&#160;Try to find and replace unknown emotes with a message' + makeInput('displayUnknownEmotes', 'checkbox', dis.all) + '<br /><br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all) + '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
+			superBundlePrefs.innerHTML = "<h3 style='font-size:110%'>GrEmB Configuration</h3><br /><form action='#' name='settingsForm' id='settingsForm'>" + 'Use script update checker?(set to off if you have GM/TM correctly configured for updating)' + makeInput('internalUpdateCheck', 'checkbox', dis.all) + '<br />&#160;&#160;Check for updates weekly instead of every day?' + makeInput('updateCheckWeekly', 'checkbox', dis.all) + '<br /><br />Include Emote Window?' + makeInput('defaultEmoteContainer', 'checkbox', dis.all) + '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E) + '<br />&#160;&#160;Display emote window above reddit header?' + makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E) + '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E) + '<br />&#160;&#160;Which side of the screen should the Emote Window be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:") + '<br />&#160;&#160;Include r/mylittleandysonic1 emotes?' + makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E) + '<br />&#160;&#160;Include r/idliketobeatree emotes?' + makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E) + '<br />&#160;&#160;Use Easy Emotes style emote window?' + makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S)))) + '<br />&#160;&#160;Emote window vertical position in pixels(41 to line up for RES)' + makeInput("defaultEmoteContainerY", "text", dis.E) + '<br />&#160;&#160;Emote window width in pixels(130 is Easy Emotes default size)' + makeInput("defaultEmoteContainerWidth", "text", dis.E) + '<br />&#160;&#160;Emote window height in pixels(250 is Easy Emotes default size)' + makeInput("defaultEmoteContainerHeight", "text", dis.E) + '<br /><br />Wide reddit mode - messages/posts display across the full width' + makeInput('wideReddit', 'checkbox', dis.all) + '<br />Reveal alt-text?' + makeInput('revealAltText', 'checkbox', dis.all) + '<br />Show pony emotes globally?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all) + '<br />&#160;&#160;Make copy-paste include emote text(FF only)' + makeInput("emoteCopy", "checkbox", dis.FF) + '<br /><br />Make reddit searchbars spike' + makeInput('searchbarSpike', 'checkbox', dis.all) + '<br />&#160;&#160;Try to make all searchbars spike' + makeInput('searchbarSpikeEverywhere', 'checkbox', dis.all) + '<br />&#160;&#160;Include non-mlp subreddits. homestuck,minecraft,f7u12' + makeInput('otherSubCSS', 'checkbox', dis.all) + '<br />&#160;&#160;To add more subreddits, add the names here.<br />&#160;&#160;Separate using commas!eg: sub1,sub2' + makeInput('additionalSubreddits_', 'text', dis.all) + '<br />&#160;&#160;Include <b style="color: red;">NSFW</b> emotes.(You probably don\'t want to)' + makeInput('nsfwDefunctEmotes', 'checkbox', dis.all) + '<br />&#160;&#160;Try to find and replace unknown emotes with a message' + makeInput('displayUnknownEmotes', 'checkbox', dis.all) + '<br /><br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all) + '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
 			settingsForm = document.getElementById('settingsForm');
 			//settingsForm.addEventListener("click", onChange);
 			settingsForm.addEventListener("change", onChange);
@@ -325,9 +338,9 @@ function passFunction(){
 				if(currentVersion <= localVersion){
 					document.getElementById('noUpdateAvailable').setAttribute('style', '');
 					document.getElementById('updateAvailable').setAttribute('style', 'display: none;');
-					if(!((/unstable/i).test("http://nallar.me/scripts/GrEmBunstable.user.js"))){document.getElementById('installclick3').setAttribute('href',"http://nallar.me/scripts/GrEmBunstable.user.js");}
+					if(!((/unstable/i).test("%^UURL^%"))){document.getElementById('installclick3').setAttribute('href',"%^UURL^%");}
 				}else{
-					if(!((/unstable/i).test("http://nallar.me/scripts/GrEmBunstable.user.js"))){document.getElementById('installclick2').setAttribute('href',"http://nallar.me/scripts/GrEmBunstable.user.js");}
+					if(!((/unstable/i).test("%^UURL^%"))){document.getElementById('installclick2').setAttribute('href',"%^UURL^%");}
 				}
 				var style = ".confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 48% !important; position: relative !important; float: right;}";
 				addCSS(style);
@@ -993,7 +1006,7 @@ function passFunction(){
 				if(!isReddit){
 					convertDefaultGlobalEmotes(evt.target);
 				};
-				var dispUn = (!doRefresh), inSub = (/\.com\/r\//).test(window.location.href), imageAlt = getConf('emoteCopy'), ytExpand = true, msgs = [];
+				var dispUn = (!doRefresh), revAlt = getConf("revealAltText"), inSub = (/\.com\/r\//).test(window.location.href), imageAlt = getConf('emoteCopy'), ytExpand = true, msgs = [];
 				if(markdownConvert){
 					if((/(?:^|\s)(?:md|livePreview)(?:\s|$)/i.test(evt.target.className))){
 						msgs = [evt.target];
@@ -1040,7 +1053,7 @@ function passFunction(){
 								emElem.className += " G_" + href + "_";
 								if(hrefss[2] != undefined)emElem.href = hrefs + '-';
 							}
-							if(emElem.title!=""){//This block is derived from ArbitraryEntity's code.
+							if(revAlt && emElem.title!=""){//This block is derived from ArbitraryEntity's code.
 							//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
 							//Or, code your own replacement for it!
 								var altText = emElem.title;
@@ -1212,6 +1225,17 @@ function passFunction(){
 			//return resultSet;
 		}
 		//End emote search code
+		
+		function resetCache(){
+			confStore["lastVersion"] = localVersion;
+			confStore['csssstore'] = {};
+			confStore['emoteNames'] = defaultConfs['emoteNames'];
+			confStore['justReset'] = true;
+			cssAr = {};
+			removeDefunctConfs();//No saveConf call as this does it!
+			emoteNames = defaultConfs['emoteNames'];
+			emoteNames_ = defaultConfs['emoteNames'];
+		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
 		
 		//START DYNAMIC (using above functions) VARS//
@@ -1226,13 +1250,7 @@ function passFunction(){
 		
 		
 		if(getConf("lastVersion") != localVersion){
-			confStore["lastVersion"] = localVersion;
-			confStore['csssstore'] = {};
-			confStore['emoteNames'] = defaultConfs['emoteNames'];
-			confStore['justReset'] = true;
-			removeDefunctConfs();
-			emoteNames = defaultConfs['emoteNames'];
-			emoteNames_ = defaultConfs['emoteNames'];
+			resetCache();
 			window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
 			if(doNotUse != ""){
 				alert(doNotUse);

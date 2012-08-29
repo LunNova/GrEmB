@@ -23,15 +23,13 @@ if(document.mozSyntheticDocument){
 	return;
 }
 
-var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/main.min.css", otherStylesheet = "http://nallar.me/css/other.min.css", nsfwStylesheet = "http://nallar.me/css/main_nsfw.min.css";
+var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/main.min.css", otherStylesheet = "http://nallar.me/css/other.min.css", nsfwStylesheet = "http://nallar.me/css/main_nsfw.min.css", confStore = undefined, inFrame = (window.top != window);
 var wkMutation = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 if(location.protocol === "https:"){
-	mainStylesheet = "https://nallar.me/scripts/out4.min.css";
-	otherStylesheet = "https://nallar.me/scripts/other.min.css";
-	nsfwStylesheet = "https://nallar.me/scripts/nsfw.min.css";
+	mainStylesheet = "https://nallar.me/css/main.min.css";
+	otherStylesheet = "https://nallar.me/css/other.min.css";
+	nsfwStylesheet = "https://nallar.me/css/main_nsfw.min.css";
 }
-var confStore = undefined;
-var inFrame = (window.top != window);
 
 if(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200)){
 	ranPassFunction = true;
@@ -1254,6 +1252,17 @@ function passFunction(){
 			//return resultSet;
 		}
 		//End emote search code
+		
+		function resetCache(){
+			confStore["lastVersion"] = localVersion;
+			confStore['csssstore'] = {};
+			confStore['emoteNames'] = defaultConfs['emoteNames'];
+			confStore['justReset'] = true;
+			cssAr = {};
+			removeDefunctConfs();//No saveConf call as this does it!
+			emoteNames = defaultConfs['emoteNames'];
+			emoteNames_ = defaultConfs['emoteNames'];
+		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
 		
 		//START DYNAMIC (using above functions) VARS//
@@ -1307,13 +1316,7 @@ function passFunction(){
 		
 		
 		if(getConf("lastVersion") != localVersion){
-			confStore["lastVersion"] = localVersion;
-			confStore['csssstore'] = {};
-			confStore['emoteNames'] = defaultConfs['emoteNames'];
-			confStore['justReset'] = true;
-			removeDefunctConfs();
-			emoteNames = defaultConfs['emoteNames'];
-			emoteNames_ = defaultConfs['emoteNames'];
+			resetCache();
 			window.location.replace(window.location.href.replace(/csscachereset=1/g, ""));
 			if(doNotUse != ""){
 				alert(doNotUse);
@@ -1332,8 +1335,7 @@ function passFunction(){
 			window.location.replace("http://nallar.me/scripts/");
 		});
 		GM_registerMenuCommand('GrEmB - Clear CSS Cache', function (){
-			setConf('csssstore', {});
-			cssAr = {};
+			resetCache();
 			window.location.reload();
 		});
 		GM_registerMenuCommand('GrEmB - Manual Update Check', function (){
