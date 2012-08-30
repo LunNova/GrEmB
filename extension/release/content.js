@@ -1157,7 +1157,7 @@ function passFunction(){
 
 		function findEmoteChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmote(evt.target.value,getConf("emoteSearchReg"))},1000);
+			timer=setTimeout(function(){findEmote(evt.target.value,getConf("emoteSearchReg"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmote(search, findReg){
