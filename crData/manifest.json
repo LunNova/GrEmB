@@ -1,25 +1,27 @@
 {
-   "all_frames": true,
-   "background_page": "background.html",
-   "browser_action": {
-      "default_icon": "logo.png",
-      "default_title": "GrEmB",
-      "popup": "action.html"
-   },
-   "content_scripts": [ {
-      "all_frames": true,
-      "js": [ "content.js" ],
-      "matches": [ "file:///*", "http://*/*", "https://*/*" ],
-      "exclude_globs": [ //IILIST "%S%"	"excludes.list" ", "],
-      "run_at": "document_start"
-   } ],
-   "description": "Displays emotes from reddit globally. Numerous optional style tweaks and emote-related features.",
-   "icons": {
-      "128": "logo.png"
-   },
-   "minimum_chrome_version": "20.0.0.0",
-   "name": "GrEmB",
-   "permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
-   "offline_enabled": true,
-   "version": "%%Version%%"
+	"background": {
+		"scripts": ["background.js"]
+	},
+	"browser_action": {
+		"default_icon": "logo.png",
+		"default_title": "GrEmB",
+		"popup": "action.html"
+	},
+	"content_scripts": [ {
+		"all_frames": true,
+		"js": [ "content.js" ],
+		"matches": [ "file:///*", "http://*/*", "https://*/*" ],
+		"exclude_globs": [ //IILIST "%S%"	"excludes.list" ", "],
+		"run_at": "document_start"
+	} ],
+	"description": "Displays emotes from reddit globally. Numerous optional style tweaks and emote-related features.",
+	"icons": {
+		"128": "logo.png"
+	},
+	"minimum_chrome_version": "20.0.0.0",
+	"name": "GrEmB",
+	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
+	"offline_enabled": true,
+	"version": "%%Version%%",
+	"manifest_version": 2
 }
