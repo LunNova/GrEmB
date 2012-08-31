@@ -5,7 +5,7 @@
 	"browser_action": {
 		"default_icon": "logo.png",
 		"default_title": "GrEmB",
-		"popup": "action.html"
+		"default_popup": "action.html"
 	},
 	"content_scripts": [ {
 		"all_frames": true,
@@ -22,6 +22,6 @@
 	"name": "GrEmB",
 	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
 	"offline_enabled": true,
-	"version": "1.98",
+	"version": "1.9801",
 	"manifest_version": 2
 }

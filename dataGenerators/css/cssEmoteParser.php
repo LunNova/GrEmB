@@ -36,12 +36,14 @@ class cssEmoteParser{
 	private $len;
 	private $whiteSpace = Array("\n"=>true,"\r"=>true);
 	private $stringChars = Array('"'=>true,"'"=>true);
+	private $stringCache = false;
 	public $selectorSeparator = "";
 	public $data = "";
 	public $tokens = Array();
 	public $emotePriorities = Array();
-	public $nsfw = Array('/o21h4/','/yqm7o/','.domain');
+	public $nsfw = Array('/o21h4/','/yqm7o/','.domain','rsaddash','class~="comments"','.sidecontentbox','.thumbnail','.title', '#siteTable', '.link');
 	public $names = Array();
+	public $noCompress = Array();
 	public $emoteCount = 0;
 	
 	public static $testFile = "http://reddit.com/r/mylittlepony/stylesheet.css";
@@ -70,21 +72,6 @@ class cssEmoteParser{
 			}
 		}while(++$n<=$i);
 		return "$line:$linePos";
-	}
-	
-	private function parseSelector($s){
-		$c = substr($s,0,1);
-		$mType = preg_match('/a(?:\:\:?[a-zA-Z]+?)?\[href.\=/',$s)?'emote':'elem';
-		switch($c){
-			case '.':
-				$t = 'class';
-				$s = substr($s,1);
-				break;
-			default:
-				$t = $mType;
-		}
-		return Array($t,$s);
-		
 	}
 	
 	private function getToken($open=Array(),$close=false,$str=false,$ws=false,$split=false){
@@ -160,6 +147,7 @@ class cssEmoteParser{
 		$selector = preg_replace("/a(?:.md)?\[href[|]?=['\"]?\/([a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
 		$selector = str_replace("a[href",".md a[href",$selector);
 		$selector = str_replace(".md .md",".md",$selector);
+		$selector = str_replace("+ .md a[","+ a[",$selector);
 		return $selector;
 	}
 	
@@ -205,6 +193,8 @@ class cssEmoteParser{
 	
 	public function finalize(){
 		$byProperties = Array();
+		$nc = " ";
+		$this->tokens = array_reverse($this->tokens);
 		foreach($this->tokens as $k => &$t){
 			foreach($t["selectors"] as $ek => &$emoteName){
 				if(@$this->emotePriorities[self::cleanName($emoteName)] > $t["priority"]){
@@ -220,10 +210,14 @@ class cssEmoteParser{
 				continue;
 			}
 			$this->emoteCount += count($t["selectors"]);
-			if(!isset($byProperties[$t["properties"]])){
-				$byProperties[$t["properties"]] = Array($t);
+			$propKey = $t["properties"];
+			if(@$noCompress[$t["priority"]]){
+				$propKey .= ($nc .= " ");
+			}
+			if(!isset($byProperties[$propKey])){
+				$byProperties[$propKey] = Array($t);
 			}else{
-				$byProperties[$t["properties"]][] = $t;
+				$byProperties[$propKey][] = $t;
 			}
 		}
 		//return;
@@ -239,22 +233,26 @@ class cssEmoteParser{
 			}
 			$i++;
 		}
+		$this->tokens = array_reverse($this->tokens);
 	}
 	
 	private static function isEmote($s){
 	//echo $s;
-		if(stripos($s,".G_")!==false || preg_match("/a(?:\.convertedEmote_)?\[href[\^\|\*]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0){
+		if(stripos($s,".G_")!==false || preg_match("/a(?:\.convertedEmote_)?\[href[\^\|]?=['\"]?\/([^'\"]+?)['\"]?\]/",$s)>0 || preg_match("/a(?:\.convertedEmote_)?\[href\*=['\"]?([^'\"]+?)['\"]?\]/",$s)>0){
 			return true;
 		}
 		return false;
 	}
 	
-	function parseString($css,$name="",$clean=true){
+	function parseString($css,$name="",$clean=false,$noCompress=false){
 		$this->cssNum++;
+		$this->stringCache = false;
 		$this->names[$this->cssNum] = $name;
+		$this->noCompress[$this->cssNum] = $noCompress;
+		$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;"),"",$css);
+		$css = preg_replace('/\/\*[\s\S]*?\*\//','',$css);
 		if($clean){
-			$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;"),"",$css);
-			$css = CssMin::minify(preg_replace('/\/\*[\s\S]*?\*\//','',$css));
+			$css = CssMin::minify($css);
 		}
 		list($this->data,$this->len) = Array($css,strlen($css)-1);
 		$this->i = 0;
@@ -266,6 +264,9 @@ class cssEmoteParser{
 	}
 
 	function toString(){
+		if($this->stringCache){
+			return $this->stringCache;
+		}
 		$str = "/*Parsed {$this->emoteCount} emote aliases.*/\n";
 		foreach($this->tokens as $t){
 			$sel = implode(",",$t["selectors"]);
@@ -274,7 +275,16 @@ class cssEmoteParser{
 			$str .= $sel;
 			$str .= "{" . $t["properties"] ."}\n";
 		}
-		return $str;
+		return ($this->stringCache = $str);
+	}
+	
+	function getEmoteNames(){
+		preg_match_all("/\.G_([0-9a-zA-Z]+)_/i", $this->toString(), $ret);
+		preg_match_all("/a(?:\.convertedEmote_)?\[href[\*\^\|]?=['\"]\/([^'\"]+?)['\"]/i", $this->toString(), $ret2);
+		
+		$ret = array_unique(array_merge($ret[1],$ret2[1]));
+		natsort($ret);
+		return $ret;
 	}
 }
 
