@@ -84,7 +84,7 @@ def parseJS(d,depth, noRecurse=False):
 			falseCode = ms.group(3)
 		
 		trueCode, falseCode = trueCode if trueCode else "", falseCode if falseCode else ""
-		trueCode, falseCode = re.sub(r"^\s?(.+?)\s?$",r"\1", trueCode, re.DOTALL), re.sub(r"^\s?(.+?)\s?$",r"\1", falseCode, re.DOTALL)
+		trueCode, falseCode = re.sub(r"^\s*(.+?)\s*$",r"\1", trueCode, re.DOTALL), re.sub(r"^\s*(.+?)\s*$",r"\1", falseCode, re.DOTALL)
 		if m.group(1):
 			trueCode, falseCode = falseCode, trueCode
 		try:

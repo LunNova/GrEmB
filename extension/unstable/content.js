@@ -146,9 +146,7 @@ function passFunction(){
 		}
 		
 		function G_safeGetValue(){
-			
 			return confStore;
-			
 		};
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
@@ -195,9 +193,7 @@ function passFunction(){
 		};
 		
 		function saveConf(){
-			
 			chrome.extension.sendMessage({method: "setConf",data:confStore});
-			
 		}
 		
 		function removeDefunctConfs(){
@@ -1376,7 +1372,5 @@ function fakeTimeout(callback){
 
 if(!ranPassFunction){
 	var runScript = function(){fakeTimeout(passFunction);}
-	
 	chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});
-	
 }
