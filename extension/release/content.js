@@ -129,14 +129,26 @@ function passFunction(){
 		//END STATIC VARS
 		
 		////////////////////////////START FUNCTIONS////////////////////////////
-				function GM_xmlhttpRequest(request){		var onComplete = request.onload;		delete(request.onload);		chrome.extension.sendMessage({method: "xhr", request: request},function(response){onComplete(response.data)});	}		
+		
+		function GM_xmlhttpRequest(request){
+			var onComplete = request.onload;
+			delete(request.onload);
+			chrome.extension.sendMessage({method: "xhr", request: request},function(response){onComplete(response.data)});
+		}
+		
 		function trim(str){
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		};
 		
-				if(confStore == undefined || !confStore['alwaysTrue']){		confStore = defaultConfs;	}		
+		
+		if(confStore == undefined || !confStore['alwaysTrue']){
+			confStore = defaultConfs;
+		}
+		
 		function G_safeGetValue(){
-						return confStore;	
+			
+			return confStore;
+			
 		};
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
@@ -183,7 +195,9 @@ function passFunction(){
 		};
 		
 		function saveConf(){
-						chrome.extension.sendMessage({method: "setConf",data:confStore});	
+			
+			chrome.extension.sendMessage({method: "setConf",data:confStore});
+			
 		}
 		
 		function removeDefunctConfs(){
@@ -747,13 +761,21 @@ function passFunction(){
 				headers: {
 					'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey nallar.me/scripts/ GrEmB',
 					'Accept': 'text/plain,text/html,text/css',
+					'Content-type': 'application/x-www-form-urlencoded',
 				},
 				onload: function (res){
-					emoteNames = JSON.parse(res.responseText);
+					try{
+						emoteNames = JSON.parse(res.responseText);
+					}catch(e){
+						console.log("response: " + res.responseText);
+						console.log("data: subs=" + encodeURIComponent(subs));
+						console.log("url: http://nallar.me/css/names.php?nsfw=" + (nsfw ? "1":"0"));
+						console.log(e);
+						return;
+					}
 					setConf("cssKey", emoteNames.cssKey);
 					delete(emoteNames.cssKey);
 					setConf('emoteNames', emoteNames);
-					updateSubredditCSS();
 					return incLoadedStyles();
 				},
 				data: "subs=" + encodeURIComponent(subs)
@@ -1091,7 +1113,10 @@ function passFunction(){
 			wt += endSSection("initial conversion pass");
 		};
 		
-					function debug(){};		sSection = sSSection = endSection = endSSection = function(){};		
+		
+			function debug(){};
+			sSection = sSSection = endSection = endSSection = function(){};
+		
 		
 		var lastSearch = '';
 		var resultSet = false;
@@ -1167,7 +1192,16 @@ function passFunction(){
 		//END DYNAMIC VARS
 		
 		//Start script body!
-				chrome.extension.onMessage.addListener(function(request,sender,sendResponse){		switch(request.method){			case 'clearCssCache':				resetCache(true);				break;		}		return false;	});		
+		
+		chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
+			switch(request.method){
+				case 'clearCssCache':
+					resetCache(true);
+					break;
+			}
+			return false;
+		});
+		
 		
 		console.log("lcut: "+getConf("nextCacheUpdateTime")+"\t Date: "+(new Date()).getTime());
 		if(getConf("lastVersion") != localVersion || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
@@ -1299,5 +1333,7 @@ function fakeTimeout(callback){
 
 if(!ranPassFunction){
 	var runScript = function(){fakeTimeout(passFunction);}
-		chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});	
+	
+	chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});
+	
 }

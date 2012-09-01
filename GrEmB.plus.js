@@ -767,13 +767,21 @@ function passFunction(){
 				headers: {
 					'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey nallar.me/scripts/ GrEmB',
 					'Accept': 'text/plain,text/html,text/css',
+					'Content-type': 'application/x-www-form-urlencoded',
 				},
 				onload: function (res){
-					emoteNames = JSON.parse(res.responseText);
+					try{
+						emoteNames = JSON.parse(res.responseText);
+					}catch(e){
+						console.log("response: " + res.responseText);
+						console.log("data: subs=" + encodeURIComponent(subs));
+						console.log("url: http://nallar.me/css/names.php?nsfw=" + (nsfw ? "1":"0"));
+						console.log(e);
+						return;
+					}
 					setConf("cssKey", emoteNames.cssKey);
 					delete(emoteNames.cssKey);
 					setConf('emoteNames', emoteNames);
-					updateSubredditCSS();
 					return incLoadedStyles();
 				},
 				data: "subs=" + encodeURIComponent(subs)
