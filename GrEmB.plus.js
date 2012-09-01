@@ -103,6 +103,7 @@ function passFunction(){
 			'emoteCopy': false,
 			'revealAltText': true,
 			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
+			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12'],
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 		};
@@ -310,10 +311,11 @@ function passFunction(){
 		function manageSubs(){
 			var msHTML = "<table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
 			var groups = getConf("emoteGroups");
+			var groupOrder = getConf("emoteGroupsOrder");
 			var nsfw = false;
-			for(var i in groups){
-				var group = groups[i];
-				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+i+"' id='C_"+i+"'"+(group.enabled?" checked='checked'":"")+"/></td></tr>";
+			for(var i = 0; i < groupOrder.length; i++){
+				var group = groups[groupOrder[i]];
+				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/></td></tr>";
 				if(group.nsfw){
 					nsfw = true;
 				}
