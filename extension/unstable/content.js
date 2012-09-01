@@ -308,7 +308,7 @@ function passFunction(){
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
-				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/></td></tr>";
+				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/> <a id='Cu_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8593 </a><a id='Cd_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8595;</a></td></tr>";
 				if(group.nsfw){
 					nsfw = true;
 				}
@@ -318,8 +318,41 @@ function passFunction(){
 			document.getElementById('manageSubs').innerHTML = msHTML;
 			for(var i in groups){
 				var c = document.getElementById('C_'+i);
-				c.addEventListener("change",function(evt){confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;saveConf();manageSubs();setConf("lastVersion",1);});
+				c.addEventListener("change",function(evt){
+					confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;
+					saveConf();
+					manageSubs();
+					setConf("lastVersion",1);
+				});
+				c = document.getElementById('Cu_'+i);
+				c.addEventListener("click",function(evt){
+					evt.preventDefault();
+					evt.stopPropagation();
+					moveGroup(evt.target.name, -1);
+					return false;
+				});
+				c = document.getElementById('Cd_'+i);
+				c.addEventListener("click",function(evt){
+					evt.preventDefault();
+					evt.stopPropagation();
+					moveGroup(evt.target.name, 1);
+					return false;
+				});
 			}
+		}
+		
+		function moveGroup(group, d){
+			var source = confStore['emoteGroupsOrder'].indexOf(group);
+			var destination = confStore['emoteGroupsOrder'].indexOf(group)+d;
+			if(source < 0 || source >= confStore['emoteGroupsOrder'].length || destination < 0 || destination >= confStore['emoteGroupsOrder'].length){
+				return;
+			}
+			var temp = confStore['emoteGroupsOrder'][destination];
+			confStore['emoteGroupsOrder'][destination] = group;
+			confStore['emoteGroupsOrder'][source] = temp;
+			saveConf();
+			manageSubs();
+			setConf("lastVersion",1);
 		}
 		
 		function getSubList(){
@@ -1301,7 +1334,7 @@ function passFunction(){
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
 			var redditSize = (getConf("wideReddit") ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}#G_manageSubs td a{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
 		wt += endSSection("Added styles and initialised");
