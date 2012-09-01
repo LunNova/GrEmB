@@ -723,16 +723,15 @@ function passFunction(){
 		function incLoadedStyles(){
 			loadedStyles++;
 			if(window.top === window && (showNotice || window.location.host == "nallar.me")){
-				if(!document.getElementById("loadingNotice")){
+				var ln = document.getElementById("loadingNotice");
+				if(!ln){
 					var cssElem = document.createElement('div');
 					cssElem.id = 'loadingNotice';
 					document.body.appendChild(cssElem);
+					ln = document.getElementById("loadingNotice");
 				}
-				if(document.getElementById("loadingNotice")){
-					var ln = document.getElementById("loadingNotice");
-					delete ln.style.display;
-					ln.innerHTML = "Reloading cached CSS - " + loadedStyles + "/" + requiredStyles;
-				}
+				delete ln.style.display;
+				ln.innerHTML = "Reloading cached CSS - " + loadedStyles + "/" + requiredStyles;
 				if(loadedStyles >= requiredStyles && doRefresh){
 					window.location.reload();
 				}
