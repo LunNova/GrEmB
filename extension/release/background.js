@@ -15,10 +15,12 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 		case 'xhr':
 			var xhr = new XMLHttpRequest();
 			xhreq = request.request;
-			console.log(xhreq);
-			xhr.onreadystatechange = function(){if(xhr.readyState === 4){sendResponse({data:{responseText: xhr.responseText}})}};
-			xhr.open("GET", xhreq.url, true);
-			xhr.send();
+			xhr.onreadystatechange = function(){if(xhr.readyState === 4){console.log("Got " + xhreq.url);sendResponse({data:{responseText: xhr.responseText}})}};
+			xhr.open(xhreq.method, xhreq.url, true);
+			if(xhreq.method == "POST"){
+				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			}
+			xhr.send(xhreq.data);
 			return true;
 			break;
 	}
