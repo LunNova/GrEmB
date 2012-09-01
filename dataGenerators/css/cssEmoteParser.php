@@ -249,7 +249,7 @@ class cssEmoteParser{
 		$this->stringCache = false;
 		$this->names[$this->cssNum] = $name;
 		$this->noCompress[$this->cssNum] = $noCompress;
-		$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;"),"",$css);
+		$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;","background-position: -0px -0px;","background-position: 0 0p","background-position: 0px 0px;"),"",$css);
 		$css = preg_replace('/\/\*[\s\S]*?\*\//','',$css);
 		if($clean){
 			$css = CssMin::minify($css);

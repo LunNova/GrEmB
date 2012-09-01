@@ -303,12 +303,21 @@ function passFunction(){
 		function manageSubs(){
 			var msHTML = "<table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
 			var groups = getConf("emoteGroups");
+			var nsfw = false;
 			for(var i in groups){
 				var group = groups[i];
-				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox'"+(group.enabled?" checked='checked'":"")+"/></td></tr>";
+				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+i+"' id='C_"+i+"'"+(group.enabled?" checked='checked'":"")+"/></td></tr>";
+				if(group.nsfw){
+					nsfw = true;
+				}
 			}
+			setConf("nsfwDefunctEmotes",nsfw);
 			msHTML += "</table>";
 			document.getElementById('manageSubs').innerHTML = msHTML;
+			for(var i in groups){
+				var c = document.getElementById('C_'+i);
+				c.addEventListener("change",function(evt){confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;saveConf();manageSubs();setConf("lastVersion",1);});
+			}
 		}
 		
 		function getSubList(){
@@ -320,6 +329,7 @@ function passFunction(){
 			for(var i = 0; i < grps.length; i++){
 				var group = groups[grps[i]];
 				if(group.enabled){
+					console.log("i is enabled");
 					for(var ii = 0; ii < group.subs.length; ii++){
 						subs.push(group.subs[ii]);
 					}
@@ -742,8 +752,12 @@ function passFunction(){
 				}
 				delete ln.style.display;
 				ln.innerHTML = "Reloading cached CSS - " + loadedStyles + "/" + requiredStyles;
-				if(loadedStyles >= requiredStyles && doRefresh){
-					window.location.reload();
+				if(loadedStyles >= requiredStyles){
+					if(doRefresh){
+						window.location.reload();
+					}else{
+						ln.parentNode.removeChild(ln);
+					}
 				}
 			}
 		}
@@ -1265,7 +1279,7 @@ function passFunction(){
 		}
 		
 		if(isReddit||globalConvert||getConf("defaultEmoteContainerEverywhere")){
-			loadStyleSheet(mainStylesheet + getConf("cssKey") + "&nsfw=" + (getConf("nsfwDefunctEmotes")?"1":"0"));
+			loadStyleSheet(mainStylesheet + getConf("cssKey") + "&nsfw=" + (getConf("nsfwDefunctEmotes")?"1":"0"), true);
 		}
 		
 		if(true){
