@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.9801
+// @version		1.9802
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -40,7 +40,7 @@
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
-var localVersion = 1.9801;
+var localVersion = 1.9802;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
