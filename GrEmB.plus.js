@@ -102,7 +102,7 @@ function passFunction(){
 			'wideReddit': false,
 			'emoteCopy': false,
 			'revealAltText': true,
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12'],
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
@@ -308,6 +308,37 @@ function passFunction(){
 			
 		};
 		
+		function editGroup(group){
+			closeEditGroup();
+			var elem = document.createElement("div");
+			elem.id = "editGroupWindow";
+			var groups = getConf("emoteGroups");
+			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit subs in " + groups[group].name + "</h3>";
+			eHTML += "<textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
+			eHTML += "<input id='Csave' type='button' value='save'/><input id='Ccancel' type='button' value='cancel'/>";
+			elem.innerHTML = eHTML;
+			document.body.appendChild(elem);
+			var c = document.getElementById('Ccancel');
+			c.addEventListener("click",function(evt){
+				closeEditGroup();
+			});
+			document.getElementById('Cedit').value = groups[group].subs.join(",");
+			var c = document.getElementById('Csave');
+			c.addEventListener("click",function(evt){
+				groups[group].subs = document.getElementById('Cedit').value.split(",");
+				closeEditGroup();
+				manageSubs();
+				setConf("lastVersion",1);
+			});
+		}
+		
+		function closeEditGroup(){
+			var elem = document.getElementById("editGroupWindow");
+			if(elem){
+				elem.parentNode.removeChild(elem);
+			}
+		}
+		
 		function manageSubs(){
 			var msHTML = "<table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
 			var groups = getConf("emoteGroups");
@@ -315,7 +346,7 @@ function passFunction(){
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
-				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/> <a id='Cu_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8593 </a><a id='Cd_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8595;</a></td></tr>";
+				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/> <a class='G_Ce' id='Cu_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8593 </a><a class='G_Ce' id='Cd_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8595; </a><a id='Ce_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> edit</a></td></tr>";
 				if(group.nsfw){
 					nsfw = true;
 				}
@@ -345,6 +376,13 @@ function passFunction(){
 					moveGroup(evt.target.name, 1);
 					return false;
 				});
+				c = document.getElementById('Ce_'+i);
+				c.addEventListener("click",function(evt){
+					evt.preventDefault();
+					evt.stopPropagation();
+					editGroup(evt.target.name);
+					return false;
+				});
 			}
 		}
 		
@@ -371,7 +409,6 @@ function passFunction(){
 			for(var i = 0; i < grps.length; i++){
 				var group = groups[grps[i]];
 				if(group.enabled){
-					console.log("i is enabled");
 					for(var ii = 0; ii < group.subs.length; ii++){
 						subs.push(group.subs[ii]);
 					}
@@ -749,14 +786,14 @@ function passFunction(){
 				emotes += "<div id='GrEmBsearchcontainer' style='overflow-y: auto !important;' class='GrEmBEmoteList'><label for='emName'>search:</label><input type='text' name='search' id='emName' style='max-width: 80%;'/><input title='Use regular expressions for search(advanced)' id=\"emNameReg\" type=\"checkbox\""+(getConf("emoteSearchReg")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' style='height: " + (getConf("defaultEmoteContainerHeight") - 65) + "px; overflow-y: scroll !important;' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-			emotes += "/*rmlp.html*/";
+			emotes += "/*INCLUDE 'rmlp.html'*/";
 			if(mlas1 != ""){
 				emotes += "</div></div><div id='GrEmBMLAS1container' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "/*rmlas1nsfw.html*/";
+				emotes += "/*INCLUDE 'rmlas1nsfw.html'*/";
 			}
 			if(iltbat != ""){
 				emotes += "</div></div><div id='GrEmBILTBATcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "/*riltbat.html*/";
+				emotes += "/*INCLUDE 'riltbat.html'*/";
 			}
 			emotes += "</div></div>";
 			return emotes;
@@ -1343,10 +1380,8 @@ function passFunction(){
 		});
 		//ENDIF
 		
-		console.log("lcut: "+getConf("nextCacheUpdateTime")+"\t Date: "+(new Date()).getTime());
 		if(getConf("lastVersion") != localVersion || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
 			resetCache();
-			console.log("lcut: "+getConf("nextCacheUpdateTime")+"\t Date: "+(new Date()).getTime());
 		} else if((/allconfreset=1/).test(window.location.href)){
 			confStore = {};
 			removeDefunctConfs();
@@ -1402,7 +1437,7 @@ function passFunction(){
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
 			var redditSize = (getConf("wideReddit") ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}#G_manageSubs td a{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#G_manageSubs td a{cursor: pointer; color: blue;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
 		wt += endSSection("Added styles and initialised");
