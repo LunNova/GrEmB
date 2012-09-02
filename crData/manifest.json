@@ -18,7 +18,7 @@
 	"icons": {
 		"128": "logo.png"
 	},
-	"minimum_chrome_version": "20.0.0.0",
+	"minimum_chrome_version": "18.0.0.0",
 	"name": "GrEmB",
 	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
 	"offline_enabled": true,

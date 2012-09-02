@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.9805
+// @version		1.98070
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -40,7 +40,7 @@
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
-var localVersion = 1.9805;
+var localVersion = 1.98070;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -74,7 +74,7 @@ function passFunction(){
 		//START STATIC VARS
 		var subs = ["mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"];
 		
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeSBConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -124,6 +124,7 @@ function passFunction(){
 			'lastVersion': localVersion,
 			'lastUpdate': 0,
 			'wideReddit': false,
+			'smallToggler': true,
 			'emoteCopy': false,
 			'revealAltText': true,
 			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
@@ -318,7 +319,7 @@ function passFunction(){
 			var elem = document.createElement("div");
 			elem.id = "editBlacklistWindow";
 			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit emote blacklist</h3>";
-			eHTML += "Enter emote names here, separated by commas.<br /><textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
+			eHTML += "Enter emote names here, separated by commas.<br /><textarea style='width: 85%; height: 40%;' id='Cedit'></textarea>";
 			eHTML += "<input type='textbox' id='Cbl'/><input type='button' id='Cabl' value='Blacklist emotes containing this.'/>";
 			eHTML += "<input style='float:right;' id='Cclose' type='button' value='done'/>";
 			elem.innerHTML = eHTML;
@@ -501,6 +502,7 @@ function passFunction(){
 			prefHTML += '<br />&#160;&#160;Which side of the screen should the Emote Window be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:");
 			prefHTML += '<br />&#160;&#160;Include r/mylittleandysonic1 emotes?' + makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
+			prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + makeInput('smallToggler', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
 			prefHTML += '<br />&#160;&#160;Emote window vertical position in pixels (Use 41 to line up for RES)' + makeInput("defaultEmoteContainerY", "text", dis.E);
 			prefHTML += '<br />&#160;&#160;Emote window width in pixels' + makeInput("defaultEmoteContainerWidth", "text", dis.E);
@@ -510,7 +512,7 @@ function passFunction(){
 			prefHTML += '<br />Show pony emotes globally?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
 			prefHTML += '<br />&#160;&#160;Make copy-paste include emote text(FF only)' + makeInput("emoteCopy", "checkbox", dis.FF);
 			prefHTML += '<div align="right" id="manageSubs"></div>';
-			prefHTML += '<br /><br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all);
+			prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all);
 			prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
 			superBundlePrefs.innerHTML = prefHTML;
 			settingsForm = document.getElementById('settingsForm');
@@ -519,8 +521,8 @@ function passFunction(){
 			manageSubs();
 		}
 		
-		function addSBConf(){
-			if(madeSBConf){
+		function addConf(){
+			if(madeConf){
 				return;
 			}
 			superBundlePrefs = document.getElementById("superBundleConfAnchor");
@@ -534,16 +536,21 @@ function passFunction(){
 				}else{
 					
 				}
-				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 55% !important; margin-left: 52% !important;}";
+				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 85%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px;} #page {width: 55% !important; margin-left: 52% !important;}";
 				addCSS(style);
 				showCSS();
 				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
 				superBundlePrefs.setAttribute("class", "confPanel");
-				superBundlePrefs.setAttribute("style", "margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px;");
 				makeWindow();
-				madeSBConf = true;
+				window.addEventListener("resize", resizeConf());
+				resizeConf();
+				madeConf = true;
 			}
 		};
+		
+		function resizeConf(evt){
+			superBundlePrefs.setAttribute("style", "max-height: " + (window.innerHeight-80));
+		}
 		
 		function addCSS(rule){
 			cssStore += ("\r\n \r\n" + rule + "\r\n \r\n");
@@ -734,7 +741,7 @@ function passFunction(){
 			return _child === _parent;
 		}
 		
-		function createEmoteWindow(id, side, x, y, z, w, h, emotes){ //Window ID,side,xPos,Ypos,zPos(Depth/zIndex),width,height,innerHTML for the emotes.
+		function createEmoteWindow(id, side, x, y, z, w, h, emotes, name){ //Window ID,side,xPos,Ypos,zPos(Depth/zIndex),width,height,innerHTML for the emotes.
 			if(window !== window.top){
 				return;
 			}
@@ -747,9 +754,9 @@ function passFunction(){
 			windowToggler.setAttribute("style", "color: black; z-index: " + z + "; position: fixed !important; top: " + y + "px; " + side + ": 10px;");
 			var toggleText = '';
 			if(side === "right"){
-				toggleText = "<b>&lt;&lt;</b>";
+				toggleText = "<b>&lt;&lt;</b>" + name;
 			} else {
-				toggleText = "<b>&gt;&gt;</b>";
+				toggleText = name + "<b>&gt;&gt;</b>";
 			}
 			windowToggler.innerHTML = '<span class="GrEmBTitleText">' + toggleText + '</span>';
 			document.body.appendChild(windowToggler);
@@ -1249,7 +1256,7 @@ function passFunction(){
 		};
 		function createDefWindow(){
 			sSSection();
-			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("defaultEmoteContainerX"), getConf("defaultEmoteContainerY"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("defaultEmoteContainerWidth"), getConf("defaultEmoteContainerHeight"), getDefaultEmoteHTML);
+			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("defaultEmoteContainerX"), getConf("defaultEmoteContainerY"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("defaultEmoteContainerWidth"), getConf("defaultEmoteContainerHeight"), getDefaultEmoteHTML, getConf("smallToggler")?"":"Emotes");
 			wt += endSSection("initial conversion pass");
 		};
 		
@@ -1402,7 +1409,7 @@ function passFunction(){
 		}
 		
 		if(window.top === window){
-			properOnLoadEvent_(function(){setTimeout(addSBConf,300);});
+			properOnLoadEvent_(function(){setTimeout(addConf,300);});
 		}
 		
 		
