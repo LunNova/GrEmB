@@ -1441,6 +1441,9 @@ function passFunction(){
 				case 'clearCssCache':
 					resetCache(true);
 					break;
+				case 'options':
+					window.location.replace("http://nallar.me/scripts/");
+					break;
 			}
 			return false;
 		});

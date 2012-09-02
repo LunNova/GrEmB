@@ -22,6 +22,6 @@
 	"name": "GrEmB",
 	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
 	"offline_enabled": true,
-	"version": "1.9804",
+	"version": "1.9805",
 	"manifest_version": 2
 }

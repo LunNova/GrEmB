@@ -5,3 +5,4 @@ function doMessage(evt){
 	})
 }
 document.getElementById("clearCssCache").addEventListener("click", doMessage);
+document.getElementById("options").addEventListener("click", doMessage);

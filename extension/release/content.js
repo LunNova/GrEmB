@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.9804
+// @version		1.9805
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -40,7 +40,7 @@
 // @updateURL	http://nallar.me/scripts/GrEmB.user.js
 // ==/UserScript==
 
-var localVersion = 1.9804;
+var localVersion = 1.9805;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -1340,6 +1340,9 @@ function passFunction(){
 			switch(request.method){
 				case 'clearCssCache':
 					resetCache(true);
+					break;
+				case 'options':
+					window.location.replace("http://nallar.me/scripts/");
 					break;
 			}
 			return false;
