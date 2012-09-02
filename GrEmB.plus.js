@@ -33,6 +33,10 @@ if(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200)){
 	ranPassFunction = true;
 }
 
+if(!console || !console.log){
+	console = {log: function(s){}};
+}
+
 function passFunction(){
 		if(ranPassFunction||document.getElementById("noGlobalPonymotes")){
 			return (ranPassFunction = true&&false);
@@ -106,6 +110,7 @@ function passFunction(){
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12'],
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
+			'emoteBlacklist': [],
 		};
 		//END STATIC VARS
 		
@@ -128,7 +133,6 @@ function passFunction(){
 				ret = JSON.parse(ret);
 			}
 			if(ret == undefined || (ret['alwaysTrue'] !== true)) {
-				console.log("Reset ret! :o");
 				ret = defaultConfs;
 				GM_setValue('confArray', JSON.stringify(ret));
 			}
@@ -229,7 +233,7 @@ function passFunction(){
 				return '<span style=\'float: right !important;\'><input id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis_ + '/></span>';
 			}
 			if(type == 'text'){
-				return '<span style=\'float: right !important;\'><input id="' + id + '" style="height: 18px;" name="conf" value="' + getConf(id) + '" type="textarea" ' + dis_ + '"/></span>';
+				return '<span style=\'float: right !important;\'><input id="' + id + '" name="conf" value="' + getConf(id) + '" type="textarea" ' + dis_ + '"/></span>';
 			}
 			if(type == 'radio2'){
 				return '<span style=\'float: right !important;\'>' + q + '<input id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis_ + '/></span>';
@@ -308,6 +312,49 @@ function passFunction(){
 			
 		};
 		
+		function uniq(a){
+			var o = {}, i, l = a.length, r = [];
+			for(i=0; i<l;i+=1) o[a[i]] = a[i];
+			for(i in o) r.push(o[i]);
+			return r;
+		}
+		
+		function editBlacklist(){
+			closeEditBlacklist();
+			var elem = document.createElement("div");
+			elem.id = "editBlacklistWindow";
+			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit emote blacklist</h3>";
+			eHTML += "Enter emote names here, separated by commas.<br /><textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
+			eHTML += "<input type='textbox' id='Cbl'/><input type='button' id='Cabl' value='Blacklist emotes containing this.'/>";
+			eHTML += "<input style='float:right;' id='Cclose' type='button' value='done'/>";
+			elem.innerHTML = eHTML;
+			document.body.appendChild(elem);
+			document.getElementById('Cedit').value = getConf("emoteBlacklist").join(",");
+			var c = document.getElementById('Cclose');
+			c.addEventListener("click",function(evt){
+				setConf("emoteBlacklist",document.getElementById('Cedit').value.split(","));
+				closeEditBlacklist();
+				setConf("lastVersion",1);
+			});
+			c = document.getElementById('Cabl');
+			c.addEventListener("click",function(evt){
+				var blEmotes = document.getElementById('Cedit').value.split(",");
+				blEmotes = blEmotes.concat(findEmotes(document.getElementById('Cbl').value, false, true));
+				console.log("Searched for: "+ document.getElementById('Cbl').value);
+				blEmotes = uniq(blEmotes);
+				setConf("emoteBlacklist",blEmotes);
+				document.getElementById('Cedit').value = blEmotes.join(",");
+				setConf("lastVersion",1);
+			});
+		}
+		
+		function closeEditBlacklist(){
+			var elem = document.getElementById("editBlacklistWindow");
+			if(elem){
+				elem.parentNode.removeChild(elem);
+			}
+		}
+		
 		function editGroup(group){
 			closeEditGroup();
 			var elem = document.createElement("div");
@@ -340,14 +387,14 @@ function passFunction(){
 		}
 		
 		function manageSubs(){
-			var msHTML = "<table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
+			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
 			var groups = getConf("emoteGroups");
 			var groupOrder = getConf("emoteGroupsOrder");
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
 				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/> <a class='G_Ce' id='Cu_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8593 </a><a class='G_Ce' id='Cd_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8595; </a><a id='Ce_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> edit</a></td></tr>";
-				if(group.nsfw){
+				if(group.nsfw && group.enabled){
 					nsfw = true;
 				}
 			}
@@ -384,6 +431,13 @@ function passFunction(){
 					return false;
 				});
 			}
+			c = document.getElementById('editBlacklist');
+			c.addEventListener("click",function(evt){
+				evt.preventDefault();
+				evt.stopPropagation();
+				editBlacklist();
+				return false;
+			});
 		}
 		
 		function moveGroup(group, d){
@@ -470,6 +524,7 @@ function passFunction(){
 			superBundlePrefs.innerHTML = prefHTML;
 			settingsForm = document.getElementById('settingsForm');
 			settingsForm.addEventListener("change", onChange);
+			document.getElementById('saveSubmit').addEventListener("click", function(){onChange();window.location.reload();});
 			manageSubs();
 		}
 		
@@ -484,13 +539,17 @@ function passFunction(){
 				document.getElementById("yourVersion").innerHTML = localVersion;
 				var currentVersion = (+(document.getElementById("currentVersion").textContent));
 				if(currentVersion <= localVersion){
+					//IF !extension
 					document.getElementById('noUpdateAvailable').setAttribute('style', '');
-					document.getElementById('updateAvailable').setAttribute('style', 'display: none;');
+					document.getElementById('updateAvailable').setAttribute('style', 'display: none;');					
 					if(!((/unstable/i).test("%^UURL^%"))){document.getElementById('installclick3').setAttribute('href',"%^UURL^%");}
+					//ENDIF
 				}else{
+					//IF !extension
 					if(!((/unstable/i).test("%^UURL^%"))){document.getElementById('installclick2').setAttribute('href',"%^UURL^%");}
+					//ENDIF
 				}
-				var style = ".confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 48% !important; position: relative !important; float: right;}";
+				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 95%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;} #page {width: 55% !important; margin-left: 52% !important;}";
 				addCSS(style);
 				showCSS();
 				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
@@ -747,9 +806,9 @@ function passFunction(){
 					updateCurrentForm();
 					return true;
 				}, false);
-				document.getElementById("emName").addEventListener("change",findEmoteChange);
-				document.getElementById("emName").addEventListener("keydown",findEmoteChange);
-				document.getElementById("emName").addEventListener("paste",findEmoteChange);
+				document.getElementById("emName").addEventListener("change",findEmotesChange);
+				document.getElementById("emName").addEventListener("keydown",findEmotesChange);
+				document.getElementById("emName").addEventListener("paste",findEmotesChange);
 				document.getElementById("emNameReg").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				addTabs();
@@ -867,6 +926,10 @@ function passFunction(){
 					}
 					setConf("cssKey", emoteNames.cssKey);
 					delete(emoteNames.cssKey);
+					var bl = getConf("emoteBlacklist");
+					for(var i = 0; i < bl.length; i++){
+						delete(emoteNames[bl[i]]);
+					}
 					setConf('emoteNames', emoteNames);
 					return incLoadedStyles();
 				},
@@ -1212,7 +1275,7 @@ function passFunction(){
 			if(isFF){
 				function debug(level, text) {
 					if(103/*REPLACE*/ < level) {
-						console.log(text);
+						//console.log(text);
 					}
 				};
 			}else{
@@ -1266,12 +1329,12 @@ function passFunction(){
 			return true;
 		}
 
-		function findEmoteChange(evt){
+		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmote(evt.target.value,getConf("emoteSearchReg"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,getConf("emoteSearchReg"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
-		function findEmote(search, findReg){
+		function findEmotes(search, findReg, ret){
 			var searchArray;
 			if(emoteNamesArray === false){
 				emoteNamesArray = [];
@@ -1301,6 +1364,9 @@ function passFunction(){
 				}
 			}
 			lastSearch = search;
+			if(ret){
+				return resultSet;
+			}
 			var searchList = document.getElementById("GrEmBSearchList");
 			var ihtml = "";
 			for(var i = 0; i < resultSet.length; i++){
@@ -1437,7 +1503,7 @@ function passFunction(){
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
 			var redditSize = (getConf("wideReddit") ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#G_manageSubs td a{cursor: pointer; color: blue;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#G_manageSubs td a{cursor: pointer; color: blue;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
 		wt += endSSection("Added styles and initialised");
