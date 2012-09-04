@@ -30,6 +30,8 @@ function strca($haystack, $needles, $offset = 0){
 
 class cssEmoteParser{
 	static $debug = Array("superfine"=>0,"fine"=>1,"warning"=>2);
+	static $cachedClean = Array();
+	static $cachedGremb = Array();
 	private $logLevel = 0;
 	private $i = 0;
 	private $cssNum = 0;
@@ -45,6 +47,8 @@ class cssEmoteParser{
 	public $names = Array();
 	public $noCompress = Array();
 	public $emoteCount = 0;
+	public $gremb = true;
+	public $clean = true;
 	
 	public static $testFile = "http://reddit.com/r/mylittlepony/stylesheet.css";
 	public static $testStr = null;
@@ -90,52 +94,70 @@ class cssEmoteParser{
 		$t->start = $this->i;
 		if($close === false){
 			do{
-				if(isset($str[$this->data{$this->i}])){
-					$schar = $this->data{$this->i};
-					$t->a($this->data{$this->i});
+				$c = $this->data{$this->i};
+				if(isset($str[$c])){
+					$schar = $c;
+					//$t->a($c);
+					$t->len++;
+					$t->t.=$c;
 					do{
 						$escape = ($this->data{$this->i} == "\\"&&!$escape);
 						$this->i++;
-						$t->a($this->data{$this->i});
+						//$t->a($this->data{$this->i});
+						$t->len++;
+						$t->t.=$this->data{$this->i};
 					}while($this->i<$this->len&&($this->data{$this->i}!=$schar || $escape));
-				}else if(in_array($this->data{$this->i},$open)){
-					$t->endChar = $this->data{$this->i};
+				}else if(in_array($c,$open)){
+					$t->endChar = $c;
 					return $t;
-				}else if(isset($ws[$this->data{$this->i}])){
+				}else if(isset($ws[$c])){
 					//do nothing?
-				}else if(isset($split[$this->data{$this->i}])){
+				}else if(isset($split[$c])){
 					$t->split();
 				}else{
-					$t->a($this->data{$this->i});
+					//$t->a($c);
+					$t->len++;
+					$t->t.=$c;
 				}
 			}while(++$this->i <= $this->len);
 		}else{
 			$level = 0;
 			do{
-				if(isset($str[$this->data{$this->i}])){
-					$schar = $this->data{$this->i};
-					$t->a($this->data{$this->i});
+				$c = $this->data{$this->i};
+				if(isset($str[$c])){
+					$schar = $c;
+					//$t->a($c);
+					$t->len++;
+					$t->t.=$c;
 					do{
 						$escape = ($this->data{$this->i} == "\\"&&!$escape);
 						$this->i++;
-						$t->a($this->data{$this->i});
+						//$t->a($this->data{$this->i});
+						$t->len++;
+						$t->t.=$this->data{$this->i};
 					}while($this->i<$this->len&&($this->data{$this->i}!=$schar || $escape));
-				}else if(in_array($this->data{$this->i},$open)){
+				}else if(in_array($c,$open)){
 					$level++;
 					if($level > 1){
-						$t->a($this->data{$this->i});
+						//$t->a($c);
+						$t->len++;
+						$t->t.=$c;
 					}
-				}else if(in_array($this->data{$this->i},$close)){
+				}else if(in_array($c,$close)){
 					$level--;
 					if($level > 0){
-						$t->a($this->data{$this->i});
+						//$t->a($c);
+						$t->len++;
+						$t->t.=$c;
 					}
-				}else if(isset($ws[$this->data{$this->i}])){
+				}else if(isset($ws[$c])){
 					//do nothing?
-				}else if(isset($split[$this->data{$this->i}])){
+				}else if(isset($split[$c])){
 					$t->split();
 				}else{
-					$t->a($this->data{$this->i});
+					//$t->a($c);
+					$t->len++;
+					$t->t.=$c;
 				}
 			}while(++$this->i <= $this->len && $level > 0);
 			$t->endChar = $this->data{$this->i-1};
@@ -143,12 +165,21 @@ class cssEmoteParser{
 		}
 	}
 	
-	private static function grembify($selector){
-		$selector = preg_replace("/a(?:.md)?\[href[|]?=['\"]?\/([a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
+	private function grembify($selector){
+		if(isset(self::$cachedGremb[$selector])){
+			return self::$cachedGremb[$selector];
+		}
+		$oselector = $selector;
+		if($this->gremb){
+			$selector = preg_replace("/a(?:.md)?\[href[|]?=['\"]?\/([a-zA-Z0-9_^'\"]+?)['\"]?\]/",".G_\\1_",$selector);
+		}else{
+			$selector = str_replace("a[href=","a[href|=",$selector);
+		}
+		$selector = str_replace(":nth-of-type(n)","",$selector);
 		$selector = str_replace("a[href",".md a[href",$selector);
 		$selector = str_replace(".md .md",".md",$selector);
 		$selector = str_replace("+ .md a[","+ a[",$selector);
-		return $selector;
+		return (self::$cachedGremb[$oselector] = $selector);
 	}
 	
 	private function getSelector(){
@@ -168,7 +199,7 @@ class cssEmoteParser{
 		$emoteSel = Array();
 		sort($s->parts);
 		foreach($s->parts as &$emote){
-			if(!self::isEmote($emote) || @$this->emotePriorities[$cn=self::cleanName($emote = self::grembify($emote))] > $this->cssNum){
+			if(!self::isEmote($emote) || @$this->emotePriorities[$cn=self::cleanName($emote = $this->grembify($emote))] > $this->cssNum){
 				continue;
 			}
 			$emoteSel[] = $emote;
@@ -188,7 +219,11 @@ class cssEmoteParser{
 	}
 	
 	private static function cleanName($emote){
-		return str_replace(array("::after","::before",":after",":before"),"",$emote);
+		if(isset(self::$cachedClean[$emote])){
+			return self::$cachedClean[$emote];
+		}
+		$oemote = $emote;
+		return (self::$cachedClean[$oemote] = str_replace(array("::after","::before",":after",":before"),"",$emote));
 	}
 	
 	public function finalize(){
@@ -244,14 +279,15 @@ class cssEmoteParser{
 		return false;
 	}
 	
-	function parseString($css,$name="",$clean=false,$noCompress=false){
+	function parseString($css,$name="",$clean=true,$noCompress=false){
+		$this->clean = $clean;
 		$this->cssNum++;
 		$this->stringCache = false;
 		$this->names[$this->cssNum] = $name;
 		$this->noCompress[$this->cssNum] = $noCompress;
-		$css = str_replace(array(" !important","!important","display:block;","float:ssleft;","clear:none;","background-position: -0px -0px;","background-position: 0 0p","background-position: 0px 0px;"),"",$css);
-		$css = preg_replace('/\/\*[\s\S]*?\*\//','',$css);
-		if($clean){
+		$str = str_replace('/*/','/* ./',$str);
+		$str = preg_replace('/\/\*[\s\S]*?\*\//','',$str);
+		if($this->clean){
 			$css = CssMin::minify($css);
 		}
 		list($this->data,$this->len) = Array($css,strlen($css)-1);
@@ -267,7 +303,7 @@ class cssEmoteParser{
 		if($this->stringCache){
 			return $this->stringCache;
 		}
-		$str = "/*Parsed {$this->emoteCount} emote aliases.*/\n";
+		$str = "";
 		foreach($this->tokens as $t){
 			$sel = implode(",",$t["selectors"]);
 			//if(stripos($sel,"/],")!==false || stripos($t["properties"],"/],")!==false){ echo $this->names[$t["priority"]]."\t"."\n";
@@ -275,16 +311,29 @@ class cssEmoteParser{
 			$str .= $sel;
 			$str .= "{" . $t["properties"] ."}\n";
 		}
+		$str = str_replace(array(" !important","!important","display:block;","float:left;","clear:none;","background-position: -0px -0px;","background-position: 0 0p","background-position: 0px 0px;"),"",$str);
+		$str = "/*Parsed {$this->emoteCount} emote aliases.*/\n" . $str;
 		return ($this->stringCache = $str);
 	}
 	
-	function getEmoteNames(){
-		preg_match_all("/\.G_([0-9a-zA-Z]+)_/i", $this->toString(), $ret);
-		preg_match_all("/a(?:\.convertedEmote_)?\[href[\*\^\|]?=['\"]\/([^'\"]+?)['\"]/i", $this->toString(), $ret2);
-		
+	function getEmoteNames($key=false,$rem=false){
+		if($rem){
+			$this->emotePriorities = array_diff($this->emotePriorities,array(999));
+		}
+		$names = implode(",",array_keys($this->emotePriorities));
+		preg_match_all("/\.G_([0-9a-zA-Z]+)_/i", $names, $ret);
+		preg_match_all("/a(?:\.convertedEmote_)?\[href[\*\^\|]?=['\"]\/([^'\"]+?)['\"]/i", $names, $ret2);
 		$ret = array_unique(array_merge($ret[1],$ret2[1]));
 		natsort($ret);
-		return $ret;
+		if($key === false){
+			return $ret;
+		}
+		$str = '{"cssKey": "' . $key . "\"";
+		foreach($ret as $e){
+			$str .= ", \"{$e}\": 1";
+		}
+		$str .= "}";
+		return $str;
 	}
 }
 

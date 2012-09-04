@@ -11,7 +11,8 @@
 // @include		http://*/*
 // @include		https://*/*
 //LIST // @exclude		%S%\n	"excludes.list"
-// @updateURL	http://nallar.me/scripts/GrEmB.user.js
+// @updateURL	%^UURL^%
+// @iconURL		http://nallar.me/scripts/logo.png
 // ==/UserScript==
 
 var localVersion = %%UVersion%%;
@@ -52,8 +53,6 @@ function passFunction(){
 		//ENDIF
 		
 		//START STATIC VARS
-		var subs = ["mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"];
-		
 		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
@@ -93,15 +92,13 @@ function passFunction(){
 			'defaultEmoteContainerSide': false,
 			'defaultEmoteContainerGlobal': true,
 			'emoteSearchReg': false,
-			'otherSubCSS': true,
 			'disableEmoteSpin': true,
-			'additionalSubreddits_': '',
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
 			'emoteNames': {},
-			'oldVersion': false,
 			'updateCheckWeekly': !isFF,
-			'lastVersion': localVersion,
+			'lastVersion': 0.01,
+			'shouldReset': false,
 			'lastUpdate': 0,
 			'wideReddit': false,
 			'smallToggler': true,
@@ -109,6 +106,7 @@ function passFunction(){
 			'revealAltText': true,
 			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12'],
+			'lastDefaultEmoteGroups': false,
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
@@ -335,7 +333,7 @@ function passFunction(){
 			c.addEventListener("click",function(evt){
 				setConf("emoteBlacklist",document.getElementById('Cedit').value.split(","));
 				closeEditBlacklist();
-				setConf("lastVersion",1);
+				setConf("shouldReset",true);
 			});
 			c = document.getElementById('Cabl');
 			c.addEventListener("click",function(evt){
@@ -345,7 +343,7 @@ function passFunction(){
 				blEmotes = uniq(blEmotes);
 				setConf("emoteBlacklist",blEmotes);
 				document.getElementById('Cedit').value = blEmotes.join(",");
-				setConf("lastVersion",1);
+				setConf("shouldReset",true);
 			});
 		}
 		
@@ -376,7 +374,7 @@ function passFunction(){
 				groups[group].subs = document.getElementById('Cedit').value.split(",");
 				closeEditGroup();
 				manageSubs();
-				setConf("lastVersion",1);
+				setConf("shouldReset",true);
 			});
 		}
 		
@@ -408,7 +406,7 @@ function passFunction(){
 					confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;
 					saveConf();
 					manageSubs();
-					setConf("lastVersion",1);
+					setConf("shouldReset",true);
 				});
 				c = document.getElementById('Cu_'+i);
 				c.addEventListener("click",function(evt){
@@ -452,7 +450,7 @@ function passFunction(){
 			confStore['emoteGroupsOrder'][source] = temp;
 			saveConf();
 			manageSubs();
-			setConf("lastVersion",1);
+			setConf("shouldReset",true);
 		}
 		
 		function getSubList(){
@@ -551,7 +549,7 @@ function passFunction(){
 					if(!((/unstable/i).test("%^UURL^%"))){document.getElementById('installclick2').setAttribute('href',"%^UURL^%");}
 					//ENDIF
 				}
-				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 85%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px;} #page {width: 55% !important; margin-left: 52% !important;}";
+				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 85%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px; padding-right: 10px;} #page {width: 55% !important; margin-left: 52% !important;}";
 				addCSS(style);
 				showCSS();
 				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
@@ -890,7 +888,7 @@ function passFunction(){
 		
 		function incLoadedStyles(){
 			loadedStyles++;
-			if(window.top === window && (showNotice || window.location.host == "nallar.me")){
+			if(window.top === window && document.body && (showNotice || window.location.host == "nallar.me")){
 				var ln = document.getElementById("loadingNotice");
 				if(!ln){
 					var cssElem = document.createElement('div');
@@ -899,7 +897,7 @@ function passFunction(){
 					ln = document.getElementById("loadingNotice");
 				}
 				delete ln.style.display;
-				ln.innerHTML = "Reloading cached CSS - " + loadedStyles + "/" + requiredStyles;
+				ln.innerHTML = "Reloading Emotes - this may take a while!";
 				if(loadedStyles >= requiredStyles){
 					if(doRefresh){
 						window.location.reload();
@@ -930,6 +928,16 @@ function passFunction(){
 						console.log("url: http://nallar.me/css/names.php?nsfw=" + (nsfw ? "1":"0"));
 						console.log(e);
 						return;
+					}
+					switch(emoteNames.cssKey){
+						case 'generating':
+							setConf('lastVersion', 1);
+							setTimeout(function(){resetCache();}, 3000);
+							return;
+						case 'broken':
+							setConf('emoteGroups', defaultConfs['emoteGroups']);
+							resetCache();
+							return;
 					}
 					setConf("cssKey", emoteNames.cssKey);
 					delete(emoteNames.cssKey);
@@ -1095,11 +1103,11 @@ function passFunction(){
 		function clickBlock(evt){
 				var anchor = evt.target;
 				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == ""){
-					var href = (/^\/([a-zA-Z0-9]+)(-[^\/]+?)?$/).exec(anchor.getAttribute('href'));
-					if(href && (emoteNames[href[1]] || /convertedEmote_/.test(anchor.className))){
+					if(/convertedEmote_/.test(anchor.className)){
 						evt.cancelBubble = true;
 						evt.preventDefault();
 						evt.stopPropagation();
+						return false;
 					}
 				}
 			}
@@ -1154,7 +1162,7 @@ function passFunction(){
 						var elems = msgs[j].getElementsByTagName("A");
 						for(var i = 0, len2 = elems.length; i < len2; i++){
 							var emElem = elems[i];
-							if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)||emElem.childNodes.length||(/ytExpand/).test(emElem.className)){
+							if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)||emElem.childNodes.length>1||(/ytExpand/).test(emElem.className)){
 								continue;
 							}
 							if(ytExpand){
@@ -1170,13 +1178,13 @@ function passFunction(){
 							}
 							var hrefs = emElem.getAttribute('href');
 							emElem.className += " convertedEmote";
-							var hrefss = (/^\/([a-zA-Z0-9_!\%]+)(-[^\/]+?)?$/).exec(hrefs);
+							var hrefss = (/^(?:http\:\/\/nallar.me\/e\.php\?e\=)?\/(\/?[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs);
 							if(!hrefss){
 								continue;
 							}
 							var href = hrefss[1];
 							emElem.className += " convertedEmote_";
-							if(dispUn && emElem.textContent == "" && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
+							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
 								emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 								if(href.length > 20){
 									emElem.className += " G_unknownEmote G_largeUnknown";
@@ -1189,6 +1197,10 @@ function passFunction(){
 							} else if((/^[\-a-zA-Z0-9_]+$/).test(href)){
 								emElem.className += " G_" + href + "_";
 								if(hrefss[2] != undefined)emElem.href = hrefs + '-';
+								if(emElem.firstChild && emElem.firstChild.nodeValue == "Emote"){
+									emElem.removeChild(emElem.firstChild);
+									emElem.href = "/" + href + (hrefss[2] === undefined ? "" : hrefss[2] + '-');
+								}
 							}
 							if(revAlt && emElem.title!=""){//This block is derived from ArbitraryEntity's code.
 							//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
@@ -1456,7 +1468,10 @@ function passFunction(){
 		});
 		//ENDIF
 		
-		if(getConf("lastVersion") != localVersion || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
+		if(getConf("lastVersion") != localVersion){
+			updateGroups();
+			resetCache();
+		}else if(getConf("shouldReset") || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
 			resetCache();
 		} else if((/allconfreset=1/).test(window.location.href)){
 			confStore = {};

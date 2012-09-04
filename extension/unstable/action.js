@@ -5,4 +5,6 @@ function doMessage(evt){
 	})
 }
 document.getElementById("clearCssCache").addEventListener("click", doMessage);
-document.getElementById("options").addEventListener("click", doMessage);
+document.getElementById("options").addEventListener("click", function(){
+	chrome.tabs.create({'url': "http://nallar.me/scripts/"}, function(tab){});
+});

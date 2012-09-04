@@ -15,75 +15,18 @@ $count["fails"] = 0;
 
 $subss["other"] = Array("minecraft", "fffffffuuuuuuuuuuuu", "homestuck");
 $subss["other_nsfw"] = Array();
-$subss["main"] = Array("map.css", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony");
+$subss["main"] = Array("map.css", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony");
 $subss["main_nsfw"] = Array("mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony");
 
 $noCompress = Array("_mylittlecombiners");
 
 $css = Array();
 
-function getStyle($name){
-	global $cached;
-	if(stripos($name,".css") !== false){
-		return file_get_contents($name);
-	}
-	if($cached){
-		$data = @file_get_contents("cachedsubs/$name.css");
-		if($data)return $data;
-	}
-	$data = file_get_contents("http://reddit.com/r/$name/stylesheet.css?v=".rand(1,9999999));
-	file_put_contents("cachedsubs/$name.css",$data);
-	if($cached){
-		sleep(6);
-	}
-	return $data;
-}
-
-$first = true;
-
 foreach($subss as $subsss){
 	foreach($subsss as $sub){
-		if(!$first && !$cached){
-			sleep(6);
-		}
-		$first = false;
-		if(!isset($css[$sub])){
-			$css[$sub] = getStyle($sub);
-			echo ".";
-			$count["subs"]++;
-		}
+		if(!@$css[$sub])$css[$sub]=file_get_contents("subs/$sub.min.css");
 	}
 }
-
-echo "\n";
-
-$fails = Array();
-
-foreach($css as $sub => $data){
-	$i = 0;
-	echo ".";
-	while(!$data && (++$i < 6)){
-		$count["fails"]++;
-		sleep($i * 24);
-		if(!@$css[$sub])$css[$sub] = getStyle($sub);
-		echo "\e[0;35m.";
-	}
-	if($i){
-		echo "\e[00m";
-		$fails[] = "\e[00m$sub failed $i times.";
-	}
-	
-	$cT = new cssEmoteParser();
-	$cT->parseString($css[$sub],$sub,true);
-	$cT->finalize();
-	$css[$sub]=$cT->toString();
-	if(!file_put_contents("subs/$sub.min.css", $css[$sub])){
-		$fails[] = "Failed to write to subs/$sub.min.css";
-	}
-	file_put_contents("subs/$sub.count", $cT->emoteCount);
-}
-
-echo implode("\n",$fails) . "\n";
 
 unset($subsss);
 unset($sub);
@@ -111,7 +54,7 @@ foreach($subss as $k => $subs){
 	$cT->finalize();
 	if($cT->emoteCount > 0){
 		file_put_contents("$k.min.css", $cT->toString());
-		file_put_contents("$k.names", implode("\n",$cT->getEmoteNames()));
+		file_put_contents("$k.names", implode("\n",$cT->getEmoteNames(false,true)));
 		file_put_contents("unstable/$k.min.css", $cT->toString());
 		file_put_contents("$k.count", $cT->emoteCount);
 		if(isset($subss[$k."_nsfw"])){
@@ -120,6 +63,23 @@ foreach($subss as $k => $subs){
 				$nsfwMin[$k."_nsfw"][$ek] = 999;
 			}
 		}
+	}
+	echo "Done $k with {$cT->emoteCount} emotes.\n";
+	sleep(60);
+	continue;
+	$cT = new cssEmoteParser();
+	$cT->gremb = false;
+	if(stripos($k, "_nsfw")===false){
+		$cT->nsfw = array_merge($cT->nsfw,Array("horsecock", "dick", "jizz", "dashurbate"));
+	}else if(isset($nsfwMin[$k])){
+		$cT->emotePriorities = $nsfwMin[$k];
+	}
+	foreach($subs as $s){
+		$cT->parseString(@file_get_contents("cachedsubs/$s.css"),$s,true,in_array($s, $noCompress));
+	}
+	$cT->finalize();
+	if($cT->emoteCount > 0){
+		file_put_contents("$k.style.css", $cT->toString());
 	}
 }
 ?>
