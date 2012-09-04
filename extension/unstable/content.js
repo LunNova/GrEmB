@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.98080
+// @version		1.98090
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -41,7 +41,7 @@
 // @iconURL		http://nallar.me/scripts/logo.png
 // ==/UserScript==
 
-var localVersion = 1.98080;
+var localVersion = 1.98090;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -348,6 +348,13 @@ function passFunction(){
 			}
 		}
 		
+		function updateGroups(){
+			if(getConf('lastDefaultEmoteGroups')){
+			
+			}
+			setConf('lastDefaultEmoteGroups',defaultConfs['emoteGroups']);
+		}
+		
 		function editGroup(group){
 			closeEditGroup();
 			var elem = document.createElement("div");
@@ -397,6 +404,10 @@ function passFunction(){
 			for(var i in groups){
 				var c = document.getElementById('C_'+i);
 				c.addEventListener("change",function(evt){
+					if(evt.target.checked && confStore['emoteGroups'][evt.target.name].nsfw && !getConf("nsfwDefunctEmotes") && !confirm("Are you sure you want to enable this? It's NSFW!")){
+						evt.target.checked = false;
+						return;
+					}
 					confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;
 					saveConf();
 					manageSubs();
@@ -1191,6 +1202,7 @@ function passFunction(){
 							//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
 							//Or, code your own replacement for it!
 								var altText = emElem.title;
+								var altText = emElem.title;
 								var theDiv = document.createElement("div");
 								theDiv.className = "SuperRedditAltTextDisplay_Text";
 								if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))){
@@ -1381,6 +1393,7 @@ function passFunction(){
 		
 		function resetCache(force){
 			removeDefunctConfs();//No saveConf call as this does it!
+			confStore["shouldReset"] = false;
 			confStore["nextCacheUpdateTime"] = (new Date()).getTime()+14400000;
 			confStore["lastVersion"] = localVersion;
 			if(force){
