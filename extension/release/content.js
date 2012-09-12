@@ -586,6 +586,14 @@ function passFunction(){
 			}
 			superBundlePrefs = document.getElementById("superBundleConfAnchor");
 			if(superBundlePrefs){
+				addCSS(style);
+				showCSS();
+				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
+				superBundlePrefs.setAttribute("class", "confPanel");
+				displayConfiguration();
+				window.addEventListener("resize", resizeConf());
+				resizeConf();
+				madeConf = true;
 				document.getElementById("installInstructions").innerHTML = '';
 				document.getElementById("updateInstructions").setAttribute('style', '');
 				document.getElementById("yourVersion").innerHTML = localVersion;
@@ -596,14 +604,6 @@ function passFunction(){
 					
 				}
 				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 85%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px; padding-right: 10px;} #page {width: 55% !important; margin-left: 52% !important;}";
-				addCSS(style);
-				showCSS();
-				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
-				superBundlePrefs.setAttribute("class", "confPanel");
-				displayConfiguration();
-				window.addEventListener("resize", resizeConf());
-				resizeConf();
-				madeConf = true;
 			}
 		};
 		
@@ -1514,6 +1514,12 @@ function passFunction(){
 		}
 		//End emote search code
 		
+		function resetConf(){
+			confStore = {};
+			saveConf();
+			window.location.replace(window.location.href.replace(/allconfreset=1/g, ""));
+		}
+		
 		function resetCache(force){
 			removeDefunctConfs();//No saveConf call as this does it!
 			if(force){
@@ -1554,10 +1560,7 @@ function passFunction(){
 		}
 		
 		if((/scripts\/\?allconfreset=1/).test(window.location.href)){
-			confStore = {};
-			removeDefunctConfs();
-			saveConf();
-			window.location.replace(window.location.href.replace(/allconfreset=1/g, ""));
+			resetConf();
 		}else if(getConf("lastVersion") != localVersion){
 			removeDefunctConfs();
 			updateGroups();
@@ -1567,7 +1570,7 @@ function passFunction(){
 		}
 		
 		if(window.top === window){
-			properOnLoadEvent_(function(){setTimeout(addConf,300);});
+			properOnLoadEvent_(function(){setTimeout(addConf,100);});
 		}
 		
 		
