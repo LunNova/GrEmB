@@ -1,10 +1,11 @@
 <?php
 if(@$_GET['subs'])$_POST['subs'] = $_GET['subs'];
 if(!@$_POST['subs']) die();
-header("Content-type: application/json");
-header("Expires: " . gmdate("D, d M Y H:i:s", time() + 1) . " GMT");
-header("Pragma: cache");
-header("Cache-Control: max-age=1");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 $subs = explode(",",@$_POST['subs']);
 foreach($subs as $kk => &$s){
 	$s = preg_replace("/[^a-zA-Z0-9_\-\.]/","",$s);

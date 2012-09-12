@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.98090
+// @version		1.98260
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -41,7 +41,7 @@
 // @iconURL		http://nallar.me/scripts/logo.png
 // ==/UserScript==
 
-var localVersion = 1.98090;
+var localVersion = 1.98260;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -56,12 +56,13 @@ if(location.protocol === "https:"){
 	mainStylesheet = "https://nallar.me/css/css.php?key=";
 }
 
-if(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200)){
+if((/google\.com\/search/).test(window.location.href)||(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200))){
 	ranPassFunction = true;
 }
 
 if(!console || !console.log){
 	console = {log: function(s){}};
+	console.log("Update Scriptish to the nightly version!");
 }
 
 function passFunction(){
@@ -73,7 +74,7 @@ function passFunction(){
 		
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]+?)"|\s'([^']+)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -105,17 +106,17 @@ function passFunction(){
 			'emoteManagerEverywhere': true,
 			'emoteManagerWindowStyleType': true,
 			'emoteManagerWindowStyle': 'border: 1px solid #E1B000; background-color: #FFFDCC;',
-			'defaultEmoteContainerY': "19",
-			'defaultEmoteContainerX': "10",
-			'defaultEmoteContainerWidth': "300",
-			'defaultEmoteContainerHeight': "375",
+			'emoteContainerY_': 19,
+			'emoteContainerX_': (window.innerWidth-320),
+			'emoteContainerWidth_': 300,
+			'emoteContainerHeight_': 375,
 			'defaultEmoteContainerSide': false,
 			'defaultEmoteContainerGlobal': true,
+			'_emoteContainerAuto': false,
 			'emoteSearchReg': false,
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
-			'emoteNames': {},
 			'updateCheckWeekly': !isFF,
 			'lastVersion': 0.01,
 			'shouldReset': false,
@@ -124,12 +125,14 @@ function passFunction(){
 			'smallToggler': true,
 			'emoteCopy': false,
 			'revealAltText': true,
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0},},
-			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12'],
-			'lastDefaultEmoteGroups': false,
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
+			'lastDefaultEmoteGroups': false,
+			'subKeys': {},
+			'emoteNames': false,
 		};
 		//END STATIC VARS
 		
@@ -300,7 +303,7 @@ function passFunction(){
 			}
 			if(!compareAssociativeArrays(confStore, oconf)){
 				saveConf();
-				makeWindow();
+				displayConfiguration();
 			}
 			
 		};
@@ -349,10 +352,57 @@ function passFunction(){
 		}
 		
 		function updateGroups(){
-			if(getConf('lastDefaultEmoteGroups')){
-			
+			var a, aa = getConf('lastDefaultEmoteGroups'), b, bb = defaultConfs['emoteGroups'], c, cc = getConf('emoteGroups'), toAdd = [], groupOrder = getConf("emoteGroupsOrder");;
+			if(aa){
+				for(var g in bb){
+					a = aa[g]; b = bb[g].subs;
+					if(!a || !cc[g]){
+						a = aa[g] = cc[g] = cloness(bb[g]);
+					}
+					a = a.subs;
+					c = cc[g].subs.slice(0);
+					for (var i = 0; i < a.length; i++) {
+						if (b.indexOf(a[i]) == -1) {
+							var ii = c.indexOf(a[i]);
+							if (ii != -1) {
+								c.splice(ii, ii);
+							}
+						}
+					}
+					for (var i = 0; i < b.length; i++) {
+						if (a.indexOf(b[i]) == -1) {
+							var ii = c.indexOf(b[i + 1]);
+							toAdd.push(b[i]);
+							if(ii != -1){
+								while (toAdd.length > 0) {
+									c.splice(ii, 0, toAdd.pop());
+								}
+							}
+						}
+					}
+					if(toAdd.length > 0){
+						c = toAdd.concat(c);
+					}
+					cc[g].subs = c;
+					if(groupOrder.indexOf(g) == -1){
+						groupOrder.push(g);
+					}
+				}
+				for(var g in aa){
+					if(!bb[g] && cc[g]){
+						delete(cc[g]);
+						groupOrder.splice(groupOrder.indexOf(g));
+					}
+				}
+			}
+			for(var i = 0; i < groupOrder.length; i++){
+				if(!cc[groupOrder[i]]){
+					groupOrder.splice(i);
+				}
 			}
 			setConf('lastDefaultEmoteGroups',defaultConfs['emoteGroups']);
+			setConf('emoteGroups',cc);
+			setConf("emoteGroupsOrder", groupOrder);
 		}
 		
 		function editGroup(group){
@@ -475,12 +525,12 @@ function passFunction(){
 			return subs.join(",");
 		}
 		
-		function makeWindow(){
+		function displayConfiguration(){
 			if(unsupported){
 				superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
 				return;
 			}
-			var dis = {'all':'','E':'','F':'','G':'','S':'','FF':' disabled=\'disabled\'','WK':' disabled=\'disabled\''};
+			var dis = {'all':'','E':'','F':'','G':'','S':'','T': '','WK':' disabled=\'disabled\''};
 
 			if(!getConf("defaultEmoteContainer")){
 				dis.E = " disabled='disabled'";
@@ -492,8 +542,8 @@ function passFunction(){
 			if(getConf("emoteManagerWindowStyleType")){
 				dis.S = " disabled='disabled'";
 			}
-			if(isFF){
-				dis.FF = '';
+			if(getConf("_emoteContainerAuto")){
+				dis.T = " disabled='disabled'";
 			}
 			if(isWebKit){
 				dis.WK = '';
@@ -504,22 +554,22 @@ function passFunction(){
 			oldDis = dis;
 			var prefHTML = "<h3 style='font-size:110%'>GrEmB Configuration</h3><br /><form action='#' name='settingsForm' id='settingsForm'>";
 			
-			prefHTML += 'Include Emote Window?' + makeInput('defaultEmoteContainer', 'checkbox', dis.all);
+			prefHTML += 'Include Emote Window/Search?' + makeInput('defaultEmoteContainer', 'checkbox', dis.all);
 			prefHTML += '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Display emote window on top of reddit header?' + makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Which side of the screen should the Emote Window be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:");
+			prefHTML += '<br />&#160;&#160;Open emote window automatically when a text box is selected?' + makeInput('_emoteContainerAuto', 'checkbox', dis.E);
+			prefHTML += (getConf('_emoteContainerAuto')?'':'<br />&#160;&#160;Which side of the screen should the toggler be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:"));
 			prefHTML += '<br />&#160;&#160;Include r/mylittleandysonic1 emotes?' + makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + makeInput('smallToggler', 'checkbox', dis.E);
 			prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
-			prefHTML += '<br />&#160;&#160;Emote window vertical position in pixels (Use 41 to line up for RES)' + makeInput("defaultEmoteContainerY", "text", dis.E);
-			prefHTML += '<br />&#160;&#160;Emote window width in pixels' + makeInput("defaultEmoteContainerWidth", "text", dis.E);
-			prefHTML += '<br />&#160;&#160;Emote window height in pixels' + makeInput("defaultEmoteContainerHeight", "text", dis.E);
-			prefHTML += '<br /><br />Wide reddit mode - messages/posts display across the full width' + makeInput('wideReddit', 'checkbox', dis.all);
-			prefHTML += '<br />Reveal alt-text?' + makeInput('revealAltText', 'checkbox', dis.all);
-			prefHTML += '<br />Show pony emotes globally?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
-			prefHTML += '<br />&#160;&#160;Make copy-paste include emote text(FF only)' + makeInput("emoteCopy", "checkbox", dis.FF);
+			prefHTML += '<br /><br />Wide reddit - comments as wide as your screen will allow, so some large emotes can fit' + makeInput('wideReddit', 'checkbox', dis.all);
+			prefHTML += '<br />Show hover text?' + makeInput('revealAltText', 'checkbox', dis.all);
+			prefHTML += '<br />Show emotes on all websites?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
+			if(isFF){
+				prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + makeInput("emoteCopy", "checkbox", dis.all);
+			}
 			prefHTML += '<div align="right" id="manageSubs"></div>';
 			prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all);
 			prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
@@ -550,7 +600,7 @@ function passFunction(){
 				showCSS();
 				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
 				superBundlePrefs.setAttribute("class", "confPanel");
-				makeWindow();
+				displayConfiguration();
 				window.addEventListener("resize", resizeConf());
 				resizeConf();
 				madeConf = true;
@@ -601,31 +651,32 @@ function passFunction(){
 			return bookmark.charCodeAt(2) - 11;
 		}
 
-		function addEmote(event, id){
-			var emoteID, startPos, endPos, formLength, className = event.target.getAttribute("class");
-			if(!className||!currentForm){
+		function addEmoteByEvent(evt, id){
+			var emoteID, startPos, endPos, formLength, className = evt.target.getAttribute("class");
+			if(!className||currentForm==document.body){
 				return true;
 			}
-			emoteID = className.match((/^G_(.+?)_(?: G_small)?$/))[1];
-			
+			emoteID = className.match((/^G_(.+?)_(?: G_small)?$/));
 			if(!emoteID){
 				return true;
 			}
-			event.stopPropagation();
-			event.preventDefault();
-			emoteID = emoteID + (event.ctrlKey ? '-inp':'') + (event.altKey ? '-r': '') + (event.shiftKey ? '-d': '');
-			
-			
+			emoteID = emoteID[1];
+			evt.stopPropagation();
+			evt.preventDefault();
+			addEmote(emoteID + (evt.ctrlKey ? '-inp':'') + (evt.altKey ? '-r': '') + (evt.shiftKey ? '-d': ''), "");
+			return false;
+		}
+		
+		function addEmote(emoteID, alt){
+			var sub = "", links = '', unBlank = false
+			//(emoteNames[emoteID]!==2 && (/\/r\/(mylittlepony|mlplounge)/i.test(window.location.href) || (currentForm.name === "text" && ((links = currentForm.parentNode.parentNode.parentNode.parentNode.parentNode)&&(links = links.getElementsByClassName("noncollapsed")).length)&&(links = links[0].getElementsByClassName("head")).length&& (links = links[0].getElementsByTagName('A')).length) && (sub = links[Math.min(links.length-1,3)]) && (sub = sub.getAttribute('href').toLowerCase()) && (sub === "/r/mlplounge/" || sub === "/r/mylittlepony/")));
+			emoteID = "/" + emoteID;
+			var emote = "["+(unBlank?'Emote':'')+"](" + ((unBlank?("http://nallar.me/e.php?e="+emoteID):emoteID)) + " ";
 			if(currentForm.value !== undefined){
 				startPos = currentForm.selectionStart;
 				endPos = currentForm.selectionEnd;
 				formLength = currentForm.value.length;
-
-				if(startPos != endPos){
-					currentForm.value = currentForm.value.substring(0, startPos) + "[](/" + emoteID + " \"" + currentForm.value.substring(startPos, endPos) + "\")" + currentForm.value.substring(endPos);
-				} else {
-					currentForm.value = currentForm.value.substring(0, startPos) + "[](/" + emoteID + ")" + currentForm.value.substring(startPos);
-				}
+				currentForm.value = currentForm.value.substring(0, startPos) + emote + "\"" + (alt?alt:currentForm.value.substring(startPos, endPos)) + "\")" + currentForm.value.substring(endPos);
 				currentForm.setSelectionRange(endPos + (currentForm.value.length - formLength), endPos + (currentForm.value.length - formLength));
 			} else if(currentForm.innerText !== undefined){
 				if(window.getSelection){
@@ -636,19 +687,13 @@ function passFunction(){
 					endPos = startPos;
 				}
 				formLength = currentForm.innerText.length;
-
-				if(startPos != endPos){
-					currentForm.innerText = currentForm.innerText.substring(0, startPos) + "[](/" + emoteID + " \"" + currentForm.innerText.substring(startPos, endPos) + "\")" + currentForm.innerText.substring(endPos);
-				} else {
-					currentForm.innerText = currentForm.innerText.substring(0, startPos) + "[](/" + emoteID + ")" + currentForm.innerText.substring(startPos);
-				}
+				currentForm.innerText = currentForm.innerText.substring(0, startPos) + emote + "\"" + (alt?alt:currentForm.innerText.substring(startPos, endPos)) + "\")" + currentForm.innerText.substring(endPos);
 				setCursor(currentForm, endPos + (currentForm.innerText.length - formLength), endPos + (currentForm.innerText.length - formLength));
 			}
 			currentForm.focus();
-			if(!getConf('defaultEmoteContainerMouseLeave')){
-				toggleEmoteWindow(event, id, 1);
-			}
-			return;
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent('keyup', true, true);
+			currentForm.dispatchEvent(event);
 		}
 		
 		function addTabs(){
@@ -658,43 +703,61 @@ function passFunction(){
 				tabs[currentTab] = containers[c];
 				++currentTab;
 			}
+			updateTabs();
+		}
+		
+		function updateTabs(){
+			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
+			var h = getConf("emoteContainerHeight_");
+			var w = getConf("emoteContainerWidth_");
+			for(var t =0; t < tabHeaders.childNodes.length; t++){
+				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
+				var emoteList = tabs[tID].getElementsByClassName('GrEmBEmoteList_')[0];
+				emoteList.style.height = (h - (tID==0?65:39)) + 'px';
+				emoteList.style.width = (w - 2) + 'px';
+			}
 		}
 		
 		function openTab(evt){
 			evt.preventDefault();
 			evt.stopPropagation();
+			if(document.activeElement.id != "emName"){
+				currentForm.focus();
+			}
 			var tabID = evt.target.getAttribute('tabID');
 			if(tabID === undefined || tabID === false || tabID === null){
 				return false;
 			}
+			evt.target.setAttribute('class', 'GrEmBSelectedTab');
 			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
 			for(var t =0; t < tabHeaders.childNodes.length; t++){
-				var tab = tabHeaders.childNodes[t].firstChild;
-				var tID = tab.getAttribute('tabID');
+				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
 				if(tabID == tID){
 					tabs[tID].setAttribute("class", "GrEmBEmoteList");
 				}else{
 					tabs[tID].setAttribute("class", "GrEmBEmoteList closedTab");
+					tabHeaders.childNodes[t].firstChild.setAttribute("class", "");
 				}
 			}
 			return false;
 		}
-		function updateCurrentForm(){
+		function updateCurrentForm(evt){
 			if(!setUpTabs && (getConf("defaultEmoteContainerMLAS1") || getConf("defaultEmoteContainerILTBAT"))){
-				if(!document.getElementById("GrEmBtablist")){
-					debug(104, "Still no element? :S");
-					return;
+				if(document.getElementById("GrEmBtablist")){
+					document.getElementById("GrEmBtablist").addEventListener("click", function (evt){
+						openTab(evt);
+					}, false);
+					setUpTabs = true;
 				}
-				document.getElementById("GrEmBtablist").addEventListener("click", function (evt){
-					openTab(evt);
-				}, false);
-				setUpTabs = true;
 			}
-			if(document.activeElement == document.body){
-				return;
-			}
-			if((document.activeElement.id != "emName")&&(document.activeElement.tagName == "INPUTBOX" || document.activeElement.tagName == "INPUT" || document.activeElement.tagName == "TEXTAREA" || (document.activeElement.contentEditable && document.activeElement.tagName == "DIV"))&&(currentForm != document.activeElement || (window.frames[document.activeElement.name] && window.frames[document.activeElement.name].window && window.frames[document.activeElement.name].window.document && window.frames[document.activeElement.name].window.document.activeElement != currentForm))){
+			if(!/^(?:www\.)?google\.com$/i.test(window.location.host) && (document.activeElement.id != "emName")&&document.activeElement.id!="GrEmBEmoteWindow0"&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),document.activeElement)&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),evt.toElement)){
+				
 				currentForm = document.activeElement;
+				if(getConf('_emoteContainerAuto')){
+					var closed = (currentForm.getAttribute('role')=="search" || /(?:search|username|password)/i.test(currentForm.placeholder)) || !((/(?:TEXT)/i.test(currentForm.tagName)&&currentForm.form)||(/(?:INPUT)/i.test(currentForm.tagName)&&currentForm.type!="password")||currentForm.contentEditable=="true");
+					toggleEmoteWindow(false, 0, closed);
+				}
+				
 				if(currentForm.tagName == "IFRAME"){
 					if(document.activeElement.contentWindow || document.activeElement.contentDocument){
 						currentForm = document.activeElement.contentWindow.document.activeElement || document.activeElement.contentDocument.document.activeElement;
@@ -703,46 +766,97 @@ function passFunction(){
 					}
 				}
 			}
-
+			return true;
 		}
 
-		function toggleEmoteWindow(evt, id, f){
+		function toggleEmoteWindow(evt, id, closed){
 			var emoteWindow = document.getElementById("GrEmBEmoteWindow" + id);
 			if(!emoteWindow){
+				if(closed){
+					return;
+				}
 				windowCreators[id]();
 				emoteWindow = document.getElementById("GrEmBEmoteWindow" + id);
 			}
-			if(!emoteWindow){
-				return debug(103, "Could not find emote window with ID: GrEmBEmoteWindow" + id + "... :( Something broke, report this error.");
-			}
-			if(f){
-				emoteWindow.setAttribute("class", closedWindowClasses);
+			if(closed !== undefined){
+				emoteWindow.setAttribute("class", closed ? closedWindowClasses : windowClasses);
 			} else {
 				emoteWindow.setAttribute("class", (emoteWindow.getAttribute("class") == windowClasses) ? closedWindowClasses : windowClasses);
+			}
+			updateTabs();
+			if(!evt){
+				return;
 			}
 			evt.preventDefault();
 			evt.stopPropagation();
 			evt.cancelBubble = true;
 		}
 
+		function drag(elem, draggedElem, onMove, onFinish) {
+			var oX, oY, lX, lY, moveFunction = function(evt) {
+				lX = evt.clientX, lY = evt.clientY
+				onMove(evt.clientX+oX, evt.clientY+oY);
+			};
+			
+			elem.addEventListener("mousedown", function(evt) {
+				oX = (draggedElem.offsetLeft-evt.clientX), oY = (draggedElem.offsetTop-evt.clientY), lX = evt.clientX, lY = evt.clientY;
+				evt.preventDefault();
+				evt.stopPropagation();
+				window.addEventListener("mousemove", moveFunction);
+			});
+			
+			window.addEventListener("mouseup", function(evt) {
+				window.removeEventListener("mousemove", moveFunction);
+				if(lX!==undefined){
+					onFinish(lX+oX, lY+oY);
+					lX = undefined;
+				}
+			});
+		}
+		
+		function resize(iX, iY, elem, onMove, onFinish) {
+			var oX, oY, lX = undefined, lY, moveFunction = function(evt) {
+				lX = Math.max(167,evt.clientX+oX), lY = Math.max(100,evt.clientY+oY);
+				if(Math.floor(Math.random()*3)==0){
+					onMove(lX, lY);
+				}
+			};
+			
+			elem.addEventListener("mousedown", function(evt) {
+				oX = (iX-evt.clientX), oY = (iY-evt.clientY), lX = evt.clientX, lY = evt.clientY;
+				evt.preventDefault();
+				evt.stopPropagation();
+				window.addEventListener("mousemove", moveFunction);
+			});
+			
+			window.addEventListener("mouseup", function(evt) {
+				window.removeEventListener("mousemove", moveFunction);
+				if(lX!==undefined){
+					onMove(lX, lY);
+					onFinish(lX, lY);
+					iX = lX, iY = lY;
+					lX = undefined;
+				}
+			});
+		}
+		
 		function mouseEnter(_fn){
-			return function (_evt){
-				var relTarget = _evt.relatedTarget;
+			return function (evt){
+				var relTarget = evt.relatedTarget;
 				if(this === relTarget || isAChildOf(this, relTarget)){
 					return;
 				}
-				_fn.call(this, _evt);
+				_fn.call(this, evt);
 			}
 		}
 
 		function isAChildOf(_parent, _child){
-			if(_parent === _child){
+			if(_parent === _child || _parent == undefined){
 				return false;
 			}
 			var limit = 0;
-			while(_child && _child !== _parent && limit < 10){
+			while(_child && _child !== _parent && ++limit < 10){
 				_child = _child.parentNode;
-				limit++;
 			}
 			if(limit >= 10){
 				return false;
@@ -750,100 +864,138 @@ function passFunction(){
 			return _child === _parent;
 		}
 		
-		function createEmoteWindow(id, side, x, y, z, w, h, emotes, name){ //Window ID,side,xPos,Ypos,zPos(Depth/zIndex),width,height,innerHTML for the emotes.
+		function fixWindowSize(){
+			var ew = document.getElementById('GrEmBEmoteWindow0'), et = document.getElementById('GrEmBEmoteToggle0');
+			var w = confStore.emoteContainerWidth_, h = confStore.emoteContainerHeight_;
+			w = (Math.max(Math.min((confStore.emoteContainerX_ + w), window.innerWidth-20),w)-w)+"px";
+			h = (Math.max(Math.min((confStore.emoteContainerY_ + h), window.innerHeight-10),h)-h)+"px";
+			if(ew){
+				ew.style.left = w;
+				ew.style.top = h;
+			}
+			if(et){
+				et.style.top = h;
+			}
+		}
+		
+		function createEmoteWindow(id, side, x, y, z, w, h, emotes, name, toggle){ //Window ID,side,xPos,Ypos,zPos(Depth/zIndex),width,height,innerHTML for the emotes.
 			if(window !== window.top){
 				return;
 			}
 			if(document.getElementById("GrEmBEmoteToggle" + id)){
 				return;
 			}
-			var windowToggler = document.createElement("div");
-			windowToggler.id = "GrEmBEmoteToggle" + id;
-			windowToggler.className = "GrEmBWindow";
-			windowToggler.setAttribute("style", "color: black; z-index: " + z + "; position: fixed !important; top: " + y + "px; " + side + ": 10px;");
-			var toggleText = '';
-			if(side === "right"){
-				toggleText = "<b>&lt;&lt;</b>" + name;
-			} else {
-				toggleText = name + "<b>&gt;&gt;</b>";
+			if(!getConf('_emoteContainerAuto')){
+				var windowToggler = document.createElement("div");
+				windowToggler.id = "GrEmBEmoteToggle" + id;
+				windowToggler.className = "GrEmBWindow";
+				windowToggler.setAttribute("style", "color: black; z-index: " + z + "; position: fixed !important; top: " + y + "px; " + side + ": 10px;");
+				var toggleText = '';
+				if(side === "right"){
+					toggleText = "<b>&lt;&lt;</b>" + name;
+				} else {
+					toggleText = name + "<b>&gt;&gt;</b>";
+				}
+				windowToggler.innerHTML = '<span class="GrEmBTitleText">' + toggleText + '</span>';
+				document.body.appendChild(windowToggler);
+				windowToggler.addEventListener("mouseover", function (evt){
+					toggleEmoteWindow(evt, id, false);
+				}, false);
 			}
-			windowToggler.innerHTML = '<span class="GrEmBTitleText">' + toggleText + '</span>';
-			document.body.appendChild(windowToggler);
+			document.body.addEventListener("click", updateCurrentForm, false);
+			if(!currentForm){
+				currentForm = document.body;
+			}
 
 			windowCreators[id] = function(){
-				var emoteWindow = document.createElement("div");
+				var emoteWindow = document.createElement("div"), rSide = (side=='right'?'left':'right');
 				emoteWindow.id = "GrEmBEmoteWindow" + id;
 				emoteWindow.className = closedWindowClasses + " closedTab";
-				emoteWindow.setAttribute("style", "color: black; z-index: " + (z + 1) + "; position: fixed !important; top: " + y + "px; " + side + ": 10px; width: " + w + "px; height: " + h + "px; max-width: " + ((+w) + 30) + "px; max-height: " + ((+h) + 30) + "px;");
-				lt = rt = '';
-				if(side === "right"){
-					rt = '<span style="float: left; cursor: pointer; font-weight: bold; text-decoration: underline overline;" class="GrEmBTitleText" id="closeEmoteWindow' + id + '">X</span>&#160;&#160; ';
-				} else {
-					rt = ' &#160;&#160;<span style="float: right; cursor: pointer; font-weight: bold; text-decoration: underline overline;" class="GrEmBTitleText" id="closeEmoteWindow' + id + '">X</span>';
-				}
-				emoteWindow.innerHTML = "<span style='float: " + side + ";'>" + 'Click to place</span>' + rt + emotes() + '';
+				emoteWindow.setAttribute("style", "color: black; z-index: " + (z + 1) + "; position: fixed !important; top: " + y + "px; left: "+x+"px; width: " + w + "px; height: " + h + "px;");
+				var rt = '<span style="float: '+rSide+'; cursor: pointer; font-weight: bold; text-decoration: underline overline;" class="GrEmBTitleText" id="closeEmoteWindow' + id + '">X</span><span id="GrEmBDrag"></span><span id="GrEmBResize"></span>';
+				emoteWindow.innerHTML = "<div><span style='float: " + side + ";'>" + 'Click to place</span>' + rt + emotes() + '</div>';
 				
 				document.body.appendChild(emoteWindow);
 				
 				emoteWindow.addEventListener("click", function (evt){
-					return addEmote(evt, id);
+					if(document.activeElement.id != "emName"){
+						currentForm.focus();
+					}
+					return addEmoteByEvent(evt, id);
 				}, false);
-				if(getConf("defaultEmoteContainerMouseLeave")){
-					function closeFunc(evt){
-							evt.stopPropagation();
-							evt.cancelBubble = true;
-							toggleEmoteWindow(evt, id, 1);
-							if(currentForm){
-								currentForm.focus();
-							}
-							evt.preventDefault();
-						}
-					emoteWindow.addEventListener('mouseout', mouseEnter(closeFunc), false);
-				}
 				document.getElementById('closeEmoteWindow'+id).addEventListener("click", function (evt){
 					toggleEmoteWindow(evt, id, 1);
-				}, false);
-				emoteWindow.addEventListener("mouseover", function (evt){
-					updateCurrentForm();
-					return true;
 				}, false);
 				document.getElementById("emName").addEventListener("change",findEmotesChange);
 				document.getElementById("emName").addEventListener("keydown",findEmotesChange);
 				document.getElementById("emName").addEventListener("paste",findEmotesChange);
 				document.getElementById("emNameReg").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
+				var resizing = false;
+				if(getConf("defaultEmoteContainerMouseLeave")){
+					function closeFunc(evt){
+						if(!resizing){
+							toggleEmoteWindow(evt, id, 1);
+							if(currentForm){
+								currentForm.focus();
+							}
+						}
+					}
+					emoteWindow.addEventListener('mouseout', mouseEnter(closeFunc), false);
+				}
 				addTabs();
+				fixWindowSize();
+				drag(document.getElementById('GrEmBDrag'), emoteWindow, function(X, Y){
+					emoteWindow.style.left = X+'px';
+					emoteWindow.style.top = Y+'px';
+					if(windowToggler){
+						windowToggler.style.top = Y+'px';
+					}
+				}, function(X, Y){
+					setConf('emoteContainerX_', X);
+					setConf('emoteContainerY_', Y);
+					fixWindowSize();
+				});
+				resize(confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, document.getElementById('GrEmBResize'), function(X, Y){
+					confStore.emoteContainerHeight_ = Y;
+					confStore.emoteContainerWidth_ = X;
+					updateTabs();
+					resizing = true;
+				}, function(X, Y){
+					confStore.emoteContainerHeight_ = Y;
+					confStore.emoteContainerWidth_ = X;
+					saveConf();
+					updateTabs();
+					fixWindowSize();
+					resizing = false;
+				});
+				window.addEventListener('resize', fixWindowSize);
+				updateCurrentForm({toElement: document.body});
 			}
-			windowToggler.addEventListener("mouseover", function (evt){
-				toggleEmoteWindow(evt, id);
-			}, false);
 		}
 
 		function getDefaultEmoteHTML(){
-			var lss = "font-size: 10pt; margin: 0; padding: 0; list-style: none !important;";
-			var ls = lss + " display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;";
-			var lsa = "padding: 0 0.15em;";
 			var emotes = "";
 			var search = "";
 			var mlas1 = "";
 			var iltbat = "";
 			var currentTabID = 0;
 			if(getConf('defaultEmoteContainerSearch')){
-				search = '<li style="' + ls + '"><a style="' + lsa + '" href="#" tabID="' + currentTabID++ + '">find</a></li>';
+				search = '<li><a class="GrEmBSelectedTab" href="#" tabID="' + currentTabID++ + '">find</a></li>';
 			}
 			var mlpTabID = currentTabID++;
 			if(getConf('defaultEmoteContainerMLAS1')){
-				mlas1 = '<li style="' + ls + '"><a style="' + lsa + '" href="#" tabID="' + currentTabID++ + '">mlas</a></li>';
+				mlas1 = '<li><a href="#" tabID="' + currentTabID++ + '">mlas</a></li>';
 			}
 			if(getConf('defaultEmoteContainerILTBAT')){
-				iltbat = '<li style="' + ls + '" id="selected"><a style="' + lsa + '" href="#" tabID="' + currentTabID++ + '">iltbat</a></li>';
+				iltbat = '<li><a href="#" tabID="' + currentTabID++ + '">iltbat</a></li>';
 			}
 			
 			if(search || mlas1 || iltbat){
-				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs" style="' + lss + '">' + search + '<li  style="' + ls + '" class="GrEmBtabs"><a tabID="'+mlpTabID+'" style="' + lsa + '" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
+				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' style='overflow-y: auto !important;' class='GrEmBEmoteList'><label for='emName'>search:</label><input type='text' name='search' id='emName' style='max-width: 80%;'/><input title='Use regular expressions for search(advanced)' id=\"emNameReg\" type=\"checkbox\""+(getConf("emoteSearchReg")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' style='height: " + (getConf("defaultEmoteContainerHeight") - 65) + "px; overflow-y: scroll !important;' class='GrEmBEmoteList_'></div></div>";
+				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title='Use regular expressions for search(advanced)' id=\"emNameReg\" type=\"checkbox\""+(getConf("emoteSearchReg")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
 			emotes += "<div title='/flutterfear' class='G_flutterfear_'></div><div title='/ppboring' class='G_ppboring_'></div><div title='/rarityyell' class='G_rarityyell_'></div><div title='/fluttershy' class='G_fluttershy_'></div><div title='/ajcower' class='G_ajcower_'></div><div title='/ajsly' class='G_ajsly_'></div><div title='/eeyup' class='G_eeyup_'></div><div title='/rdsmile' class='G_rdsmile_'></div><div title='/fluttersrs' class='G_fluttersrs_'></div><div title='/raritydress' class='G_raritydress_'></div><div title='/takealetter' class='G_takealetter_'></div><div title='/rdwut' class='G_rdwut_'></div><div title='/ppshrug' class='G_ppshrug_'></div><div title='/spikenervous' class='G_spikenervous_'></div><div title='/noooo' class='G_noooo_'></div><div title='/dj' class='G_dj_'></div><div title='/fluttershh' class='G_fluttershh_'></div><div title='/flutteryay' class='G_flutteryay_'></div><div title='/squintyjack' class='G_squintyjack_'></div><div title='/spikepushy' class='G_spikepushy_'></div><div title='/ajugh' class='G_ajugh_'></div><div title='/raritywut' class='G_raritywut_'></div><div title='/dumbfabric' class='G_dumbfabric_'></div><div title='/raritywhy' class='G_raritywhy_'></div><div title='/trixiesmug' class='G_trixiesmug_'></div><div title='/flutterwink' class='G_flutterwink_'></div><div title='/rarityannoyed' class='G_rarityannoyed_'></div><div title='/soawesome' class='G_soawesome_'></div><div title='/ajwut' class='G_ajwut_'></div><div title='/twisquint' class='G_twisquint_'></div><div title='/raritywhine' class='G_raritywhine_'></div><div title='/rdcool' class='G_rdcool_'></div><div title='/abwut' class='G_abwut_'></div><div title='/manspike' class='G_manspike_'></div><div title='/cockatrice' class='G_cockatrice_'></div><div title='/facehoof' class='G_facehoof_'></div><div title='/rarityjudge' class='G_rarityjudge_'></div><div title='/rarityprimp' class='G_rarityprimp_'></div><div title='/twirage' class='G_twirage_'></div><div title='/ppseesyou' class='G_ppseesyou_'></div><div title='/ajlie' class='G_ajlie_'></div><div title='/priceless' class='G_priceless_'></div><div title='/flutterjerk' class='G_flutterjerk_'></div><div title='/twipride' class='G_twipride_'></div><div title='/celestiamad' class='G_celestiamad_'></div><div title='/twicrazy' class='G_twicrazy_'></div><div title='/lunateehee' class='G_lunateehee_'></div><div title='/lunawait' class='G_lunawait_'></div><div title='/derpwizard' class='G_derpwizard_'></div><div title='/ajhappy' class='G_ajhappy_'></div><div title='/pinkiefear' class='G_pinkiefear_'></div><div title='/twibeam' class='G_twibeam_'></div><div title='/raritydaww' class='G_raritydaww_'></div><div title='/scootacheer' class='G_scootacheer_'></div><div title='/swagintosh' class='G_swagintosh_'></div><div title='/ajsup' class='G_ajsup_'></div><div title='/flutterwhoa' class='G_flutterwhoa_'></div><div title='/rdsad' class='G_rdsad_'></div><div title='/ohcomeon' class='G_ohcomeon_'></div><div title='/ppcute' class='G_ppcute_'></div><div title='/abbored' class='G_abbored_'></div><div title='/raritynews' class='G_raritynews_'></div><div title='/sbbook' class='G_sbbook_'></div><div title='/scootaplease' class='G_scootaplease_'></div><div title='/twiright' class='G_twiright_'></div><div title='/celestiawut' class='G_celestiawut_'></div><div title='/grannysmith' class='G_grannysmith_'></div><div title='/shiningarmor' class='G_shiningarmor_'></div><div title='/chrysalis' class='G_chrysalis_'></div><div title='/cadence' class='G_cadence_'></div><div title='/rdsitting' class='G_rdsitting_'></div><div title='/rdhappy' class='G_rdhappy_'></div><div title='/rdannoyed' class='G_rdannoyed_'></div><div title='/twismug' class='G_twismug_'></div><div title='/twismile' class='G_twismile_'></div><div title='/twistare' class='G_twistare_'></div><div title='/ohhi' class='G_ohhi_'></div><div title='/party' class='G_party_'></div><div title='/hahaha' class='G_hahaha_'></div><div title='/flutterblush' class='G_flutterblush_'></div><div title='/gross' class='G_gross_'></div><div title='/derpyhappy' class='G_derpyhappy_'></div><div title='/ajfrown' class='G_ajfrown_'></div><div title='/hmmm' class='G_hmmm_'></div><div title='/joy' class='G_joy_'></div><div title='/raritysad' class='G_raritysad_'></div><div title='/fabulous' class='G_fabulous_'></div><div title='/derp' class='G_derp_'></div><div title='/louder' class='G_louder_'></div><div title='/lunasad' class='G_lunasad_'></div><div title='/derpyshock' class='G_derpyshock_'></div><div title='/pinkamina' class='G_pinkamina_'></div><div title='/loveme' class='G_loveme_'></div><div title='/lunagasp' class='G_lunagasp_'></div><div title='/scootaloo' class='G_scootaloo_'></div><div title='/celestia' class='G_celestia_'></div><div title='/angel' class='G_angel_'></div><div title='/allmybits' class='G_allmybits_'></div><div title='/zecora' class='G_zecora_'></div><div title='/photofinish' class='G_photofinish_'></div><div title='/fillytgap' class='G_fillytgap_'></div><div title='/rdhuh' class='G_rdhuh_'></div><div title='/snails' class='G_snails_'></div><div title='/lyra' class='G_lyra_'></div><div title='/bonbon' class='G_bonbon_'></div><div title='/spitfire' class='G_spitfire_'></div><div title='/cutealoo' class='G_cutealoo_'></div><div title='/happyluna' class='G_happyluna_'></div><div title='/sotrue' class='G_sotrue_'></div><div title='/wahaha' class='G_wahaha_'></div><div title='/sbstare' class='G_sbstare_'></div><div title='/punchdrunk' class='G_punchdrunk_'></div><div title='/huhhuh' class='G_huhhuh_'></div><div title='/absmile' class='G_absmile_'></div><div title='/dealwithit' class='G_dealwithit_'></div><div title='/nmm' class='G_nmm_'></div><div title='/whooves' class='G_whooves_'></div><div title='/rdsalute' class='G_rdsalute_'></div><div title='/octavia' class='G_octavia_'></div><div title='/colgate' class='G_colgate_'></div><div title='/cheerilee' class='G_cheerilee_'></div><div title='/ajbaffle' class='G_ajbaffle_'></div><div title='/abhuh' class='G_abhuh_'></div><div title='/thehorror' class='G_thehorror_'></div><div title='/twiponder' class='G_twiponder_'></div><div title='/spikewtf' class='G_spikewtf_'></div><div title='/awwyeah' class='G_awwyeah_'></div>";
@@ -904,7 +1056,7 @@ function passFunction(){
 			}
 		}
 		
-		function getEmoteNames(subs,nsfw){
+		function getEmoteNames(subs,nsfw, onSuccess){
 			loadedStyles--;
 			incLoadedStyles();
 			GM_xmlhttpRequest({
@@ -923,11 +1075,12 @@ function passFunction(){
 						console.log("data: subs=" + encodeURIComponent(subs));
 						console.log("url: http://nallar.me/css/names.php?nsfw=" + (nsfw ? "1":"0"));
 						console.log(e);
+						setConf("shouldReset",true);
 						return;
 					}
 					switch(emoteNames.cssKey){
 						case 'generating':
-							setConf('lastVersion', 1);
+							setConf("shouldReset",true);
 							setTimeout(function(){resetCache();}, 3000);
 							return;
 						case 'broken':
@@ -936,12 +1089,16 @@ function passFunction(){
 							return;
 					}
 					setConf("cssKey", emoteNames.cssKey);
+					setConf("subKeys", emoteNames.subKeys);
+					subKeys = emoteNames.subKeys;
 					delete(emoteNames.cssKey);
+					delete(emoteNames.subKeys);
 					var bl = getConf("emoteBlacklist");
 					for(var i = 0; i < bl.length; i++){
 						delete(emoteNames[bl[i]]);
 					}
 					setConf('emoteNames', emoteNames);
+					onSuccess();
 					return incLoadedStyles();
 				},
 				data: "subs=" + encodeURIComponent(subs)
@@ -1174,7 +1331,10 @@ function passFunction(){
 							}
 							var hrefs = emElem.getAttribute('href');
 							emElem.className += " convertedEmote";
-							var hrefss = (/^(?:http\:\/\/nallar.me\/e\.php\?e\=)?\/(\/?[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs);
+							if(!hrefs){
+								continue;
+							}
+							var hrefss = (/^(?:http\:\/\/nallar.me\/e\.php\?e\=)?\/(\/?[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs.replace("#","/hh"));
 							if(!hrefss){
 								continue;
 							}
@@ -1198,41 +1358,43 @@ function passFunction(){
 									emElem.href = "/" + href + (hrefss[2] === undefined ? "" : hrefss[2] + '-');
 								}
 							}
-							if(revAlt && emElem.title!=""){//This block is derived from ArbitraryEntity's code.
-							//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
-							//Or, code your own replacement for it!
-								var altText = emElem.title;
-								var altText = emElem.title;
-								var theDiv = document.createElement("div");
-								theDiv.className = "SuperRedditAltTextDisplay_Text";
-								if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))){
-									theDiv.setAttribute("style", "display: inline-block !important;");
-								}
-								while(altText){
-									linkResult = linkRegex.exec(altText);
-									if(linkResult){
-										theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)));
-										var newLinkElement = document.createElement("a");
-										if(linkResult[1]){
-											newLinkElement.href = linkResult[0];
-										} else {
-											newLinkElement.href = "http://" + linkResult[0];
-										}
-										newLinkElement.appendChild(document.createTextNode(linkResult[0]));
-										theDiv.appendChild(newLinkElement);
-										altText = altText.substr(linkResult.index + linkResult[0].length);
-									} else {
-										theDiv.appendChild(document.createTextNode(altText));
-										altText = "";
+							if(revAlt && !spoilers[href]){
+								if(emElem.title!=""){//This block is derived from ArbitraryEntity's code.
+								//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
+								//Or, code your own replacement for it!
+									var altText = emElem.title;
+									var theDiv = document.createElement("div");
+									theDiv.className = "SuperRedditAltTextDisplay_Text";
+									if((/(?:(-in(?:p-|-|p$|$))|(?:-lalt(?:-|$)))/).test(emElem.getAttribute('href'))){
+										theDiv.setAttribute("style", "display: inline-block !important;");
 									}
-								}
-								if((/(?:-lalt(?:-|$))/).test(emElem.getAttribute('href'))){
-									emElem.parentNode.insertBefore(theDiv, emElem);
-									theDiv.setAttribute("style",theDiv.getAttribute("style")+"float: left !important;");
-								}else{
-									emElem.parentNode.insertBefore(theDiv, emElem.nextSibling);
-								}
-							}//End ArbitraryEntity's code
+									while(altText){
+										linkResult = linkRegex.exec(altText);
+										if(linkResult){
+											theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)));
+											var newLinkElement = document.createElement("a");
+											if(linkResult[1]){
+												newLinkElement.href = linkResult[0];
+											} else {
+												newLinkElement.href = "http://" + linkResult[0];
+											}
+											newLinkElement.appendChild(document.createTextNode(linkResult[0]));
+											theDiv.appendChild(newLinkElement);
+											altText = altText.substr(linkResult.index + linkResult[0].length);
+										} else {
+											theDiv.appendChild(document.createTextNode(altText));
+											altText = "";
+										}
+									}
+									if((/(?:-lalt(?:-|$))/).test(emElem.getAttribute('href'))){
+										emElem.parentNode.insertBefore(theDiv, emElem);
+										theDiv.setAttribute("style",theDiv.getAttribute("style")+"float: left !important;");
+									}else{
+										emElem.parentNode.insertBefore(theDiv, emElem.nextSibling);
+									}
+								}//End ArbitraryEntity's code
+								emElem.title = hrefs + " from /r/" + subKeys[emoteNames[href]];
+							}
 							if(imageAlt){
 								var copyImage = document.createElement("img");
 								copyImage.alt = "[](/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
@@ -1267,12 +1429,15 @@ function passFunction(){
 			document.body.addEventListener("click", clickBlock, false);
 			if(wkMutation){
 				(new wkMutation(function(mutations, observer){
-					var target;
+					var mut = [];
 					for(var i = 0, len = mutations.length; i < len;i++){
-						target = {target:mutations[i].target};
-						domInsertFunction(target);
+						mut.push(mutations[i].target);
 					}
-				})).observe(document.body, {subtree: true, childList: true, characterData: true, attributes: !isReddit,});
+					mut = uniq(mut);
+					for(var i = 0, len = mut.length; i < len; i++){
+						domInsertFunction({target:mut[i]});
+					}
+				})).observe(document.body, {subtree: true, childList: true, characterData: true, attributes: false,});
 			}else{
 				document.body.addEventListener('DOMNodeInserted', domInsertFunction);
 				document.body.addEventListener('DOMNodeInsertedIntoDocument', domInsertFunction);
@@ -1280,7 +1445,7 @@ function passFunction(){
 		};
 		function createDefWindow(){
 			sSSection();
-			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("defaultEmoteContainerX"), getConf("defaultEmoteContainerY"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("defaultEmoteContainerWidth"), getConf("defaultEmoteContainerHeight"), getDefaultEmoteHTML, getConf("smallToggler")?"":"Emotes");
+			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("emoteContainerX_"), getConf("emoteContainerY_"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("emoteContainerWidth_"), getConf("emoteContainerHeight_"), getDefaultEmoteHTML, getConf("smallToggler")?"":"Emotes");
 			wt += endSSection("initial conversion pass");
 		};
 		
@@ -1337,10 +1502,11 @@ function passFunction(){
 			if(ret){
 				return resultSet;
 			}
-			var searchList = document.getElementById("GrEmBSearchList");
-			var ihtml = "";
-			for(var i = 0; i < resultSet.length; i++){
-				ihtml += "<div title='/"+resultSet[i]+"' class='G_"+resultSet[i]+"_ G_small'></div>";
+			//var searchList = document.getElementById("GrEmBSearchList"), ihtml = "", length = Math.min(2500, resultSet.length), name = "";
+			var searchList = document.getElementById("GrEmBSearchList"), ihtml = "", length = resultSet.length, name = "";
+			for(var i = 0; i < length; i++){
+				name = resultSet[i];
+				ihtml += "<div title='/"+name+" from /r/"+subKeys[emoteNames[name]]+"' class='G_"+resultSet[i]+"_ G_small'></div>";
 			}
 			searchList.innerHTML = ihtml;
 			ihtml = false;
@@ -1350,13 +1516,14 @@ function passFunction(){
 		
 		function resetCache(force){
 			removeDefunctConfs();//No saveConf call as this does it!
-			confStore["shouldReset"] = false;
-			confStore["nextCacheUpdateTime"] = (new Date()).getTime()+14400000;
-			confStore["lastVersion"] = localVersion;
 			if(force){
 				showNotice = doRefresh = true;
 			}
-			getEmoteNames(getSubList(),confStore["nsfwDefunctEmotes"]);
+			getEmoteNames(getSubList(),confStore["nsfwDefunctEmotes"],function(){
+				confStore["shouldReset"] = false;
+				confStore["nextCacheUpdateTime"] = (new Date()).getTime()+14400000;
+				confStore["lastVersion"] = localVersion;
+			});
 		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
 		
@@ -1381,16 +1548,22 @@ function passFunction(){
 		});
 		
 		
-		if(getConf("lastVersion") != localVersion){
-			updateGroups();
-			resetCache();
-		}else if(getConf("shouldReset") || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
-			resetCache();
-		} else if((/allconfreset=1/).test(window.location.href)){
+		var emoteNames = getConf('emoteNames'), subKeys = getConf('subKeys');
+		if((emoteNames instanceof Array)){
+			emoteNames = defaultConfs['emoteNames'];
+		}
+		
+		if((/scripts\/\?allconfreset=1/).test(window.location.href)){
 			confStore = {};
 			removeDefunctConfs();
 			saveConf();
 			window.location.replace(window.location.href.replace(/allconfreset=1/g, ""));
+		}else if(getConf("lastVersion") != localVersion){
+			removeDefunctConfs();
+			updateGroups();
+			resetCache();
+		}else if(!emoteNames || getConf("shouldReset") || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
+			resetCache();
 		}
 		
 		if(window.top === window){
@@ -1398,11 +1571,6 @@ function passFunction(){
 		}
 		
 		
-		
-		var emoteNames = getConf('emoteNames');
-		if((emoteNames instanceof Array)){
-			emoteNames = defaultConfs['emoteNames'];
-		}
 		
 		if(isReddit||globalConvert||getConf("defaultEmoteContainerEverywhere")){
 			loadStyleSheet(mainStylesheet + getConf("cssKey") + "&nsfw=" + (getConf("nsfwDefunctEmotes")?"1":"0"), true);
@@ -1412,9 +1580,9 @@ function passFunction(){
 			if((/\/r\/MLPLounge/i).test(window.location.href)){
 				cssStore += ('code{font-family: monospace !important;} ');
 			}
-			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0 !important; border-radius: 0px !important;clear:none;float:left;display:block}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden; height: ' + (getConf("defaultEmoteContainerHeight") - 39) + 'px;width: ' + (getConf("defaultEmoteContainerWidth") - 2) + 'px;} .GrEmBEmoteList_ div{cursor: pointer;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
+			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
 			if(isReddit||getConf('emoteManagerEverywhere')){
-				cssStore += ("a.convertedEmote_[href*='-r-']{-moz-transform:scaleX(-1);-webkit-transform:scaleX(-1);-o-transform:scaleX(-1);}a.convertedEmote_[href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href*='-r-'][href*='-d-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'],a.convertedEmote_:hover[href*='-45-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-90-'],a.convertedEmote_:hover[href*='-90-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'],a.convertedEmote_:hover[href*='-135-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href*='-180-'],a.convertedEmote_:hover[href*='-180-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'],a.convertedEmote_:hover[href*='-225-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href*='-270-'],a.convertedEmote_:hover[href*='-270-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'],a.convertedEmote_:hover[href*='-315-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href*='-r-'],a.convertedEmote_:hover[href*='-d-'],a.convertedEmote_:hover[href*='-dancer-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href*='-180-'][href*='-r-'],a.convertedEmote_:hover[href*='-180-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href*='-270-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href*='-225-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-270-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-f-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href*='-90-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href*='-225-'][href*='-f-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-270-'][href*='-f-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href*='-f-'],a.convertedEmote_[href*='-fuckingcrazy-'],a.convertedEmote_:hover[href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-f-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90d-'],a.convertedEmote_:hover[href*='-90rd-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-180d-'],a.convertedEmote_:hover[href*='-fd-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270d-'],a.convertedEmote_:hover[href*='-270rd-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90r-'],a.convertedEmote_[href*='-90rd-'],a.convertedEmote_:hover[href*='-90d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-fd-'],a.convertedEmote_:hover[href*='-180d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270r-'],a.convertedEmote_[href*='-270rd-'],a.convertedEmote_:hover[href*='-270d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href='/sp']{display: inline-block !important;padding-right: 100% !important;float: none !important;}");
+				cssStore += ("a.convertedEmote_[href*='-r-']{-moz-transform:scaleX(-1);-webkit-transform:scaleX(-1);-o-transform:scaleX(-1);}a.convertedEmote_[href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href*='-r-'][href*='-d-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'],a.convertedEmote_:hover[href*='-45-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-90-'],a.convertedEmote_:hover[href*='-90-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'],a.convertedEmote_:hover[href*='-135-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href*='-180-'],a.convertedEmote_:hover[href*='-180-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'],a.convertedEmote_:hover[href*='-225-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href*='-270-'],a.convertedEmote_:hover[href*='-270-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'],a.convertedEmote_:hover[href*='-315-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href*='-r-'],a.convertedEmote_:hover[href*='-d-'],a.convertedEmote_:hover[href*='-dancer-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href*='-180-'][href*='-r-'],a.convertedEmote_:hover[href*='-180-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href*='-270-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href*='-225-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-270-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-f-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href*='-90-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href*='-225-'][href*='-f-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-270-'][href*='-f-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href*='-f-'],a.convertedEmote_[href*='-fuckingcrazy-'],a.convertedEmote_:hover[href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-f-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90d-'],a.convertedEmote_:hover[href*='-90rd-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-180d-'],a.convertedEmote_:hover[href*='-fd-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270d-'],a.convertedEmote_:hover[href*='-270rd-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90r-'],a.convertedEmote_[href*='-90rd-'],a.convertedEmote_:hover[href*='-90d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-fd-'],a.convertedEmote_:hover[href*='-180d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270r-'],a.convertedEmote_[href*='-270rd-'],a.convertedEmote_:hover[href*='-270d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}body .G_sp_{display: inline-block !important;padding-right: 100% !important;}");
 			}
 
 			if(!getConf("disableEmoteSpin")&&(isReddit||getConf('emoteManagerEverywhere'))){
@@ -1425,7 +1593,7 @@ function passFunction(){
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
 			var redditSize = (getConf("wideReddit") ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#G_manageSubs td a{cursor: pointer; color: blue;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#GrEmBtablist a{color: #369;}#emName{width:80%;}#GrEmBtablist li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
 		wt += endSSection("Added styles and initialised");

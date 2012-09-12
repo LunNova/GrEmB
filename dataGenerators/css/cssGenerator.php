@@ -53,7 +53,7 @@ foreach($subss as $k => $subs){
 	}
 	$cT->finalize();
 	if($cT->emoteCount > 0){
-		file_put_contents("$k.min.css", $cT->toString());
+		file_put_contents("$k.min.css", 'body::after{content:"Your GrEmB is out of date, or you have multiple versions installed. Please go to http://nallar.me/scripts/ and update it!"; width: 400px; display:block; height: 40px; background-color: white; position: fixed; left:20px; top: 100px; border: 1px solid #E1B000;}'.$cT->toString());
 		file_put_contents("$k.names", implode("\n",$cT->getEmoteNames(false,true)));
 		file_put_contents("unstable/$k.min.css", $cT->toString());
 		file_put_contents("$k.count", $cT->emoteCount);
