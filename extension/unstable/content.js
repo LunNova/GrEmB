@@ -257,7 +257,7 @@ function passFunction(){
 			return i;
 		}
 
-		function compareAssociativeArrays(a, b, depth){
+		function compareObjects(a, b, depth){
 			if(a == b){
 				return true;
 			}
@@ -272,7 +272,7 @@ function passFunction(){
 			for(var key in a){
 				if(noCloneNames[key]){}
 				else if(typeof (a[key]) === "object" && typeof (b[key]) === "object"){
-					if(!compareAssociativeArrays(a[key], b[key], depth + 1)){
+					if(!compareObjects(a[key], b[key], depth + 1)){
 						return false;
 					}
 				}else if(a[key] != b[key]){
@@ -281,7 +281,8 @@ function passFunction(){
 			}
 			return true;
 		}
-		function onChange(){
+		
+		function onConfigChange(){
 			var oconf = cloness(confStore),refreshPage = false;
 			for(var i in settingsForm.elements){
 				i = +i;
@@ -301,7 +302,7 @@ function passFunction(){
 			if(getConf("emoteManagerWindowStyleType")){
 				confStore["emoteManagerWindowStyle"] = defaultConfs["emoteManagerWindowStyle"];
 			}
-			if(!compareAssociativeArrays(confStore, oconf)){
+			if(!compareObjects(confStore, oconf)){
 				saveConf();
 				displayConfiguration();
 			}
@@ -548,7 +549,7 @@ function passFunction(){
 			if(isWebKit){
 				dis.WK = '';
 			}
-			if(compareAssociativeArrays(oldDis,dis)){
+			if(compareObjects(oldDis,dis)){
 				return;
 			}
 			oldDis = dis;
@@ -575,8 +576,8 @@ function passFunction(){
 			prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
 			superBundlePrefs.innerHTML = prefHTML;
 			settingsForm = document.getElementById('settingsForm');
-			settingsForm.addEventListener("change", onChange);
-			document.getElementById('saveSubmit').addEventListener("click", function(){onChange();window.location.reload();});
+			settingsForm.addEventListener("change", onConfigChange);
+			document.getElementById('saveSubmit').addEventListener("click", function(){onConfigChange();window.location.reload();});
 			manageSubs();
 		}
 		
