@@ -54,7 +54,7 @@ function passFunction(){
 		//ENDIF
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -93,7 +93,7 @@ function passFunction(){
 			'defaultEmoteContainerSide': false,
 			'defaultEmoteContainerGlobal': true,
 			'_emoteContainerAuto': false,
-			'emoteSearchReg': false,
+			'emoteSearchDerivatives': false,
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
@@ -108,7 +108,7 @@ function passFunction(){
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittledramaticstory", "ploungemafia", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
 			'lastDefaultEmoteGroups': false,
 			'subKeys': {},
@@ -264,13 +264,13 @@ function passFunction(){
 		}
 
 		function compareObjects(a, b, depth){
-			if(a == b){
+			if(a === b){
 				return true;
 			}
-			if(nrKeys(a) != nrKeys(b)){
+			if(nrKeys(a) !== nrKeys(b)){
 				return false;
 			}
-			if(depth == undefined){
+			if(depth === undefined){
 				var depth = 0;
 			} else if(depth > 3){
 				return true; //hopefully they actually are the same... :p
@@ -342,7 +342,7 @@ function passFunction(){
 			c = document.getElementById('Cabl');
 			c.addEventListener("click",function(evt){
 				var blEmotes = document.getElementById('Cedit').value.split(",");
-				blEmotes = blEmotes.concat(findEmotes(document.getElementById('Cbl').value, false, true));
+				blEmotes = blEmotes.concat(findEmotes(document.getElementById('Cbl').value, true));
 				console.log("Searched for: "+ document.getElementById('Cbl').value);
 				blEmotes = uniq(blEmotes);
 				setConf("emoteBlacklist",blEmotes);
@@ -372,7 +372,7 @@ function passFunction(){
 						if (b.indexOf(a[i]) == -1) {
 							var ii = c.indexOf(a[i]);
 							if (ii != -1) {
-								c.splice(ii, ii);
+								c.splice(ii, 1);
 							}
 						}
 					}
@@ -943,7 +943,7 @@ function passFunction(){
 				document.getElementById("emName").addEventListener("change",findEmotesChange);
 				document.getElementById("emName").addEventListener("keydown",findEmotesChange);
 				document.getElementById("emName").addEventListener("paste",findEmotesChange);
-				document.getElementById("emNameReg").addEventListener("change",emoteRegChange);
+				document.getElementById("emNameDerivatives").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
 				if(getConf("defaultEmoteContainerMouseLeave")){
@@ -1009,7 +1009,7 @@ function passFunction(){
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title='Use regular expressions for search(advanced)' id=\"emNameReg\" type=\"checkbox\""+(getConf("emoteSearchReg")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
+				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(getConf("emoteSearchDerivatives")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
 			emotes += "/*INCLUDE 'rmlp.html'*/";
@@ -1111,8 +1111,8 @@ function passFunction(){
 					for(var i = 0; i < bl.length; i++){
 						delete(emoteNames[bl[i]]);
 					}
-					setConf('emoteNames', emoteNames);
 					onSuccess();
+					setConf('emoteNames', emoteNames);
 					return incLoadedStyles();
 				},
 				data: "subs=" + encodeURIComponent(subs)
@@ -1354,7 +1354,7 @@ function passFunction(){
 							}
 							var href = hrefss[1];
 							emElem.className += " convertedEmote_";
-							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
+							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!spoilers[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
 								emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 								if(href.length > 20){
 									emElem.className += " G_unknownEmote G_largeUnknown";
@@ -1520,17 +1520,17 @@ function passFunction(){
 		var timer = false;
 		//Start emote search code
 		function emoteRegChange(evt){
-			setConf("emoteSearchReg",document.getElementById("emNameReg").checked);
+			setConf("emoteSearchDerivatives",document.getElementById("emNameDerivatives").checked);
+			findEmotesChange({target: document.getElementById('emName')});
 			return true;
 		}
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,getConf("emoteSearchReg"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,getConf("emoteSearchDerivatives"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
-		function findEmotes(search, findReg, ret){
-			var searchArray;
+		function findEmotes(search, ret, ignoreDerivatives){
 			if(emoteNamesArray === false){
 				emoteNamesArray = [];
 				for(var emoteName in emoteNames){
@@ -1538,24 +1538,18 @@ function passFunction(){
 				}
 				emoteNamesArray.sort();
 			}
-			if((search.indexOf(lastSearch)!=-1) && lastSearch && !findReg){
-				searchArray = resultSet;
-			}else{
-				searchArray = emoteNamesArray;
+			var searchArray, noModifier, tempEmote, sub = search.match(/s\:([a-zA-Z1-9]+)/);
+			if(sub){
+				search = trim(search.replace(sub[0], ''));
+				sub = sub[0].substr(2);
 			}
+			searchArray = emoteNamesArray;
 			resultSet = [];
-			if(findReg){
-				var cachedFindReg = new RegExp(search);
-				for(var emote = 0; emote < searchArray.length; emote++){
-					if(new RegExp(search).test(searchArray[emote])){
-						resultSet.push(searchArray[emote]);
-					}
-				}
-			}else{
-				for(var emote = 0; emote < searchArray.length; emote++){
-					if(searchArray[emote].indexOf(search) != -1){
-						resultSet.push(searchArray[emote]);
-					}
+			var cachedFindReg = new RegExp(search);
+			for(var emote = 0; emote < searchArray.length; emote++){
+				tempEmote = searchArray[emote];
+				if((!sub || subKeys[emoteNames[tempEmote]] == sub) && cachedFindReg.test(tempEmote) && !(ignoreDerivatives && (((noModifier = tempEmote.replace(/^(?:[drb]|ilf)/,"")) && noModifier != tempEmote && emoteNames[noModifier]) || ((noModifier = tempEmote.replace(/^[drb]{2,2}/,"")) && noModifier != tempEmote && emoteNames[noModifier])))){
+					resultSet.push(searchArray[emote]);
 				}
 			}
 			lastSearch = search;

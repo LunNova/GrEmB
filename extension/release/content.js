@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name		GrEmB - Global r/mylittlepony Emote Bundle
-// @version		1.98260
+// @version		1.98320
 // @namespace		http://nallar.me
 // @run-at		document-start
 // @description		Reddit emote display script.
@@ -41,7 +41,7 @@
 // @iconURL		http://nallar.me/scripts/logo.png
 // ==/UserScript==
 
-var localVersion = 1.98260;
+var localVersion = 1.98320;
 
 //If there's another(reasonable :P) license you think this should be released under, just ask!
 
@@ -74,7 +74,7 @@ function passFunction(){
 		
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1,}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1}, oldDis = false, convTimeout = false, tabs = {};
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -113,7 +113,7 @@ function passFunction(){
 			'defaultEmoteContainerSide': false,
 			'defaultEmoteContainerGlobal': true,
 			'_emoteContainerAuto': false,
-			'emoteSearchReg': false,
+			'emoteSearchDerivatives': false,
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
@@ -128,7 +128,7 @@ function passFunction(){
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "futemotes", "ponyanarchism", "spaceclop", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittledramaticstory", "ploungemafia", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
 			'lastDefaultEmoteGroups': false,
 			'subKeys': {},
@@ -258,13 +258,13 @@ function passFunction(){
 		}
 
 		function compareObjects(a, b, depth){
-			if(a == b){
+			if(a === b){
 				return true;
 			}
-			if(nrKeys(a) != nrKeys(b)){
+			if(nrKeys(a) !== nrKeys(b)){
 				return false;
 			}
-			if(depth == undefined){
+			if(depth === undefined){
 				var depth = 0;
 			} else if(depth > 3){
 				return true; //hopefully they actually are the same... :p
@@ -336,7 +336,7 @@ function passFunction(){
 			c = document.getElementById('Cabl');
 			c.addEventListener("click",function(evt){
 				var blEmotes = document.getElementById('Cedit').value.split(",");
-				blEmotes = blEmotes.concat(findEmotes(document.getElementById('Cbl').value, false, true));
+				blEmotes = blEmotes.concat(findEmotes(document.getElementById('Cbl').value, true));
 				console.log("Searched for: "+ document.getElementById('Cbl').value);
 				blEmotes = uniq(blEmotes);
 				setConf("emoteBlacklist",blEmotes);
@@ -366,7 +366,7 @@ function passFunction(){
 						if (b.indexOf(a[i]) == -1) {
 							var ii = c.indexOf(a[i]);
 							if (ii != -1) {
-								c.splice(ii, ii);
+								c.splice(ii, 1);
 							}
 						}
 					}
@@ -925,7 +925,7 @@ function passFunction(){
 				document.getElementById("emName").addEventListener("change",findEmotesChange);
 				document.getElementById("emName").addEventListener("keydown",findEmotesChange);
 				document.getElementById("emName").addEventListener("paste",findEmotesChange);
-				document.getElementById("emNameReg").addEventListener("change",emoteRegChange);
+				document.getElementById("emNameDerivatives").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
 				if(getConf("defaultEmoteContainerMouseLeave")){
@@ -991,7 +991,7 @@ function passFunction(){
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title='Use regular expressions for search(advanced)' id=\"emNameReg\" type=\"checkbox\""+(getConf("emoteSearchReg")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
+				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(getConf("emoteSearchDerivatives")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
 			emotes += "<div title='/flutterfear' class='G_flutterfear_'></div><div title='/ppboring' class='G_ppboring_'></div><div title='/rarityyell' class='G_rarityyell_'></div><div title='/fluttershy' class='G_fluttershy_'></div><div title='/ajcower' class='G_ajcower_'></div><div title='/ajsly' class='G_ajsly_'></div><div title='/eeyup' class='G_eeyup_'></div><div title='/rdsmile' class='G_rdsmile_'></div><div title='/fluttersrs' class='G_fluttersrs_'></div><div title='/raritydress' class='G_raritydress_'></div><div title='/takealetter' class='G_takealetter_'></div><div title='/rdwut' class='G_rdwut_'></div><div title='/ppshrug' class='G_ppshrug_'></div><div title='/spikenervous' class='G_spikenervous_'></div><div title='/noooo' class='G_noooo_'></div><div title='/dj' class='G_dj_'></div><div title='/fluttershh' class='G_fluttershh_'></div><div title='/flutteryay' class='G_flutteryay_'></div><div title='/squintyjack' class='G_squintyjack_'></div><div title='/spikepushy' class='G_spikepushy_'></div><div title='/ajugh' class='G_ajugh_'></div><div title='/raritywut' class='G_raritywut_'></div><div title='/dumbfabric' class='G_dumbfabric_'></div><div title='/raritywhy' class='G_raritywhy_'></div><div title='/trixiesmug' class='G_trixiesmug_'></div><div title='/flutterwink' class='G_flutterwink_'></div><div title='/rarityannoyed' class='G_rarityannoyed_'></div><div title='/soawesome' class='G_soawesome_'></div><div title='/ajwut' class='G_ajwut_'></div><div title='/twisquint' class='G_twisquint_'></div><div title='/raritywhine' class='G_raritywhine_'></div><div title='/rdcool' class='G_rdcool_'></div><div title='/abwut' class='G_abwut_'></div><div title='/manspike' class='G_manspike_'></div><div title='/cockatrice' class='G_cockatrice_'></div><div title='/facehoof' class='G_facehoof_'></div><div title='/rarityjudge' class='G_rarityjudge_'></div><div title='/rarityprimp' class='G_rarityprimp_'></div><div title='/twirage' class='G_twirage_'></div><div title='/ppseesyou' class='G_ppseesyou_'></div><div title='/ajlie' class='G_ajlie_'></div><div title='/priceless' class='G_priceless_'></div><div title='/flutterjerk' class='G_flutterjerk_'></div><div title='/twipride' class='G_twipride_'></div><div title='/celestiamad' class='G_celestiamad_'></div><div title='/twicrazy' class='G_twicrazy_'></div><div title='/lunateehee' class='G_lunateehee_'></div><div title='/lunawait' class='G_lunawait_'></div><div title='/derpwizard' class='G_derpwizard_'></div><div title='/ajhappy' class='G_ajhappy_'></div><div title='/pinkiefear' class='G_pinkiefear_'></div><div title='/twibeam' class='G_twibeam_'></div><div title='/raritydaww' class='G_raritydaww_'></div><div title='/scootacheer' class='G_scootacheer_'></div><div title='/swagintosh' class='G_swagintosh_'></div><div title='/ajsup' class='G_ajsup_'></div><div title='/flutterwhoa' class='G_flutterwhoa_'></div><div title='/rdsad' class='G_rdsad_'></div><div title='/ohcomeon' class='G_ohcomeon_'></div><div title='/ppcute' class='G_ppcute_'></div><div title='/abbored' class='G_abbored_'></div><div title='/raritynews' class='G_raritynews_'></div><div title='/sbbook' class='G_sbbook_'></div><div title='/scootaplease' class='G_scootaplease_'></div><div title='/twiright' class='G_twiright_'></div><div title='/celestiawut' class='G_celestiawut_'></div><div title='/grannysmith' class='G_grannysmith_'></div><div title='/shiningarmor' class='G_shiningarmor_'></div><div title='/chrysalis' class='G_chrysalis_'></div><div title='/cadence' class='G_cadence_'></div><div title='/rdsitting' class='G_rdsitting_'></div><div title='/rdhappy' class='G_rdhappy_'></div><div title='/rdannoyed' class='G_rdannoyed_'></div><div title='/twismug' class='G_twismug_'></div><div title='/twismile' class='G_twismile_'></div><div title='/twistare' class='G_twistare_'></div><div title='/ohhi' class='G_ohhi_'></div><div title='/party' class='G_party_'></div><div title='/hahaha' class='G_hahaha_'></div><div title='/flutterblush' class='G_flutterblush_'></div><div title='/gross' class='G_gross_'></div><div title='/derpyhappy' class='G_derpyhappy_'></div><div title='/ajfrown' class='G_ajfrown_'></div><div title='/hmmm' class='G_hmmm_'></div><div title='/joy' class='G_joy_'></div><div title='/raritysad' class='G_raritysad_'></div><div title='/fabulous' class='G_fabulous_'></div><div title='/derp' class='G_derp_'></div><div title='/louder' class='G_louder_'></div><div title='/lunasad' class='G_lunasad_'></div><div title='/derpyshock' class='G_derpyshock_'></div><div title='/pinkamina' class='G_pinkamina_'></div><div title='/loveme' class='G_loveme_'></div><div title='/lunagasp' class='G_lunagasp_'></div><div title='/scootaloo' class='G_scootaloo_'></div><div title='/celestia' class='G_celestia_'></div><div title='/angel' class='G_angel_'></div><div title='/allmybits' class='G_allmybits_'></div><div title='/zecora' class='G_zecora_'></div><div title='/photofinish' class='G_photofinish_'></div><div title='/fillytgap' class='G_fillytgap_'></div><div title='/rdhuh' class='G_rdhuh_'></div><div title='/snails' class='G_snails_'></div><div title='/lyra' class='G_lyra_'></div><div title='/bonbon' class='G_bonbon_'></div><div title='/spitfire' class='G_spitfire_'></div><div title='/cutealoo' class='G_cutealoo_'></div><div title='/happyluna' class='G_happyluna_'></div><div title='/sotrue' class='G_sotrue_'></div><div title='/wahaha' class='G_wahaha_'></div><div title='/sbstare' class='G_sbstare_'></div><div title='/punchdrunk' class='G_punchdrunk_'></div><div title='/huhhuh' class='G_huhhuh_'></div><div title='/absmile' class='G_absmile_'></div><div title='/dealwithit' class='G_dealwithit_'></div><div title='/nmm' class='G_nmm_'></div><div title='/whooves' class='G_whooves_'></div><div title='/rdsalute' class='G_rdsalute_'></div><div title='/octavia' class='G_octavia_'></div><div title='/colgate' class='G_colgate_'></div><div title='/cheerilee' class='G_cheerilee_'></div><div title='/ajbaffle' class='G_ajbaffle_'></div><div title='/abhuh' class='G_abhuh_'></div><div title='/thehorror' class='G_thehorror_'></div><div title='/twiponder' class='G_twiponder_'></div><div title='/spikewtf' class='G_spikewtf_'></div><div title='/awwyeah' class='G_awwyeah_'></div>";
@@ -1093,8 +1093,8 @@ function passFunction(){
 					for(var i = 0; i < bl.length; i++){
 						delete(emoteNames[bl[i]]);
 					}
-					setConf('emoteNames', emoteNames);
 					onSuccess();
+					setConf('emoteNames', emoteNames);
 					return incLoadedStyles();
 				},
 				data: "subs=" + encodeURIComponent(subs)
@@ -1336,7 +1336,7 @@ function passFunction(){
 							}
 							var href = hrefss[1];
 							emElem.className += " convertedEmote_";
-							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
+							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!spoilers[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
 								emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
 								if(href.length > 20){
 									emElem.className += " G_unknownEmote G_largeUnknown";
@@ -1456,17 +1456,17 @@ function passFunction(){
 		var timer = false;
 		//Start emote search code
 		function emoteRegChange(evt){
-			setConf("emoteSearchReg",document.getElementById("emNameReg").checked);
+			setConf("emoteSearchDerivatives",document.getElementById("emNameDerivatives").checked);
+			findEmotesChange({target: document.getElementById('emName')});
 			return true;
 		}
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,getConf("emoteSearchReg"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,getConf("emoteSearchDerivatives"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
-		function findEmotes(search, findReg, ret){
-			var searchArray;
+		function findEmotes(search, ret, ignoreDerivatives){
 			if(emoteNamesArray === false){
 				emoteNamesArray = [];
 				for(var emoteName in emoteNames){
@@ -1474,24 +1474,18 @@ function passFunction(){
 				}
 				emoteNamesArray.sort();
 			}
-			if((search.indexOf(lastSearch)!=-1) && lastSearch && !findReg){
-				searchArray = resultSet;
-			}else{
-				searchArray = emoteNamesArray;
+			var searchArray, noModifier, tempEmote, sub = search.match(/s\:([a-zA-Z1-9]+)/);
+			if(sub){
+				search = trim(search.replace(sub[0], ''));
+				sub = sub[0].substr(2);
 			}
+			searchArray = emoteNamesArray;
 			resultSet = [];
-			if(findReg){
-				var cachedFindReg = new RegExp(search);
-				for(var emote = 0; emote < searchArray.length; emote++){
-					if(new RegExp(search).test(searchArray[emote])){
-						resultSet.push(searchArray[emote]);
-					}
-				}
-			}else{
-				for(var emote = 0; emote < searchArray.length; emote++){
-					if(searchArray[emote].indexOf(search) != -1){
-						resultSet.push(searchArray[emote]);
-					}
+			var cachedFindReg = new RegExp(search);
+			for(var emote = 0; emote < searchArray.length; emote++){
+				tempEmote = searchArray[emote];
+				if((!sub || subKeys[emoteNames[tempEmote]] == sub) && cachedFindReg.test(tempEmote) && !(ignoreDerivatives && (((noModifier = tempEmote.replace(/^(?:[drb]|ilf)/,"")) && noModifier != tempEmote && emoteNames[noModifier]) || ((noModifier = tempEmote.replace(/^[drb]{2,2}/,"")) && noModifier != tempEmote && emoteNames[noModifier])))){
+					resultSet.push(searchArray[emote]);
 				}
 			}
 			lastSearch = search;
