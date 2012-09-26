@@ -1499,6 +1499,22 @@ function passFunction(){
 				search = trim(search.replace(sub[0], ''));
 				sub = sub[1];
 			}
+			if(search.indexOf("|")>0){
+				var subParts = search.split("|");
+				for(var part in subParts){
+					subParts[part] = trim(subParts[part]);
+				}
+				var last = subParts.pop();
+				search = "(?:" + subParts.join("|") + last + ")";
+			}
+			if(search.indexOf("&")>0){
+				var subParts = search.split("&");
+				for(var part in subParts){
+					subParts[part] = trim(subParts[part]);
+				}
+				var last = subParts.pop();
+				search = "(?=.*?" + subParts.join(".*?)(?=.*?") + last + ".*?)";
+			}
 			searchArray = emoteNamesArray;
 			resultSet = [];
 			var cachedFindReg = new RegExp(search);
