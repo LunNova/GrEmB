@@ -1,17 +1,13 @@
 chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 	switch(request.method){
-		case 'badgeText':
-			chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT, active: true}, function(tabs){
-				chrome.browserAction.setBadgeText({text: (request.data+""), tabId: tabs[0].id});
-			})
+		case 'setBadgeText':
+			chrome.browserAction.setBadgeText({text: (request.data+""), tabId: sender.tab.tabId});
 			break;
 		case 'getConf':
 			var conf;
 			try{
 				conf = JSON.parse(localStorage["configuration"]);
-			}catch(e){
-				conf = undefined;
-			}
+			}catch(e){ }
 			sendResponse({data: conf});
 			break;
 		case 'setConf':

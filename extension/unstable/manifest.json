@@ -23,6 +23,6 @@
 	"homepage_url": "http://nallar.me/scripts/",
 	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
 	"offline_enabled": true,
-	"version": "1.9842",
+	"version": "1.9843",
 	"manifest_version": 2
 }
