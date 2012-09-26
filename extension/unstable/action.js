@@ -7,5 +7,5 @@ function doMessage(evt){
 document.getElementById("openWindow").addEventListener("click", doMessage);
 document.getElementById("clearCssCache").addEventListener("click", doMessage);
 document.getElementById("options").addEventListener("click", function(){
-	chrome.tabs.create({'url': "http://nallar.me/scripts/"}, function(tab){});
+	chrome.tabs.create({'url': "http://nallar.me/scripts/settings/"}, function(tab){});
 });

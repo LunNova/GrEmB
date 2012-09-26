@@ -74,7 +74,7 @@ function passFunction(){
 		
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, tabs = {}, convertedEmotes = 0;
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, tabs = {}, convertedEmotes = 0, settings = false;
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -102,7 +102,7 @@ function passFunction(){
 			'defaultEmoteContainerMouseLeave': false,
 			'defaultEmoteContainerEverywhere': true,
 			'defaultEmoteContainerOnTop': true,
-			'internalUpdateCheck': true,
+			'updateCheck': true,
 			'emoteManagerEverywhere': true,
 			'emoteManagerWindowStyleType': true,
 			'emoteManagerWindowStyle': 'border: 1px solid #E1B000; background-color: #FFFDCC;',
@@ -113,6 +113,7 @@ function passFunction(){
 			'defaultEmoteContainerSide': false,
 			'defaultEmoteContainerGlobal': true,
 			'_emoteContainerAuto': false,
+			'toggleEvent': 'mouseover',
 			'emoteSearchDerivatives': false,
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
@@ -217,30 +218,6 @@ function passFunction(){
 			}
 			saveConf();
 		}
-		
-		function makeInput(id, type, dis, q){
-			if(defaultConfs[id] === undefined){
-				debug(103, "makeInput(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
-			}
-			if(!q){
-				q = '';
-			}
-			dis = dis ? "" : " disabled='disabled'";
-			if(type == 'checkbox'){
-				return '<span style=\'float: right !important;\'><input id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
-			}
-			if(type == 'text'){
-				return '<span style=\'float: right !important;\'><input id="' + id + '" name="conf" value="' + getConf(id) + '" type="textarea" ' + dis + '"/></span>';
-			}
-			if(type == 'radio2'){
-				return '<span style=\'float: right !important;\'>' + q + '<input id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
-			}
-			if(type == 'radio1'){
-				return '<span style=\'float: right !important;\'>' + q + '<input id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
-			}
-			debug(104, "Invalid type for makeInput: " + id + "\t" + type + "\t" + dis);
-			return '';
-		}
 
 		function getKeys(a){
 			var r = [];
@@ -283,33 +260,6 @@ function passFunction(){
 			return true;
 		}
 		
-		function onConfigChange(){
-			var oconf = cloneObject(confStore),refreshPage = false;
-			for(var i in settingsForm.elements){
-				i = +i;
-				if(isNaN(i)){
-					continue;
-				}
-				if(settingsForm.elements[i].checked !== undefined && settingsForm.elements[i].type === "checkbox"){
-					confStore[settingsForm.elements[i].id] = settingsForm.elements[i].checked;
-				} else if(settingsForm.elements[i].type.substr(0, 4) === "text"){
-					confStore[settingsForm.elements[i].id] = settingsForm.elements[i].value;
-				} else if(settingsForm.elements[i].type === "radio"){
-					if(settingsForm.elements[i].checked){
-						confStore[settingsForm.elements[i].id] = (settingsForm.elements[i].value === "left");
-					}
-				}
-			}
-			if(getConf("emoteManagerWindowStyleType")){
-				confStore["emoteManagerWindowStyle"] = defaultConfs["emoteManagerWindowStyle"];
-			}
-			if(!compareObjects(confStore, oconf)){
-				saveConf();
-				displayConfiguration();
-			}
-			
-		};
-		
 		function uniq(a){
 			var o = {}, i, l = a.length, r = [];
 			for(i=0; i<l;i+=1) o[a[i]] = a[i];
@@ -327,7 +277,7 @@ function passFunction(){
 			eHTML += "<input style='float:right;' id='Cclose' type='button' value='done'/>";
 			elem.innerHTML = eHTML;
 			document.body.appendChild(elem);
-			document.getElementById('Cedit').value = getConf("emoteBlacklist").join(",");
+			document.getElementById('Cedit').value = confStore["emoteBlacklist"].join(",");
 			var c = document.getElementById('Cclose');
 			c.addEventListener("click",function(evt){
 				setConf("emoteBlacklist",document.getElementById('Cedit').value.split(","));
@@ -354,7 +304,7 @@ function passFunction(){
 		}
 		
 		function updateGroups(){
-			var a, aa = getConf('lastDefaultEmoteGroups'), b, bb = defaultConfs['emoteGroups'], c, cc = getConf('emoteGroups'), toAdd = [], groupOrder = getConf("emoteGroupsOrder");;
+			var a, aa = confStore['lastDefaultEmoteGroups'], b, bb = defaultConfs['emoteGroups'], c, cc = confStore['emoteGroups'], toAdd = [], groupOrder = confStore["emoteGroupsOrder"];;
 			if(aa){
 				for(var g in bb){
 					a = aa[g]; b = bb[g].subs;
@@ -411,7 +361,7 @@ function passFunction(){
 			closeEditGroup();
 			var elem = document.createElement("div");
 			elem.id = "editGroupWindow";
-			var groups = getConf("emoteGroups");
+			var groups = confStore["emoteGroups"];
 			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit subs in " + groups[group].name + "</h3>";
 			eHTML += "<textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
 			eHTML += "<input id='Csave' type='button' value='save'/><input id='Ccancel' type='button' value='cancel'/>";
@@ -440,8 +390,8 @@ function passFunction(){
 		
 		function manageSubs(){
 			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
-			var groups = getConf("emoteGroups");
-			var groupOrder = getConf("emoteGroupsOrder");
+			var groups = confStore["emoteGroups"];
+			var groupOrder = confStore["emoteGroupsOrder"];
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
@@ -456,7 +406,7 @@ function passFunction(){
 			for(var i in groups){
 				var c = document.getElementById('C_'+i);
 				c.addEventListener("change",function(evt){
-					if(evt.target.checked && confStore['emoteGroups'][evt.target.name].nsfw && !getConf("nsfwDefunctEmotes") && !confirm("Are you sure you want to enable this? It's NSFW!")){
+					if(evt.target.checked && confStore['emoteGroups'][evt.target.name].nsfw && !confStore["nsfwDefunctEmotes"] && !confirm("Are you sure you want to enable this? It's NSFW!")){
 						evt.target.checked = false;
 						return;
 					}
@@ -511,7 +461,7 @@ function passFunction(){
 		}
 		
 		function getSubList(){
-			var groups = getConf("emoteGroups");
+			var groups = confStore["emoteGroups"];
 			var subs = [], grps = [];
 			for(var i in groups){
 				grps.unshift(i);
@@ -526,87 +476,188 @@ function passFunction(){
 			}
 			return subs.join(",");
 		}
-		
-		function displayConfiguration(){
-			if(unsupported){
-				superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
-				return;
-			}
-			var dis = {'all':'','E':'','F':'','G':'','S':'','T': '','WK':' disabled=\'disabled\''};
 
-			if(!getConf("defaultEmoteContainer")){
-				dis.E = " disabled='disabled'";
-			}
-			if(!getConf("emoteManagerEverywhere")){
-				dis.G = " disabled='disabled'";
-				dis.F = dis.G;
-			}
-			if(getConf("emoteManagerWindowStyleType")){
-				dis.S = " disabled='disabled'";
-			}
-			if(getConf("_emoteContainerAuto")){
-				dis.T = " disabled='disabled'";
-			}
-			if(isWebKit){
-				dis.WK = '';
-			}
-			if(compareObjects(oldDis,dis)){
-				return;
-			}
-			oldDis = dis;
-			var prefHTML = "<h3 style='font-size:110%'>GrEmB Configuration</h3><br /><form action='#' name='settingsForm' id='settingsForm'>";
-			
-			prefHTML += 'Include Emote Window/Search?' + makeInput('defaultEmoteContainer', 'checkbox', dis.all);
-			prefHTML += '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Display emote window on top of reddit header?' + makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Open emote window automatically when a text box is selected?' + makeInput('_emoteContainerAuto', 'checkbox', dis.E);
-			prefHTML += (getConf('_emoteContainerAuto')?'':'<br />&#160;&#160;Which side of the screen should the toggler be displayed on?' + makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:"));
-			prefHTML += '<br />&#160;&#160;Include r/mylittleandysonic1 emotes?' + makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + makeInput('smallToggler', 'checkbox', dis.E);
-			prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
-			prefHTML += '<br /><br />Wide reddit - comments as wide as your screen will allow, so some large emotes can fit' + makeInput('wideReddit', 'checkbox', dis.all);
-			prefHTML += '<br />Show hover text?' + makeInput('revealAltText', 'checkbox', dis.all);
-			prefHTML += '<br />Show emotes on all websites?' + makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
-			if(isFF){
-				prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + makeInput("emoteCopy", "checkbox", dis.all);
-			}
-			prefHTML += '<div align="right" id="manageSubs"></div>';
-			prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + makeInput('disableEmoteSpin', 'checkbox', dis.all);
-			prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
-			superBundlePrefs.innerHTML = prefHTML;
-			settingsForm = document.getElementById('settingsForm');
-			settingsForm.addEventListener("change", onConfigChange);
-			document.getElementById('saveSubmit').addEventListener("click", function(){onConfigChange();window.location.reload();});
-			manageSubs();
-		}
-		
 		function addConf(){
 			if(madeConf){
 				return;
 			}
-			superBundlePrefs = document.getElementById("superBundleConfAnchor");
-			if(superBundlePrefs){
-				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}.confPanel {border: 1px solid #E1B000; background-color: #FFFDCC; top: 60px; position: fixed;} .confPanel {min-height: 10%; max-height: 85%; overflow-y: scroll; width: 48%; height: auto; z-index: 0 !important; left: 10px !important;margin-left: 10px !important; margin-right: 10px !important; font-size: small !important; line-height: 20px; padding-right: 10px;} #page {width: 55% !important; margin-left: 52% !important;}";
-				addCSS(style);
-				showCSS();
-				superBundlePrefs.setAttribute("id", "superBundleConfPanel");
-				superBundlePrefs.setAttribute("class", "confPanel");
-				displayConfiguration();
-				window.addEventListener("resize", resizeConf());
-				resizeConf();
-				madeConf = true;
+			if(document.getElementById("installInstructions")){
 				document.getElementById("installInstructions").innerHTML = '';
 				document.getElementById("updateInstructions").setAttribute('style', '');
 				document.getElementById("yourVersion").innerHTML = localVersion;
 				
 			}
-		};
-		
-		function resizeConf(evt){
-			superBundlePrefs.setAttribute("style", "max-height: " + (window.innerHeight-80));
+			superBundlePrefs = document.getElementById("G_ConfAnchor");
+			if(superBundlePrefs){
+				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}";
+				addCSS(style);
+				showCSS();
+				superBundlePrefs.setAttribute("class", "confPanel");
+				settings = {
+	unconfigureableProperties: {
+		"alwaysTrue": 1,
+	},
+	tabs:{
+		advanced: {generator: function(){
+			var iHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
+			var ids = [];
+			for(var id in confStore){
+				ids.push(id);
+			}
+			ids.sort();
+			for(var i = 0; i < ids.length; i++){
+				id = ids[i];
+				if(uncloneableProperties[id] || settings.unconfigureableProperties[id] || typeof confStore[id] === "object"){
+					continue;
+				}
+				iHTML += settings.makeInput(id, (typeof confStore[id]==="boolean")?"checkbox":"text") + " " + id +"<br />";
+			}
+			iHTML += "</form>";
+			return iHTML;
+		}},
+		main: {
+			generator: function(){
+				if(unsupported){
+					superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
+					return;
+				}
+				var dis = {'all':'','E':'','F':'','G':'','S':'','T': '','WK':' disabled=\'disabled\''};
+
+				if(!getConf("defaultEmoteContainer")){
+					dis.E = true;
+				}
+				if(!getConf("emoteManagerEverywhere")){
+					dis.F = dis.G = true;
+				}
+				if(getConf("emoteManagerWindowStyleType")){
+					dis.S = true;
+				}
+				if(getConf("_emoteContainerAuto")){
+					dis.T = true;
+				}
+				if(isWebKit){
+					dis.WK = true;
+				}
+				oldDis = dis;
+				var prefHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
+				
+				prefHTML += 'Include Emote Window/Search?' + settings.makeInput('defaultEmoteContainer', 'checkbox', dis.all);
+				prefHTML += '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + settings.makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E);
+				prefHTML += '<br />&#160;&#160;Display emote window on top of reddit header?' + settings.makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E);
+				prefHTML += '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + settings.makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E);
+				prefHTML += '<br />&#160;&#160;Open emote window automatically when a text box is selected?' + settings.makeInput('_emoteContainerAuto', 'checkbox', dis.E);
+				prefHTML += (getConf('_emoteContainerAuto')?'':'<br />&#160;&#160;Which side of the screen should the toggler be displayed on?' + settings.makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + settings.makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:"));
+				prefHTML += settings.makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E) + '&#160;&#160;Include r/mylittleandysonic1 emotes? <br />' ;
+				prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + settings.makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
+				prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + settings.makeInput('smallToggler', 'checkbox', dis.E);
+				prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + settings.makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + settings.makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
+				prefHTML += '<br /><br />Wide reddit - comments as wide as your screen will allow, so some large emotes can fit' + settings.makeInput('wideReddit', 'checkbox', dis.all);
+				prefHTML += '<br />Show hover text?' + settings.makeInput('revealAltText', 'checkbox', dis.all);
+				prefHTML += '<br />Show emotes on all websites?' + settings.makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
+				if(isFF){
+					prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + settings.makeInput("emoteCopy", "checkbox", dis.all);
+				}
+				prefHTML += '<div align="right" id="manageSubs"></div>';
+				prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + settings.makeInput('disableEmoteSpin', 'checkbox', dis.all);
+				prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
+				return prefHTML;
+			},
+			onDisplay: function(){
+				document.getElementById('saveSubmit').addEventListener("click", function(){
+					settings.onChange();
+					window.location.reload();
+				});
+				manageSubs();
+			}
 		}
+	},
+	
+	makeInput: function(id, type, dis, q){
+		if(defaultConfs[id] === undefined){
+			debug(103, "makeInput(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
+		}
+		if(!q){
+			q = '';
+		}
+		dis = dis ? " disabled='disabled'" : "";
+		if(type == 'checkbox'){
+			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
+		}
+		if(type == 'text'){
+			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
+		}
+		if(type == 'radio2'){
+			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
+		}
+		if(type == 'radio1'){
+			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
+		}
+		debug(104, "Invalid type for settings.makeInput: " + id + "\t" + type + "\t" + dis);
+		return '';
+	},
+	
+	init: function(){
+		settings.elem = document.getElementById('G_ConfAnchor');
+		document.getElementById('G_ConfTabs').addEventListener("click", function(evt){
+			settings.showTab(evt.target.innerHTML.toLowerCase());
+			evt.preventDefault();
+			return false;
+		});
+		settings.showTab("main");
+	},
+	
+	showTab: function(tab){
+		if(!settings.tabs[tab]){
+			return;
+		}
+		if(settings.tabs[tab].generator){
+			settings.elem.innerHTML = settings.tabs[tab].generator();
+		}
+		if(settings.tabs[tab].onDisplay){
+			settings.tabs[tab].onDisplay();
+		}
+		settingsForm = document.getElementById('settingsForm');
+		settingsForm.addEventListener("change", settings.onChange);
+		settings.lastTab = tab;
+	},
+	
+	update: function(){
+		settings.showTab(settings.lastTab);
+	},
+	
+	onChange: function(){
+		var oconf = cloneObject(confStore),refreshPage = false;
+		for(var i = 0, e; i < settingsForm.elements.length; i++){
+			e = settingsForm.elements[i];
+			if(e.className != "G_input"){
+				continue;
+			}
+			if(e.checked !== undefined && e.type === "checkbox"){
+				confStore[e.id] = e.checked;
+			} else if(e.type.substr(0, 4) === "text"){
+				confStore[e.id] = e.value;
+			} else if(e.type === "radio"){
+				if(e.checked){
+					confStore[e.id] = (e.value === "left");
+				}
+			}
+			if(typeof confStore[e.id] === 'string' && /^[0-9\.]+$/.test(confStore[e.id])){
+				confStore[e.id] = +confStore[e.id];
+			}
+		}
+		if(getConf("emoteManagerWindowStyleType")){
+			confStore["emoteManagerWindowStyle"] = defaultConfs["emoteManagerWindowStyle"];
+		}
+		if(!compareObjects(confStore, oconf)){
+			saveConf();
+			settings.update();
+		}
+	},
+};
+				settings.init();
+			}
+			madeConf = true;
+		};
 		
 		function addCSS(rule){
 			cssStore += ("\r\n \r\n" + rule + "\r\n \r\n");
@@ -705,8 +756,8 @@ function passFunction(){
 		
 		function updateTabs(){
 			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
-			var h = getConf("emoteContainerHeight_");
-			var w = getConf("emoteContainerWidth_");
+			var h = confStore["emoteContainerHeight_"];
+			var w = confStore["emoteContainerWidth_"];
 			for(var t =0; t < tabHeaders.childNodes.length; t++){
 				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
 				var emoteList = tabs[tID].getElementsByClassName('GrEmBEmoteList_')[0];
@@ -739,7 +790,7 @@ function passFunction(){
 			return false;
 		}
 		function updateCurrentForm(evt){
-			if(!setUpTabs && (getConf("defaultEmoteContainerMLAS1") || getConf("defaultEmoteContainerILTBAT"))){
+			if(!setUpTabs && (confStore["defaultEmoteContainerMLAS1"] || confStore["defaultEmoteContainerILTBAT"])){
 				if(document.getElementById("GrEmBtablist")){
 					document.getElementById("GrEmBtablist").addEventListener("click", function (evt){
 						openTab(evt);
@@ -750,7 +801,7 @@ function passFunction(){
 			if(!/^(?:www\.)?google\.com$/i.test(window.location.host) && (document.activeElement.id != "emName")&&document.activeElement.id!="GrEmBEmoteWindow0"&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),document.activeElement)&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),evt.toElement)){
 				
 				currentForm = document.activeElement;
-				if(getConf('_emoteContainerAuto')){
+				if(confStore['_emoteContainerAuto']){
 					var closed = (currentForm.getAttribute('role')=="search" || /(?:search|username|password)/i.test(currentForm.placeholder)) || !((/(?:TEXT)/i.test(currentForm.tagName)&&currentForm.form)||(/(?:INPUT)/i.test(currentForm.tagName)&&currentForm.type!="password")||currentForm.contentEditable=="true");
 					toggleEmoteWindow(false, 0, closed);
 				}
@@ -882,7 +933,7 @@ function passFunction(){
 			if(document.getElementById("GrEmBEmoteToggle" + id)){
 				return;
 			}
-			if(!getConf('_emoteContainerAuto')){
+			if(!confStore['_emoteContainerAuto']){
 				var windowToggler = document.createElement("div");
 				windowToggler.id = "GrEmBEmoteToggle" + id;
 				windowToggler.className = "GrEmBWindow";
@@ -895,7 +946,7 @@ function passFunction(){
 				}
 				windowToggler.innerHTML = '<span class="GrEmBTitleText">' + toggleText + '</span>';
 				document.body.appendChild(windowToggler);
-				windowToggler.addEventListener("mouseover", function (evt){
+				windowToggler.addEventListener(confStore.toggleEvent, function (evt){
 					toggleEmoteWindow(evt, id, false);
 				}, false);
 			}
@@ -929,7 +980,7 @@ function passFunction(){
 				document.getElementById("emNameDerivatives").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
-				if(getConf("defaultEmoteContainerMouseLeave")){
+				if(confStore["defaultEmoteContainerMouseLeave"]){
 					function closeFunc(evt){
 						if(!resizing){
 							toggleEmoteWindow(evt, id, 1);
@@ -977,14 +1028,14 @@ function passFunction(){
 			var mlas1 = "";
 			var iltbat = "";
 			var currentTabID = 0;
-			if(getConf('defaultEmoteContainerSearch')){
+			if(confStore['defaultEmoteContainerSearch']){
 				search = '<li><a class="GrEmBSelectedTab" href="#" tabID="' + currentTabID++ + '">find</a></li>';
 			}
 			var mlpTabID = currentTabID++;
-			if(getConf('defaultEmoteContainerMLAS1')){
+			if(confStore['defaultEmoteContainerMLAS1']){
 				mlas1 = '<li><a href="#" tabID="' + currentTabID++ + '">mlas</a></li>';
 			}
-			if(getConf('defaultEmoteContainerILTBAT')){
+			if(confStore['defaultEmoteContainerILTBAT']){
 				iltbat = '<li><a href="#" tabID="' + currentTabID++ + '">iltbat</a></li>';
 			}
 			
@@ -992,7 +1043,7 @@ function passFunction(){
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(getConf("emoteSearchDerivatives")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
+				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(confStore["emoteSearchDerivatives"]?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
 			emotes += "<div title='/flutterfear' class='G_flutterfear_'></div><div title='/ppboring' class='G_ppboring_'></div><div title='/rarityyell' class='G_rarityyell_'></div><div title='/fluttershy' class='G_fluttershy_'></div><div title='/ajcower' class='G_ajcower_'></div><div title='/ajsly' class='G_ajsly_'></div><div title='/eeyup' class='G_eeyup_'></div><div title='/rdsmile' class='G_rdsmile_'></div><div title='/fluttersrs' class='G_fluttersrs_'></div><div title='/raritydress' class='G_raritydress_'></div><div title='/takealetter' class='G_takealetter_'></div><div title='/rdwut' class='G_rdwut_'></div><div title='/ppshrug' class='G_ppshrug_'></div><div title='/spikenervous' class='G_spikenervous_'></div><div title='/noooo' class='G_noooo_'></div><div title='/dj' class='G_dj_'></div><div title='/fluttershh' class='G_fluttershh_'></div><div title='/flutteryay' class='G_flutteryay_'></div><div title='/squintyjack' class='G_squintyjack_'></div><div title='/spikepushy' class='G_spikepushy_'></div><div title='/ajugh' class='G_ajugh_'></div><div title='/raritywut' class='G_raritywut_'></div><div title='/dumbfabric' class='G_dumbfabric_'></div><div title='/raritywhy' class='G_raritywhy_'></div><div title='/trixiesmug' class='G_trixiesmug_'></div><div title='/flutterwink' class='G_flutterwink_'></div><div title='/rarityannoyed' class='G_rarityannoyed_'></div><div title='/soawesome' class='G_soawesome_'></div><div title='/ajwut' class='G_ajwut_'></div><div title='/twisquint' class='G_twisquint_'></div><div title='/raritywhine' class='G_raritywhine_'></div><div title='/rdcool' class='G_rdcool_'></div><div title='/abwut' class='G_abwut_'></div><div title='/manspike' class='G_manspike_'></div><div title='/cockatrice' class='G_cockatrice_'></div><div title='/facehoof' class='G_facehoof_'></div><div title='/rarityjudge' class='G_rarityjudge_'></div><div title='/rarityprimp' class='G_rarityprimp_'></div><div title='/twirage' class='G_twirage_'></div><div title='/ppseesyou' class='G_ppseesyou_'></div><div title='/ajlie' class='G_ajlie_'></div><div title='/priceless' class='G_priceless_'></div><div title='/flutterjerk' class='G_flutterjerk_'></div><div title='/twipride' class='G_twipride_'></div><div title='/celestiamad' class='G_celestiamad_'></div><div title='/twicrazy' class='G_twicrazy_'></div><div title='/lunateehee' class='G_lunateehee_'></div><div title='/lunawait' class='G_lunawait_'></div><div title='/derpwizard' class='G_derpwizard_'></div><div title='/ajhappy' class='G_ajhappy_'></div><div title='/pinkiefear' class='G_pinkiefear_'></div><div title='/twibeam' class='G_twibeam_'></div><div title='/raritydaww' class='G_raritydaww_'></div><div title='/scootacheer' class='G_scootacheer_'></div><div title='/swagintosh' class='G_swagintosh_'></div><div title='/ajsup' class='G_ajsup_'></div><div title='/flutterwhoa' class='G_flutterwhoa_'></div><div title='/rdsad' class='G_rdsad_'></div><div title='/ohcomeon' class='G_ohcomeon_'></div><div title='/ppcute' class='G_ppcute_'></div><div title='/abbored' class='G_abbored_'></div><div title='/raritynews' class='G_raritynews_'></div><div title='/sbbook' class='G_sbbook_'></div><div title='/scootaplease' class='G_scootaplease_'></div><div title='/twiright' class='G_twiright_'></div><div title='/celestiawut' class='G_celestiawut_'></div><div title='/grannysmith' class='G_grannysmith_'></div><div title='/shiningarmor' class='G_shiningarmor_'></div><div title='/chrysalis' class='G_chrysalis_'></div><div title='/cadence' class='G_cadence_'></div><div title='/rdsitting' class='G_rdsitting_'></div><div title='/rdhappy' class='G_rdhappy_'></div><div title='/rdannoyed' class='G_rdannoyed_'></div><div title='/twismug' class='G_twismug_'></div><div title='/twismile' class='G_twismile_'></div><div title='/twistare' class='G_twistare_'></div><div title='/ohhi' class='G_ohhi_'></div><div title='/party' class='G_party_'></div><div title='/hahaha' class='G_hahaha_'></div><div title='/flutterblush' class='G_flutterblush_'></div><div title='/gross' class='G_gross_'></div><div title='/derpyhappy' class='G_derpyhappy_'></div><div title='/ajfrown' class='G_ajfrown_'></div><div title='/hmmm' class='G_hmmm_'></div><div title='/joy' class='G_joy_'></div><div title='/raritysad' class='G_raritysad_'></div><div title='/fabulous' class='G_fabulous_'></div><div title='/derp' class='G_derp_'></div><div title='/louder' class='G_louder_'></div><div title='/lunasad' class='G_lunasad_'></div><div title='/derpyshock' class='G_derpyshock_'></div><div title='/pinkamina' class='G_pinkamina_'></div><div title='/loveme' class='G_loveme_'></div><div title='/lunagasp' class='G_lunagasp_'></div><div title='/scootaloo' class='G_scootaloo_'></div><div title='/celestia' class='G_celestia_'></div><div title='/angel' class='G_angel_'></div><div title='/allmybits' class='G_allmybits_'></div><div title='/zecora' class='G_zecora_'></div><div title='/photofinish' class='G_photofinish_'></div><div title='/fillytgap' class='G_fillytgap_'></div><div title='/rdhuh' class='G_rdhuh_'></div><div title='/snails' class='G_snails_'></div><div title='/lyra' class='G_lyra_'></div><div title='/bonbon' class='G_bonbon_'></div><div title='/spitfire' class='G_spitfire_'></div><div title='/cutealoo' class='G_cutealoo_'></div><div title='/happyluna' class='G_happyluna_'></div><div title='/sotrue' class='G_sotrue_'></div><div title='/wahaha' class='G_wahaha_'></div><div title='/sbstare' class='G_sbstare_'></div><div title='/punchdrunk' class='G_punchdrunk_'></div><div title='/huhhuh' class='G_huhhuh_'></div><div title='/absmile' class='G_absmile_'></div><div title='/dealwithit' class='G_dealwithit_'></div><div title='/nmm' class='G_nmm_'></div><div title='/whooves' class='G_whooves_'></div><div title='/rdsalute' class='G_rdsalute_'></div><div title='/octavia' class='G_octavia_'></div><div title='/colgate' class='G_colgate_'></div><div title='/cheerilee' class='G_cheerilee_'></div><div title='/ajbaffle' class='G_ajbaffle_'></div><div title='/abhuh' class='G_abhuh_'></div><div title='/thehorror' class='G_thehorror_'></div><div title='/twiponder' class='G_twiponder_'></div><div title='/spikewtf' class='G_spikewtf_'></div><div title='/awwyeah' class='G_awwyeah_'></div>";
@@ -1090,7 +1141,7 @@ function passFunction(){
 					subKeys = emoteNames.subKeys;
 					delete(emoteNames.cssKey);
 					delete(emoteNames.subKeys);
-					var bl = getConf("emoteBlacklist");
+					var bl = confStore["emoteBlacklist"];
 					for(var i = 0; i < bl.length; i++){
 						delete(emoteNames[bl[i]]);
 					}
@@ -1302,7 +1353,7 @@ function passFunction(){
 				if(!isReddit){
 					convertDefaultGlobalEmotes(evt.target);
 				};
-				var dispUn = (!doRefresh), revAlt = getConf("revealAltText"), inSub = (/\.com\/r\//).test(window.location.href), imageAlt = getConf('emoteCopy'), ytExpand = true, msgs = [];
+				var dispUn = (!doRefresh), revAlt = confStore["revealAltText"], inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore['emoteCopy'], ytExpand = true, msgs = [];
 				if(markdownConvert){
 					if((/(?:^|\s)(?:md|livePreview)(?:\s|$)/i.test(evt.target.className))){
 						msgs = [evt.target];
@@ -1313,7 +1364,7 @@ function passFunction(){
 						var elems = msgs[j].getElementsByTagName("A");
 						for(var i = 0, len2 = elems.length; i < len2; i++){
 							var emElem = elems[i];
-							if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)||emElem.childNodes.length>1||(/ytExpand/).test(emElem.className)){
+							if((/(?:^|\s)convertedEmote(?:\s|$)/).test(emElem.className)||(/ytExpand/).test(emElem.className)){
 								continue;
 							}
 							if(ytExpand){
@@ -1424,7 +1475,7 @@ function passFunction(){
 			domInsertFunction({
 				target: document.body
 			});
-			if(getConf("defaultEmoteContainer") && (isReddit||getConf("defaultEmoteContainerEverywhere"))){
+			if(confStore["defaultEmoteContainer"] && (isReddit||confStore["defaultEmoteContainerEverywhere"])){
 				createDefWindow();
 			}
 			debug(100,"frm: "+window.location.href);
@@ -1446,7 +1497,7 @@ function passFunction(){
 			}
 		};
 		function createDefWindow(){
-			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("emoteContainerX_"), getConf("emoteContainerY_"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("emoteContainerWidth_"), getConf("emoteContainerHeight_"), getDefaultEmoteHTML, getConf("smallToggler")?"":"Emotes");
+			createEmoteWindow(0, confStore["defaultEmoteContainerSide"] ? "left" : "right", confStore["emoteContainerX_"], confStore["emoteContainerY_"], (confStore["defaultEmoteContainerOnTop"] || !isReddit) ? 99999 : 11, confStore["emoteContainerWidth_"], confStore["emoteContainerHeight_"], getDefaultEmoteHTML, confStore["smallToggler"]?"":"Emotes");
 		};
 		
 		function debug(){};
@@ -1464,7 +1515,7 @@ function passFunction(){
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,false,getConf("emoteSearchDerivatives"))},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore["emoteSearchDerivatives"])},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmotes(search, ret, ignoreDerivatives){
@@ -1540,7 +1591,7 @@ function passFunction(){
 		
 		//START DYNAMIC (using above functions) VARS//
 		var markdownConvert = isReddit;
-		var globalConvert = !isReddit&&getConf('emoteManagerEverywhere');
+		var globalConvert = !isReddit&&confStore['emoteManagerEverywhere'];
 		var showNotice = false;
 		//END DYNAMIC VARS
 		
@@ -1563,18 +1614,18 @@ function passFunction(){
 		});
 		
 		
-		var emoteNames = getConf('emoteNames'), subKeys = getConf('subKeys');
+		var emoteNames = confStore['emoteNames'], subKeys = confStore['subKeys'];
 		if((emoteNames instanceof Array)){
 			emoteNames = defaultConfs['emoteNames'];
 		}
 		
 		if((/scripts\/\?allconfreset=1/).test(window.location.href)){
 			resetConf();
-		}else if(getConf("lastVersion") != localVersion){
+		}else if(confStore["lastVersion"] != localVersion){
 			removeDefunctConfs();
 			updateGroups();
 			resetCache();
-		}else if(!emoteNames || getConf("shouldReset") || getConf("nextCacheUpdateTime") < (new Date()).getTime()){
+		}else if(!emoteNames || confStore["shouldReset"] || confStore["nextCacheUpdateTime"] < (new Date()).getTime()){
 			resetCache();
 		}
 		
@@ -1584,8 +1635,8 @@ function passFunction(){
 		
 		
 		
-		if(isReddit||globalConvert||getConf("defaultEmoteContainerEverywhere")){
-			loadStyleSheet(mainStylesheet + getConf("cssKey") + "&nsfw=" + (getConf("nsfwDefunctEmotes")?"1":"0"), true);
+		if(isReddit||globalConvert||confStore["defaultEmoteContainerEverywhere"]){
+			loadStyleSheet(mainStylesheet + confStore["cssKey"] + "&nsfw=" + (confStore["nsfwDefunctEmotes"]?"1":"0"), true);
 		}
 		
 		if(true){
@@ -1593,19 +1644,19 @@ function passFunction(){
 				cssStore += ('code{font-family: monospace !important;} ');
 			}
 			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
-			if(isReddit||getConf('emoteManagerEverywhere')){
+			if(isReddit||confStore['emoteManagerEverywhere']){
 				cssStore += ("a.convertedEmote_[href*='-r-']{-moz-transform:scaleX(-1);-webkit-transform:scaleX(-1);-o-transform:scaleX(-1);}a.convertedEmote_[href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href*='-r-'][href*='-d-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'],a.convertedEmote_:hover[href*='-45-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-90-'],a.convertedEmote_:hover[href*='-90-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'],a.convertedEmote_:hover[href*='-135-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href*='-180-'],a.convertedEmote_:hover[href*='-180-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'],a.convertedEmote_:hover[href*='-225-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href*='-270-'],a.convertedEmote_:hover[href*='-270-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'],a.convertedEmote_:hover[href*='-315-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href*='-r-'],a.convertedEmote_:hover[href*='-d-'],a.convertedEmote_:hover[href*='-dancer-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href*='-180-'][href*='-r-'],a.convertedEmote_:hover[href*='-180-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href*='-270-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href*='-225-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-270-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-f-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href*='-90-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href*='-225-'][href*='-f-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-270-'][href*='-f-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href*='-f-'],a.convertedEmote_[href*='-fuckingcrazy-'],a.convertedEmote_:hover[href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-f-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90d-'],a.convertedEmote_:hover[href*='-90rd-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-180d-'],a.convertedEmote_:hover[href*='-fd-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270d-'],a.convertedEmote_:hover[href*='-270rd-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90r-'],a.convertedEmote_[href*='-90rd-'],a.convertedEmote_:hover[href*='-90d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-fd-'],a.convertedEmote_:hover[href*='-180d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270r-'],a.convertedEmote_[href*='-270rd-'],a.convertedEmote_:hover[href*='-270d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}body .G_sp_{display: inline-block !important;padding-right: 100% !important;}");
 			}
 
-			if(!getConf("disableEmoteSpin")&&(isReddit||getConf('emoteManagerEverywhere'))){
+			if(!confStore["disableEmoteSpin"]&&(isReddit||confStore['emoteManagerEverywhere'])){
 				cssStore += ('a.convertedEmote_[href*=-spin-],  a.convertedEmote_[href*=-spin-]{ -moz-transform-style: flat; -moz-animation: spin 2s infinite ease; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: spin 2s infinite ease; -webkit-transform: translateZ(-360px) rotateX(360deg);}a.convertedEmote_[href*=-ispin-], a.convertedEmote_[href*=-ispin-] { -moz-transform-style: flat; -moz-animation: ispin 2s infinite linear; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: ispin 2s infinite linear; -webkit-transform: translateZ(-360px) rotateX(360deg);} a.convertedEmote_[href*=-yspin-] {-moz-transform: translateZ(50px); -moz-transform-style: flat; -moz-animation: yspin 2s infinite linear; -webkit-transform: translateZ(50px); -webkit-transform-style: flat; -webkit-animation: yspin 2s infinite linear;} a.convertedEmote_[href*=-xspin-] {-moz-transform-style: flat; -moz-transform: rotateX(0deg); -moz-animation: xspin 2s infinite ease; -webkit-transform: rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: xspin 2s infinite ease;}a.convertedEmote_[href*=-rotate-], a.convertedEmote_[href*=-rotate-] { -moz-transform-style: flat; -moz-animation: rotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotate 2s infinite ease;}a.convertedEmote_[href*=-rrotate-] { -moz-transform-style: flat; -moz-animation: rrotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotater 2s infinite ease;}a.convertedEmote_[href*=-lrotate-] { -moz-transform-style: flat; -moz-animation: lrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatel 2s infinite linear;}a.convertedEmote_[href*=-lrrotate-] { -moz-transform-style: flat; -moz-animation: lrrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatelr 2s infinite linear;}@-moz-keyframes xspin { from { -moz-transform: rotateX(0deg);} to { -moz-transform: rotateX(360deg); } }@-webkit-keyframes spin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes ispin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-moz-keyframes spin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes xspin { from { -webkit-transform: rotateX(0deg);} to { -webkit-transform: rotateX(360deg); } }@-moz-keyframes ispin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes yspin { from { -webkit-transform: rotateY(0)} to { -webkit-transform: rotateY(360deg);} }@-moz-keyframes yspin { from { -moz-transform: rotateY(0)} to { -moz-transform: rotateY(360deg);} }@-moz-keyframes rotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes rrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-moz-keyframes lrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes lrrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-webkit-keyframes rotate { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotater { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } }@-webkit-keyframes rotatel { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotatelr { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } } @-moz-keyframes zspin{from{-moz-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-moz-transform:rotate(0deg)scaleX(1)rotatez(360deg)}}@-webkit-keyframes zspin{from{-webkit-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-webkit-transform:rotate(0deg)scaleX(1)rotatez(360deg)}} a.convertedEmote_[href*="-zspin-"]{-moz-animation:zspin 2s infinite linear;-webkit-animation:zspin 2s infinite linear;image-rendering:-moz-crisp-edges}');
 			}
 			cssStore += ("a.convertedEmote_[href*='-i-']{ -o-filter: hue-rotate(180deg) !important; filter: hue-rotate(180deg) !important; -webkit-filter: hue-rotate(180deg) !important;} a.convertedEmote_[href*='-inp-'], a.convertedEmote_[href*='-in-']{ float: none !important; display: inline-block !important;}");
 			
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
-			var redditSize = (getConf("wideReddit") ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#GrEmBtablist a{color: #369;}#emName{width:80%;}#GrEmBtablist li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			var redditSize = (confStore["wideReddit"] ? 'max-width: none !important; width: auto !important;' : '');
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBtabs a{color: #369;}#emName{width:80%;}.GrEmBtabs li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + confStore["emoteManagerWindowStyle"] + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
 		properOnLoadEvent_(initialEmotePass);
