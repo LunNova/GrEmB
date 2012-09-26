@@ -1223,12 +1223,12 @@ function passFunction(){
 								continue;
 							}
 							if(ytExpand){
-								var ytData = (/(?:https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)*v=([a-zA-Z0-9\-_]+)(?:[#\?]t=(.*)$)?|http:\/\/(?:www\.)?youtu.be\/([^\?]+))/).exec(emElem.getAttribute('href'));
+								var ytData = (/(?:(?:https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)*v=([a-zA-Z0-9\-_]+)|http:\/\/(?:www\.)?youtu.be\/([^\?]+)))(?:[#\?]t=(.*)$)?/).exec(emElem.getAttribute('href'));
 								if(ytData){
-									if(ytData[3]){
-										youtubeInlineExpand(emElem,ytData[3],ytData[4]);
+									if(ytData[2]){
+										youtubeInlineExpand(emElem,ytData[2],ytData[3]);
 									}else{
-										youtubeInlineExpand(emElem,ytData[1],ytData[2]);
+										youtubeInlineExpand(emElem,ytData[1],ytData[3]);
 									}
 									continue;
 								}
