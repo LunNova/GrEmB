@@ -54,7 +54,7 @@ function passFunction(){
 		//ENDIF
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, wt = 0, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1}, oldDis = false, convTimeout = false, tabs = {};
+		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, noCloneNames = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, tabs = {}, convertedEmotes = 0;
 		
 		var flagFunctions = {
 			'rs_': function(flag,em){
@@ -108,7 +108,7 @@ function passFunction(){
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittledramaticstory", "ploungemafia", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "mylittlesupportgroup", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleconspiracy", "mylittledramaticstory", "ploungemafia", "mylittlesupportgroup", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
 			'lastDefaultEmoteGroups': false,
 			'subKeys': {},
@@ -134,7 +134,7 @@ function passFunction(){
 			if(ret) {
 				ret = JSON.parse(ret);
 			}
-			if(ret == undefined || (ret['alwaysTrue'] !== true)) {
+			if(!ret || (ret['alwaysTrue'] !== true)) {
 				ret = defaultConfs;
 				GM_setValue('confArray', JSON.stringify(ret));
 			}
@@ -1009,7 +1009,7 @@ function passFunction(){
 				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
 			}
 			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(getConf("emoteSearchDerivatives")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
+				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(getConf("emoteSearchDerivatives")?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 			}
 			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
 			emotes += "/*INCLUDE 'rmlp.html'*/";
@@ -1129,12 +1129,12 @@ function passFunction(){
 			if(convTimeout){
 				clearTimeout(convTimeout);
 			}
-			if((!goEmote&&!wkMutation)||!globalConvert||root == null|| !(/\[\]\(\/.*?\)/).test(root.innerHTML)){
+			if((!goEmote&&!wkMutation)||!globalConvert||!root|| !(/\[\]\(\/.*?\)/).test(root.innerHTML)){
 				return;
 			}
 			goEmote = false;
 			var converted = 0, maxConvert = 300, dispUn = (!doRefresh), node = root.firstChild;
-			if(node == null){
+			if(!node){
 				debug(100,"No firstChild? :S");
 			}
 			while(node != null && converted < maxConvert){
@@ -1352,10 +1352,10 @@ function passFunction(){
 							if(!hrefss){
 								continue;
 							}
-							var href = hrefss[1];
+							var href = hrefss[1], subKey = emoteNames[href];
 							emElem.className += " convertedEmote_";
-							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!emoteNames[href]) && (!spoilers[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
-								emElem.textContent = "/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "");
+							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!subKey) && (!spoilers[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
+								emElem.textContent = "/" + hrefs + ((hrefss[2] != undefined) ? hrefss[2] : "");
 								if(href.length > 20){
 									emElem.className += " G_unknownEmote G_largeUnknown";
 								}else{
@@ -1371,6 +1371,10 @@ function passFunction(){
 									emElem.removeChild(emElem.firstChild);
 									emElem.href = "/" + href + (hrefss[2] === undefined ? "" : hrefss[2] + '-');
 								}
+								if(subKey===-1){
+									emElem.innerText = "[DEPRECATED]";
+								}
+								convertedEmotes++;
 							}
 							if(revAlt && !spoilers[href]){
 								if(emElem.title!=""){//This block is derived from ArbitraryEntity's code.
@@ -1407,7 +1411,9 @@ function passFunction(){
 										emElem.parentNode.insertBefore(theDiv, emElem.nextSibling);
 									}
 								}//End ArbitraryEntity's code
-								emElem.title = hrefs + " from /r/" + subKeys[emoteNames[href]];
+								if(subKey){
+									emElem.title = hrefs + " from " + (subKey!==-1?"/r/"+subKeys[subKey]:"no longer supported");
+								}
 							}
 							if(imageAlt){
 								var copyImage = document.createElement("img");
@@ -1417,6 +1423,9 @@ function passFunction(){
 							}
 						}
 					}
+					//IF extension
+					chrome.extension.sendMessage({method: "badgeText", data: convertedEmotes});
+					//ENDIF
 				}
 			}
 			goFind = true;
@@ -1426,7 +1435,6 @@ function passFunction(){
 			if(ranInitial){
 				return;
 			} 
-			sSSection();
 			ranInitial = true;
 			if(isReddit&&(/reddit\.com(?:\/r\/[^\/]+?\+|\/?$)/).test(window.location.href)){
 				fixHomePageNSFW(document.body);
@@ -1437,9 +1445,7 @@ function passFunction(){
 			if(getConf("defaultEmoteContainer") && (isReddit||getConf("defaultEmoteContainerEverywhere"))){
 				createDefWindow();
 			}
-			wt += endSSection("initial conversion pass");
-			var tt = endSection("Total time taken");
-			debug(100,"frm: "+window.location.href+"\ttsr: "+wt+"ms\t(extern)tsl: "+(tt-wt)+"ms");
+			debug(100,"frm: "+window.location.href);
 			document.body.addEventListener("click", clickBlock, false);
 			if(wkMutation){
 				(new wkMutation(function(mutations, observer){
@@ -1458,19 +1464,16 @@ function passFunction(){
 			}
 		};
 		function createDefWindow(){
-			sSSection();
 			createEmoteWindow(0, getConf("defaultEmoteContainerSide") ? "left" : "right", getConf("emoteContainerX_"), getConf("emoteContainerY_"), (getConf("defaultEmoteContainerOnTop") || !isReddit) ? 99999 : 11, getConf("emoteContainerWidth_"), getConf("emoteContainerHeight_"), getDefaultEmoteHTML, getConf("smallToggler")?"":"Emotes");
-			wt += endSSection("initial conversion pass");
 		};
 		
 		//IF release
 			function debug(){};
-			sSection = sSSection = endSection = endSSection = function(){};
 		//ELSE
 			if(isFF){
 				function debug(level, text) {
 					if(103/*REPLACE*/ < level) {
-						//console.log(text);
+						console.log(text);
 					}
 				};
 			}else{
@@ -1480,38 +1483,6 @@ function passFunction(){
 					}
 				};
 			}
-			var sTime = 0, ssTime = 0;
-			
-			sSection = function () {
-				sTime = (new Date()).getTime();
-			};
-
-			endSection = function (name) {
-				var retV = 0;
-				if(sTime != 0) {
-					retV=((new Date()).getTime() - sTime);
-				} else {
-					debug(103, "no section started");
-				}
-				return retV;
-			};
-			
-			sSSection = function () {
-				ssTime = (new Date()).getTime();
-			};
-
-			sSection();
-			sSSection();
-				
-			endSSection = function (name) {
-				var retV = 0;
-				if(ssTime != 0) {
-					retV=((new Date()).getTime() - ssTime);
-				} else {
-					debug(103, "no section started");
-				}
-				return retV;
-			};
 		//ENDIF
 		
 		var lastSearch = '';
@@ -1527,21 +1498,26 @@ function passFunction(){
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,false,getConf("emoteSearchDerivatives"))},evt.keyCode == 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,getConf("emoteSearchDerivatives"))},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmotes(search, ret, ignoreDerivatives){
 			if(emoteNamesArray === false){
 				emoteNamesArray = [];
 				for(var emoteName in emoteNames){
-					emoteNamesArray.push(emoteName);
+					if(emoteNames[emoteName] !== -1){
+						emoteNamesArray.push(emoteName);
+					}
 				}
 				emoteNamesArray.sort();
 			}
-			var searchArray, noModifier, tempEmote, sub = search.match(/s\:([a-zA-Z1-9]+)/);
+			if(!search){
+				return;
+			}
+			var searchArray, noModifier, tempEmote, sub = search.match(/sr?\:([a-zA-Z1-9]+)/);
 			if(sub){
 				search = trim(search.replace(sub[0], ''));
-				sub = sub[0].substr(2);
+				sub = sub[1];
 			}
 			searchArray = emoteNamesArray;
 			resultSet = [];
@@ -1642,6 +1618,10 @@ function passFunction(){
 				case 'options':
 					window.location.replace("http://nallar.me/scripts/");
 					break;
+				case 'openWindow':
+					toggleEmoteWindow(false, 0, false);
+					console.log("toggled!");
+					break;
 			}
 			return false;
 		});
@@ -1667,6 +1647,9 @@ function passFunction(){
 		}
 		
 		//IF !extension
+		GM_registerMenuCommand('GrEmB - Open emote window', function (){
+			toggleEmoteWindow(false, 0, false);
+		});
 		GM_registerMenuCommand('GrEmB - Open options', function (){
 			window.location.replace("http://nallar.me/scripts/");
 		});
@@ -1711,7 +1694,6 @@ function passFunction(){
 			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}#GrEmBtablist a{color: #369;}#emName{width:80%;}#GrEmBtablist li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.GrEmBWindow{height: auto !important; width: auto !important;' + getConf("emoteManagerWindowStyle") + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
-		wt += endSSection("Added styles and initialised");
 		properOnLoadEvent_(initialEmotePass);
 	};
 
@@ -1732,11 +1714,6 @@ function properOnLoadEvent(cb){
 	if(document.readyState === "complete" && document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
-		/*document.addEventListener("DOMContentLoaded", function (){
-			if((document.readyState === "complete") && document.getElementsByTagName("head")[0]){
-				cb();
-			}
-		}, false);*/
 		document.addEventListener("readystatechange", function (){
 			if((document.readyState === "complete") && document.getElementsByTagName("head")[0]){
 				cb();
@@ -1749,11 +1726,6 @@ function properOnLoadEvent_(cb){
 	if((document.readyState === "complete" || document.readyState === "interactive") && document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
-		/*document.addEventListener("DOMContentLoaded", function (){
-			if((document.readyState === "complete" || document.readyState === "interactive") && document.getElementsByTagName("head")[0]){
-				cb();
-			}
-		}, false);*/
 		document.addEventListener("readystatechange", function (){
 			if((document.readyState === "complete" || document.readyState === "interactive") && document.getElementsByTagName("head")[0]){
 				cb();
@@ -1766,11 +1738,6 @@ function properOnLoadEvent__(cb){
 	if(document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
-		/*document.addEventListener("DOMContentLoaded", function (){
-			if(document.getElementsByTagName("head")[0]){
-				cb();
-			}
-		}, false);*/
 		document.addEventListener("readystatechange", function (){
 			if(document.getElementsByTagName("head")[0]){
 				cb();

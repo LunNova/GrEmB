@@ -20,8 +20,9 @@
 	},
 	"minimum_chrome_version": "20.0.0.0",
 	"name": "GrEmB",
+	"homepage_url": "http://nallar.me/scripts/",
 	"permissions": [ "notifications", "unlimited_storage", "tabs", "management", "webNavigation", "webRequest", "webRequestBlocking", "<all_urls>" ],
 	"offline_enabled": true,
-	"version": "1.9832",
+	"version": "1.9842",
 	"manifest_version": 2
 }

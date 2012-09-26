@@ -1,5 +1,10 @@
 chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 	switch(request.method){
+		case 'badgeText':
+			chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT, active: true}, function(tabs){
+				chrome.browserAction.setBadgeText({text: (request.data+""), tabId: tabs[0].id});
+			})
+			break;
 		case 'getConf':
 			var conf;
 			try{

@@ -4,6 +4,7 @@ function doMessage(evt){
 		chrome.tabs.sendMessage(tabs[0].id,{method:message});
 	})
 }
+document.getElementById("openWindow").addEventListener("click", doMessage);
 document.getElementById("clearCssCache").addEventListener("click", doMessage);
 document.getElementById("options").addEventListener("click", function(){
 	chrome.tabs.create({'url': "http://nallar.me/scripts/"}, function(tab){});
