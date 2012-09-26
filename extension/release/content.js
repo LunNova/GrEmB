@@ -1485,14 +1485,7 @@ function passFunction(){
 				search = trim(search.replace(sub[0], ''));
 				sub = sub[1];
 			}
-			if(search.indexOf("|")>0){
-				var subParts = search.split("|");
-				for(var part in subParts){
-					subParts[part] = trim(subParts[part]);
-				}
-				var last = subParts.pop();
-				search = "(?:" + subParts.join("|") + last + ")";
-			}
+			search = search.replace(" OR ", "|").replace(" AND ", "&").replace(/\s+?\|\s+?/, "|").replace(/(&|\|)+$/,'');
 			if(search.indexOf("&")>0){
 				var subParts = search.split("&");
 				for(var part in subParts){
@@ -1501,6 +1494,7 @@ function passFunction(){
 				var last = subParts.pop();
 				search = "(?=.*?" + subParts.join(".*?)(?=.*?") + last + ".*?)";
 			}
+			console.log(search);
 			searchArray = emoteNamesArray;
 			resultSet = [];
 			var cachedFindReg = new RegExp(search);
