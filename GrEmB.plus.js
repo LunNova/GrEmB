@@ -1530,7 +1530,6 @@ function passFunction(){
 				var last = subParts.pop();
 				search = "(?=.*?" + subParts.join(".*?)(?=.*?") + last + ".*?)";
 			}
-			console.log(search);
 			searchArray = emoteNamesArray;
 			resultSet = [];
 			var cachedFindReg = new RegExp(search);
