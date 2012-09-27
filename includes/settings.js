@@ -35,7 +35,10 @@ settings = {
 				defaultEmoteContainer: {
 					description: "Enable emote browser",
 					children:{
-						
+						defaultEmoteContainerEverywhere:{
+							description: "Enable emote browser globally",
+							help: "globally = all websites"
+						}
 					}
 				}
 			},
@@ -98,7 +101,7 @@ settings = {
 		function makeHtml(settingsList,space){
 			var rHTML = "";
 			for(var s in settingsList){
-				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + "<br />";
+				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
 				if(confStore[s] === true && settingsList[s].children){
 					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;");
 				}
