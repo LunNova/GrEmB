@@ -21,7 +21,25 @@ settings = {
 			return iHTML;
 		}},
 		main: {
-			generator: function(){
+			settings: {
+				//IF !extension
+				internalUpdateCheck: {
+					description: "Use built-in update checker?",
+					children:{
+						updateCheckWeekly: {
+							description: "Use built-in update checker?",
+						}
+					}
+				},
+				//ENDIF
+				defaultEmoteContainer: {
+					description: "Enable emote browser",
+					children:{
+						
+					}
+				}
+			},
+			gen_erator: function(){
 				if(unsupported){
 					superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
 					return;
@@ -65,19 +83,31 @@ settings = {
 				if(isFF){
 					prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + settings.makeInput("emoteCopy", "checkbox", dis.all);
 				}
-				prefHTML += '<div align="right" id="manageSubs"></div>';
 				prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + settings.makeInput('disableEmoteSpin', 'checkbox', dis.all);
 				prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
 				return prefHTML;
 			},
 			onDisplay: function(){
-				document.getElementById('saveSubmit').addEventListener("click", function(){
-					settings.onChange();
-					window.location.reload();
-				});
 				manageSubs();
 			}
 		}
+	},
+	
+	defaultGenerator: function(tab){
+		var iHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
+		function makeHtml(settingsList,space){
+			var rHTML = "";
+			for(var s in settingsList){
+				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + "<br />";
+				if(confStore[s] === true && settingsList[s].children){
+					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;");
+				}
+			}
+			return rHTML;
+		}
+		iHTML += makeHtml(tab.settings, "");
+		iHTML += "<div align='right' id='manageSubs'></div></form>";
+		return iHTML;
 	},
 	
 	makeInput: function(id, type, dis, q){
@@ -88,20 +118,16 @@ settings = {
 			q = '';
 		}
 		dis = dis ? " disabled='disabled'" : "";
-		if(type == 'checkbox'){
-			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
-		}
 		if(type == 'text'){
-			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
+			return '<span><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
 		}
 		if(type == 'radio2'){
-			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
+			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
 		}
 		if(type == 'radio1'){
-			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
+			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
 		}
-		debug(104, "Invalid type for settings.makeInput: " + id + "\t" + type + "\t" + dis);
-		return '';
+		return '<span><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
 	},
 	
 	init: function(){
@@ -115,14 +141,12 @@ settings = {
 	},
 	
 	showTab: function(tab){
-		if(!settings.tabs[tab]){
+		if(typeof tab === 'string' && !(tab = settings.tabs[tab])){
 			return;
 		}
-		if(settings.tabs[tab].generator){
-			settings.elem.innerHTML = settings.tabs[tab].generator();
-		}
-		if(settings.tabs[tab].onDisplay){
-			settings.tabs[tab].onDisplay();
+		settings.elem.innerHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
+		if(tab.onDisplay){
+			tab.onDisplay();
 		}
 		settingsForm = document.getElementById('settingsForm');
 		settingsForm.addEventListener("change", settings.onChange);

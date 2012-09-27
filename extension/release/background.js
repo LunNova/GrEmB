@@ -1,7 +1,8 @@
 chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 	switch(request.method){
 		case 'setBadgeText':
-			chrome.browserAction.setBadgeText({text: (request.data+""), tabId: sender.tab.tabId});
+			chrome.browserAction.setBadgeText({text: (request.data+""), tabId: sender.tab.id});
+			console.log(sender.tab);
 			break;
 		case 'getConf':
 			var conf;

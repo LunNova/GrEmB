@@ -98,7 +98,7 @@ function passFunction(){
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
-			'updateCheckWeekly': !isFF,
+			'updateCheckWeekly': true,
 			'lastVersion': 0.01,
 			'shouldReset': false,
 			'lastUpdate': 0,
@@ -109,7 +109,7 @@ function passFunction(){
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleconspiracy", "mylittledramaticstory", "ploungemafia", "mylittlesupportgroup", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "bacon7", "mylittleconspiracy", "mylittledramaticstory", "ploungemafia", "mylittlesupportgroup", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
 			'lastDefaultEmoteGroups': false,
 			'subKeys': {},
@@ -1238,7 +1238,7 @@ function passFunction(){
 							if(!hrefs){
 								continue;
 							}
-							var hrefss = (/^(?:http\:\/\/nallar.me\/e\.php\?e\=)?\/(\/?[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs.replace("#","/hh"));
+							var hrefss = (/^\/(\/*[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs.replace("#","/hh"));
 							if(!hrefss){
 								continue;
 							}
@@ -1257,10 +1257,6 @@ function passFunction(){
 							} else if((/^[\-a-zA-Z0-9_]+$/).test(href)){
 								emElem.className += " G_" + href + "_";
 								if(hrefss[2] != undefined)emElem.href = hrefs + '-';
-								if(emElem.firstChild && emElem.firstChild.nodeValue == "Emote"){
-									emElem.removeChild(emElem.firstChild);
-									emElem.href = "/" + href + (hrefss[2] === undefined ? "" : hrefss[2] + '-');
-								}
 								if(subKey===-1){
 									emElem.innerText = "[DEPRECATED]";
 								}
@@ -1486,12 +1482,8 @@ function passFunction(){
 								rt = resp.responseText;
 								remote_version = (/@version\s*(.*?)\n/i).exec(rt);
 								remote_version = parseFloat(remote_version[1]);
-								if(remote_version > localVersion && ((confStore["updateCheck"] || ((remote_version - localVersion) > 0.2) || forced) && confirm('There is an update(v: '+remote_version+') available for GrEmB.\nWould you like to go to the install page now so you can install it?\n\nYou can make these update notices less frequent in the config.'))){
-									if(isChrome){
-										GM_openInTab('%^UURL^%');
-									}else{
-										GM_openInTab('http://nallar.me/scripts/');
-									}
+								if(remote_version > localVersion && ((confStore["updateCheck"] || ((remote_version - localVersion) > 0.2) || forced) && confirm('There is an update(v: '+remote_version+') available for GrEmB.\nClick ok to get it.'))){
+									GM_openInTab('%^UURL^%');
 								} else if(forced){
 									alert('No update is available for GrEmB, version: ' + remote_version + "\nlocal: " + localVersion);
 								}

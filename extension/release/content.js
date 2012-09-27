@@ -118,7 +118,7 @@ function passFunction(){
 			'disableEmoteSpin': true,
 			'nsfwDefunctEmotes': false,
 			'alwaysTrue': true,
-			'updateCheckWeekly': !isFF,
+			'updateCheckWeekly': true,
 			'lastVersion': 0.01,
 			'shouldReset': false,
 			'lastUpdate': 0,
@@ -129,7 +129,7 @@ function passFunction(){
 			'nextCacheUpdateTime': 1,
 			'cssKey': " ",
 			'emoteBlacklist': [],
-			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "mylittleconspiracy", "mylittledramaticstory", "ploungemafia", "mylittlesupportgroup", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
+			'emoteGroups': {mlp_nsfw: {name: "MLP NSFW", enabled: 0, subs: ["mylittlechaos", "mylittlebannertest", "ponyanarchism", "spaceclop", "futemotes", "clopclop", "nsfwgremotes", "mylittlecombiners", "mylittlepony"], nsfw: 1}, mlp: {name: "MLP", enabled: 1, subs: ["map.css", "bacon7", "mylittleconspiracy", "mylittledramaticstory", "ploungemafia", "mylittlesupportgroup", "mylittleilf", "mylittleditto", "mylittletacos", "tacoshy", "mylittlesh", "mlas1party", "mylittleanhero23", "cuttershy", "gremotes", "pankakke", "mylittlesports", "molestia", "flitter", "ilovedashie", "applebloom", "seriouslyluna", "mylittlefoodmanes", "gallopfrey", "mylittleanime", "mylittleaprilfools", "dashiemotes", "lyra", "tbpimagedump", "mylittlealcoholic", "mlplounge", "mylittleserver", "minuette", "twilightsparkle", "mylittlewarhammer", "ainbowdash", "mylittledamon", "mylittlekindle", "octavia", "pinkiepie", "mylittlewtf", "mylittlenanners", "mylittlewelcomewagon", "mylittlenosleep", "mlpdrawingschool", "mylittledaww", "mylittlemusician", "surprise", "mylittlelistentothis", "applejack", "mylittlecelestias", "mylittlefortress", "roseluck", "mlhfis", "falloutequestria", "mylittlelivestream", "mlas1animotes", "daylightemotes", "mylittlesquidward", "vinylscratch", "mylittlenopenopenope", "thebestpony", "mylittleandysonic1", "mlas1emotes", "mlas1emotes2", "mlas1animotes", "mlas1imagedump", "idliketobeatree", "mylittlebannertest", "mylittlechaos", "speedingturtle", "mylittlecirclejerk", "mylittleonions", "mylittlecombiners", "mylittlepony"], nsfw: 0}, minecraft: {name: "minecraft", enabled: 1, subs: ["minecraft"], nsfw: 0}, homestuck: {name: "Homestuck", enabled: 1, subs: ["homestuck"], nsfw: 0}, f7u12: {name: "f7u12", enabled: 1, subs: ["fffffffuuuuuuuuuuuu"], nsfw: 0}, tf2: {name: "Team Fortress 2", enabled: 1, subs: ["tf2"], nsfw: 0},},
 			'emoteGroupsOrder': ['mlp_nsfw', 'mlp', 'minecraft', 'homestuck', 'f7u12', 'tf2'],
 			'lastDefaultEmoteGroups': false,
 			'subKeys': {},
@@ -516,7 +516,16 @@ function passFunction(){
 			return iHTML;
 		}},
 		main: {
-			generator: function(){
+			settings: {
+				
+				defaultEmoteContainer: {
+					description: "Enable emote browser",
+					children:{
+						
+					}
+				}
+			},
+			gen_erator: function(){
 				if(unsupported){
 					superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
 					return;
@@ -557,19 +566,31 @@ function passFunction(){
 				if(isFF){
 					prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + settings.makeInput("emoteCopy", "checkbox", dis.all);
 				}
-				prefHTML += '<div align="right" id="manageSubs"></div>';
 				prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + settings.makeInput('disableEmoteSpin', 'checkbox', dis.all);
 				prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
 				return prefHTML;
 			},
 			onDisplay: function(){
-				document.getElementById('saveSubmit').addEventListener("click", function(){
-					settings.onChange();
-					window.location.reload();
-				});
 				manageSubs();
 			}
 		}
+	},
+	
+	defaultGenerator: function(tab){
+		var iHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
+		function makeHtml(settingsList,space){
+			var rHTML = "";
+			for(var s in settingsList){
+				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + "<br />";
+				if(confStore[s] === true && settingsList[s].children){
+					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;");
+				}
+			}
+			return rHTML;
+		}
+		iHTML += makeHtml(tab.settings, "");
+		iHTML += "<div align='right' id='manageSubs'></div></form>";
+		return iHTML;
 	},
 	
 	makeInput: function(id, type, dis, q){
@@ -580,20 +601,16 @@ function passFunction(){
 			q = '';
 		}
 		dis = dis ? " disabled='disabled'" : "";
-		if(type == 'checkbox'){
-			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
-		}
 		if(type == 'text'){
-			return '<span style=\'\'><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
+			return '<span><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
 		}
 		if(type == 'radio2'){
-			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
+			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
 		}
 		if(type == 'radio1'){
-			return '<span style=\'\'>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
+			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
 		}
-		debug(104, "Invalid type for settings.makeInput: " + id + "\t" + type + "\t" + dis);
-		return '';
+		return '<span><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
 	},
 	
 	init: function(){
@@ -607,14 +624,12 @@ function passFunction(){
 	},
 	
 	showTab: function(tab){
-		if(!settings.tabs[tab]){
+		if(typeof tab === 'string' && !(tab = settings.tabs[tab])){
 			return;
 		}
-		if(settings.tabs[tab].generator){
-			settings.elem.innerHTML = settings.tabs[tab].generator();
-		}
-		if(settings.tabs[tab].onDisplay){
-			settings.tabs[tab].onDisplay();
+		settings.elem.innerHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
+		if(tab.onDisplay){
+			tab.onDisplay();
 		}
 		settingsForm = document.getElementById('settingsForm');
 		settingsForm.addEventListener("change", settings.onChange);
@@ -1383,7 +1398,7 @@ function passFunction(){
 							if(!hrefs){
 								continue;
 							}
-							var hrefss = (/^(?:http\:\/\/nallar.me\/e\.php\?e\=)?\/(\/?[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs.replace("#","/hh"));
+							var hrefss = (/^\/(\/*[a-zA-Z0-9_!\%\#]+)(-[^\/]+?)?$/).exec(hrefs.replace("#","/hh"));
 							if(!hrefss){
 								continue;
 							}
@@ -1402,10 +1417,6 @@ function passFunction(){
 							} else if((/^[\-a-zA-Z0-9_]+$/).test(href)){
 								emElem.className += " G_" + href + "_";
 								if(hrefss[2] != undefined)emElem.href = hrefs + '-';
-								if(emElem.firstChild && emElem.firstChild.nodeValue == "Emote"){
-									emElem.removeChild(emElem.firstChild);
-									emElem.href = "/" + href + (hrefss[2] === undefined ? "" : hrefss[2] + '-');
-								}
 								if(subKey===-1){
 									emElem.innerText = "[DEPRECATED]";
 								}
