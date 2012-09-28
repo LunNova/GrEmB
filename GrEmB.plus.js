@@ -31,7 +31,7 @@ if(location.protocol === "https:"){
 }
 
 if((/google\.com\/search/).test(window.location.href)||(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200))){
-	ranPassFunction = true;
+	undefined.crashMe();
 }
 
 if(!console || !console.log){
@@ -48,37 +48,16 @@ function passFunction(){
 		//IF !extension
 		if((!GM_getValue || (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") > -1))){
 			console.log("Unsupported browser :(");
-			unsupported = true;
-			undefined.crashMe();
+			return;
 		}
 		//ENDIF
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, tabs = {}, convertedEmotes = 0, settings = false;
-		
-		var flagFunctions = {
-			'rs_': function(flag,em){
-				em.style[cssPrefix+'transform']+=' scaleX('+flag+') scaleY('+flag+')';
-			},
-			
-			'rsx_': function(flag,em){
-			
-			},
-			
-			'rsy_': function(flag,em){
-			
-			},
-			
-			'or_': function(flag,em){
-			
-			},
-		};
+		var debug, sSection, sSSection, endSection, endSSection, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,
 			'defaultEmoteContainerSearch': true,
-			'defaultEmoteContainerMLAS1': true,
-			'defaultEmoteContainerILTBAT': true,
 			'defaultEmoteContainerMouseLeave': false,
 			'defaultEmoteContainerEverywhere': true,
 			'defaultEmoteContainerOnTop': true,
@@ -142,7 +121,7 @@ function passFunction(){
 			return ret;
 		};
 		//ELSE
-		if(confStore == undefined || !confStore['alwaysTrue']){
+		if(confStore == undefined || !confStore.alwaysTrue){
 			confStore = defaultConfs;
 		}
 		//ENDIF
@@ -172,19 +151,13 @@ function passFunction(){
 		//IF !extension
 		G_safeGetValue();
 		//ENDIF
-		function getConfForm(id){
-			if(confStore[id]!==false){
-				return "checked='yes'";
+		function boolToChecked(b){
+			if(b!==false){
+				return " checked='yes'";
 			}
 			return "";
 		}
-		
-		function getConfForm2(id){
-			if(confStore[id]===false){
-				return "checked='yes'";
-			}
-			return "";
-		}
+
 		function cloneObject(thiss){
 			var newObj = (thiss instanceof Array) ? [] : {};
 			for(i in thiss) {
@@ -225,14 +198,6 @@ function passFunction(){
 			saveConf();
 		}
 
-		function getKeys(a){
-			var r = [];
-			for(var k in a){
-				r.push(k);
-			}
-			return r;
-		}
-		
 		function nrKeys(a){
 			var i = 0;
 			for(var key in a){
@@ -283,7 +248,7 @@ function passFunction(){
 			eHTML += "<input style='float:right;' id='Cclose' type='button' value='done'/>";
 			elem.innerHTML = eHTML;
 			document.body.appendChild(elem);
-			document.getElementById('Cedit').value = confStore["emoteBlacklist"].join(",");
+			document.getElementById('Cedit').value = confStore.emoteBlacklist.join(",");
 			var c = document.getElementById('Cclose');
 			c.addEventListener("click",function(evt){
 				setConf("emoteBlacklist",document.getElementById('Cedit').value.split(","));
@@ -310,7 +275,7 @@ function passFunction(){
 		}
 		
 		function updateGroups(){
-			var a, aa = confStore['lastDefaultEmoteGroups'], b, bb = defaultConfs['emoteGroups'], c, cc = confStore['emoteGroups'], toAdd = [], groupOrder = confStore["emoteGroupsOrder"];;
+			var a, aa = confStore.lastDefaultEmoteGroups, b, bb = defaultConfs['emoteGroups'], c, cc = confStore.emoteGroups, toAdd = [], groupOrder = confStore.emoteGroupsOrder;;
 			if(aa){
 				for(var g in bb){
 					a = aa[g]; b = bb[g].subs;
@@ -358,8 +323,8 @@ function passFunction(){
 					groupOrder.splice(i);
 				}
 			}
-			setConf('lastDefaultEmoteGroups',defaultConfs['emoteGroups']);
-			setConf('emoteGroups',cc);
+			confStore.lastDefaultEmoteGroups = defaultConfs['emoteGroups'];
+			confStore.emoteGroups = cc;
 			setConf("emoteGroupsOrder", groupOrder);
 		}
 		
@@ -367,7 +332,7 @@ function passFunction(){
 			closeEditGroup();
 			var elem = document.createElement("div");
 			elem.id = "editGroupWindow";
-			var groups = confStore["emoteGroups"];
+			var groups = confStore.emoteGroups;
 			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit subs in " + groups[group].name + "</h3>";
 			eHTML += "<textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
 			eHTML += "<input id='Csave' type='button' value='save'/><input id='Ccancel' type='button' value='cancel'/>";
@@ -396,8 +361,8 @@ function passFunction(){
 		
 		function manageSubs(){
 			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
-			var groups = confStore["emoteGroups"];
-			var groupOrder = confStore["emoteGroupsOrder"];
+			var groups = confStore.emoteGroups;
+			var groupOrder = confStore.emoteGroupsOrder;
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
@@ -412,11 +377,11 @@ function passFunction(){
 			for(var i in groups){
 				var c = document.getElementById('C_'+i);
 				c.addEventListener("change",function(evt){
-					if(evt.target.checked && confStore['emoteGroups'][evt.target.name].nsfw && !confStore["nsfwDefunctEmotes"] && !confirm("Are you sure you want to enable this? It's NSFW!")){
+					if(evt.target.checked && confStore.emoteGroups[evt.target.name].nsfw && !confStore.nsfwDefunctEmotes && !confirm("Are you sure you want to enable this? It's NSFW!")){
 						evt.target.checked = false;
 						return;
 					}
-					confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;
+					confStore.emoteGroups[evt.target.name].enabled = evt.target.checked;
 					saveConf();
 					manageSubs();
 					setConf("shouldReset",true);
@@ -453,21 +418,21 @@ function passFunction(){
 		}
 		
 		function moveGroup(group, d){
-			var source = confStore['emoteGroupsOrder'].indexOf(group);
-			var destination = confStore['emoteGroupsOrder'].indexOf(group)+d;
-			if(source < 0 || source >= confStore['emoteGroupsOrder'].length || destination < 0 || destination >= confStore['emoteGroupsOrder'].length){
+			var source = confStore.emoteGroupsOrder.indexOf(group);
+			var destination = confStore.emoteGroupsOrder.indexOf(group)+d;
+			if(source < 0 || source >= confStore.emoteGroupsOrder.length || destination < 0 || destination >= confStore.emoteGroupsOrder.length){
 				return;
 			}
-			var temp = confStore['emoteGroupsOrder'][destination];
-			confStore['emoteGroupsOrder'][destination] = group;
-			confStore['emoteGroupsOrder'][source] = temp;
+			var temp = confStore.emoteGroupsOrder[destination];
+			confStore.emoteGroupsOrder[destination] = group;
+			confStore.emoteGroupsOrder[source] = temp;
 			saveConf();
 			manageSubs();
 			setConf("shouldReset",true);
 		}
 		
 		function getSubList(){
-			var groups = confStore["emoteGroups"];
+			var groups = confStore.emoteGroups;
 			var subs = [], grps = [];
 			for(var i in groups){
 				grps.unshift(i);
@@ -502,21 +467,14 @@ function passFunction(){
 				}
 				//ENDIF
 			}
-			superBundlePrefs = document.getElementById("G_ConfAnchor");
-			if(superBundlePrefs){
-				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}";
-				addCSS(style);
+			if(document.getElementById("G_ConfAnchor")){
+				cssStore += ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}";
 				showCSS();
-				superBundlePrefs.setAttribute("class", "confPanel");
 				//INCLUDE "settings.js"
 				settings.init();
 			}
 			madeConf = true;
 		};
-		
-		function addCSS(rule){
-			cssStore += ("\r\n \r\n" + rule + "\r\n \r\n");
-		}
 		
 		function showCSS(){
 			if(!cssElement){
@@ -599,68 +557,13 @@ function passFunction(){
 			currentForm.dispatchEvent(event);
 		}
 		
-		function addTabs(){
-			var containers = document.getElementsByClassName("GrEmBEmoteList");
-			var currentTab = 0;
-			for(var c = 0; c < containers.length; c++){
-				tabs[currentTab] = containers[c];
-				++currentTab;
-			}
-			updateTabs();
-		}
-		
-		function updateTabs(){
-			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
-			var h = confStore["emoteContainerHeight_"];
-			var w = confStore["emoteContainerWidth_"];
-			for(var t =0; t < tabHeaders.childNodes.length; t++){
-				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
-				var emoteList = tabs[tID].getElementsByClassName('GrEmBEmoteList_')[0];
-				emoteList.style.height = (h - (tID==0?65:39)) + 'px';
-				emoteList.style.width = (w - 2) + 'px';
-			}
-		}
-		
-		function openTab(evt){
-			evt.preventDefault();
-			evt.stopPropagation();
-			if(document.activeElement.id != "emName"){
-				currentForm.focus();
-			}
-			var tabID = evt.target.getAttribute('tabID');
-			if(tabID === undefined || tabID === false || tabID === null){
-				return false;
-			}
-			evt.target.setAttribute('class', 'GrEmBSelectedTab');
-			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
-			for(var t =0; t < tabHeaders.childNodes.length; t++){
-				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
-				if(tabID == tID){
-					tabs[tID].setAttribute("class", "GrEmBEmoteList");
-				}else{
-					tabs[tID].setAttribute("class", "GrEmBEmoteList closedTab");
-					tabHeaders.childNodes[t].firstChild.setAttribute("class", "");
-				}
-			}
-			return false;
-		}
 		function updateCurrentForm(evt){
-			if(!setUpTabs && (confStore["defaultEmoteContainerMLAS1"] || confStore["defaultEmoteContainerILTBAT"])){
-				if(document.getElementById("GrEmBtablist")){
-					document.getElementById("GrEmBtablist").addEventListener("click", function (evt){
-						openTab(evt);
-					}, false);
-					setUpTabs = true;
-				}
-			}
 			if(!/^(?:www\.)?google\.com$/i.test(window.location.host) && (document.activeElement.id != "emName")&&document.activeElement.id!="GrEmBEmoteWindow0"&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),document.activeElement)&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),evt.toElement)){
-				
 				currentForm = document.activeElement;
-				if(confStore['_emoteContainerAuto']){
+				if(confStore._emoteContainerAuto){
 					var closed = (currentForm.getAttribute('role')=="search" || /(?:search|username|password)/i.test(currentForm.placeholder)) || !((/(?:TEXT)/i.test(currentForm.tagName)&&currentForm.form)||(/(?:INPUT)/i.test(currentForm.tagName)&&currentForm.type!="password")||currentForm.contentEditable=="true");
 					toggleEmoteWindow(false, 0, closed);
 				}
-				
 				if(currentForm.tagName == "IFRAME"){
 					if(document.activeElement.contentWindow || document.activeElement.contentDocument){
 						currentForm = document.activeElement.contentWindow.document.activeElement || document.activeElement.contentDocument.document.activeElement;
@@ -788,7 +691,7 @@ function passFunction(){
 			if(document.getElementById("GrEmBEmoteToggle" + id)){
 				return;
 			}
-			if(!confStore['_emoteContainerAuto']){
+			if(!confStore._emoteContainerAuto){
 				var windowToggler = document.createElement("div");
 				windowToggler.id = "GrEmBEmoteToggle" + id;
 				windowToggler.className = "GrEmBWindow";
@@ -835,7 +738,7 @@ function passFunction(){
 				document.getElementById("emNameDerivatives").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
-				if(confStore["defaultEmoteContainerMouseLeave"]){
+				if(confStore.defaultEmoteContainerMouseLeave){
 					function closeFunc(evt){
 						if(!resizing){
 							toggleEmoteWindow(evt, id, 1);
@@ -846,7 +749,6 @@ function passFunction(){
 					}
 					emoteWindow.addEventListener('mouseout', mouseEnter(closeFunc), false);
 				}
-				addTabs();
 				fixWindowSize();
 				drag(document.getElementById('GrEmBDrag'), emoteWindow, function(X, Y){
 					emoteWindow.style.left = X+'px';
@@ -862,13 +764,11 @@ function passFunction(){
 				resize(confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, document.getElementById('GrEmBResize'), function(X, Y){
 					confStore.emoteContainerHeight_ = Y;
 					confStore.emoteContainerWidth_ = X;
-					updateTabs();
 					resizing = true;
 				}, function(X, Y){
 					confStore.emoteContainerHeight_ = Y;
 					confStore.emoteContainerWidth_ = X;
 					saveConf();
-					updateTabs();
 					fixWindowSize();
 					resizing = false;
 				});
@@ -877,41 +777,8 @@ function passFunction(){
 			}
 		}
 
-		function getDefaultEmoteHTML(){
-			var emotes = "";
-			var search = "";
-			var mlas1 = "";
-			var iltbat = "";
-			var currentTabID = 0;
-			if(confStore['defaultEmoteContainerSearch']){
-				search = '<li><a class="GrEmBSelectedTab" href="#" tabID="' + currentTabID++ + '">find</a></li>';
-			}
-			var mlpTabID = currentTabID++;
-			if(confStore['defaultEmoteContainerMLAS1']){
-				mlas1 = '<li><a href="#" tabID="' + currentTabID++ + '">mlas</a></li>';
-			}
-			if(confStore['defaultEmoteContainerILTBAT']){
-				iltbat = '<li><a href="#" tabID="' + currentTabID++ + '">iltbat</a></li>';
-			}
-			
-			if(search || mlas1 || iltbat){
-				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
-			}
-			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(confStore["emoteSearchDerivatives"]?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
-			}
-			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-			emotes += "/*INCLUDE 'rmlp.html'*/";
-			if(mlas1 != ""){
-				emotes += "</div></div><div id='GrEmBMLAS1container' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "/*INCLUDE 'rmlas1nsfw.html'*/";
-			}
-			if(iltbat != ""){
-				emotes += "</div></div><div id='GrEmBILTBATcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "/*INCLUDE 'riltbat.html'*/";
-			}
-			emotes += "</div></div>";
-			return emotes;
+		function getEmoteBrowserHTML(){
+			return "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(confStore.emoteSearchDerivatives?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 		}
 		
 		function showDebugWindow(){
@@ -942,10 +809,9 @@ function passFunction(){
 			if(window.top === window && document.body && (showNotice || window.location.host == "nallar.me")){
 				var ln = document.getElementById("loadingNotice");
 				if(!ln){
-					var cssElem = document.createElement('div');
-					cssElem.id = 'loadingNotice';
-					document.body.appendChild(cssElem);
-					ln = document.getElementById("loadingNotice");
+					ln = document.createElement('div');
+					ln.id = 'loadingNotice';
+					document.body.appendChild(ln);
 				}
 				delete ln.style.display;
 				ln.innerHTML = "Reloading Emotes - this may take a while!";
@@ -959,7 +825,7 @@ function passFunction(){
 			}
 		}
 		
-		function getEmoteNames(subs,nsfw, onSuccess){
+		function getEmoteNames(subs, nsfw, onSuccess){
 			loadedStyles--;
 			incLoadedStyles();
 			GM_xmlhttpRequest({
@@ -991,14 +857,12 @@ function passFunction(){
 							resetCache();
 							return;
 					}
-					setConf("cssKey", emoteNames.cssKey);
-					setConf("subKeys", emoteNames.subKeys);
-					subKeys = emoteNames.subKeys;
+					confStore.cssKey = emoteNames.cssKey;
+					subKeys = confStore.subKeys = emoteNames.subKeys;
 					delete(emoteNames.cssKey);
 					delete(emoteNames.subKeys);
-					var bl = confStore["emoteBlacklist"];
-					for(var i = 0; i < bl.length; i++){
-						delete(emoteNames[bl[i]]);
+					for(var i = 0; i < confStore.emoteBlacklist.length; i++){
+						delete(emoteNames[confStore.emoteBlacklist[i]]);
 					}
 					onSuccess();
 					setConf('emoteNames', emoteNames);
@@ -1028,9 +892,8 @@ function passFunction(){
 			}
 			while(node != null && converted < maxConvert){
 				if(node.nodeType == 3){
-					var text = node;
-					var v;
-					while(text.nodeValue && text.parentNode.className != "GlobalEmoteAltTextDisplay_Text" && (v = emoteMatchRegExp.exec(text.nodeValue)) && v[1] && converted < maxConvert){
+					var text = node, v;
+					while(text.nodeValue && text.parentNode.className != "SuperRedditAltTextDisplay_Text" && (v = emoteMatchRegExp.exec(text.nodeValue)) && v[1] && converted < maxConvert){
 						var pos = v['index'];
 						v[1] = v[1].toLowerCase();
 						if(!v[2] && v[3]){
@@ -1159,22 +1022,19 @@ function passFunction(){
 		
 		function clickBlock(evt){
 				var anchor = evt.target;
-				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == ""){
-					if(/convertedEmote_/.test(anchor.className)){
-						evt.cancelBubble = true;
-						evt.preventDefault();
-						evt.stopPropagation();
-						return false;
-					}
+				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == "" && /convertedEmote_/.test(anchor.className)){
+					evt.cancelBubble = true;
+					evt.preventDefault();
+					evt.stopPropagation();
 				}
 			}
 			
 		function youtubeInlineExpand(anchor,id,startTime){
-			anchor.className += 'ytExpand';
+			anchor.className += ' ytExpand';
 			var ytDiv = document.createElement("div");
 			ytDiv.className = "expando-button collapsed video expando-inline";
 			ytDiv.setAttribute('style','vertical-align:top !important;float:none;width:23px !important;height:23px !important; max-width: 23px !important; max-height: 23px !important;display:inline-block;margin-right:6px;cursor:pointer;padding:0px');
-			var videoFrame = false,br = false;
+			var videoFrame = false, br = false;
 			function onClick(){
 				if(ytDiv.className.indexOf('collapsed')==-1){
 					ytDiv.className = 'expando-button video expando-inline collapsed';
@@ -1208,7 +1068,7 @@ function passFunction(){
 				if(!isReddit){
 					convertDefaultGlobalEmotes(evt.target);
 				};
-				var dispUn = (!doRefresh), revAlt = confStore["revealAltText"], inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore['emoteCopy'], ytExpand = true, msgs = [];
+				var dispUn = (!doRefresh), revAlt = confStore.revealAltText, inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore.emoteCopy, ytExpand = true, msgs = [];
 				if(markdownConvert){
 					if((/(?:^|\s)(?:md|livePreview)(?:\s|$)/i.test(evt.target.className))){
 						msgs = [evt.target];
@@ -1317,7 +1177,7 @@ function passFunction(){
 			goFind = true;
 		};
 		
-		function initialEmotePass(){
+		function initialDocumentPass(){
 			if(ranInitial){
 				return;
 			} 
@@ -1328,10 +1188,9 @@ function passFunction(){
 			domInsertFunction({
 				target: document.body
 			});
-			if(confStore["defaultEmoteContainer"] && (isReddit||confStore["defaultEmoteContainerEverywhere"])){
+			if(confStore.defaultEmoteContainer && (isReddit||confStore.defaultEmoteContainerEverywhere)){
 				createDefWindow();
 			}
-			debug(100,"frm: "+window.location.href);
 			document.body.addEventListener("click", clickBlock, false);
 			if(wkMutation){
 				(new wkMutation(function(mutations, observer){
@@ -1350,7 +1209,7 @@ function passFunction(){
 			}
 		};
 		function createDefWindow(){
-			createEmoteWindow(0, confStore["defaultEmoteContainerSide"] ? "left" : "right", confStore["emoteContainerX_"], confStore["emoteContainerY_"], (confStore["defaultEmoteContainerOnTop"] || !isReddit) ? 99999 : 11, confStore["emoteContainerWidth_"], confStore["emoteContainerHeight_"], getDefaultEmoteHTML, confStore["smallToggler"]?"":"Emotes");
+			createEmoteWindow(0, confStore.defaultEmoteContainerSide ? "left" : "right", confStore.emoteContainerX_, confStore.emoteContainerY_, (confStore.defaultEmoteContainerOnTop || !isReddit) ? 99999 : 11, confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, getEmoteBrowserHTML, confStore.smallToggler?"":"Emotes");
 		};
 		
 		//IF release
@@ -1384,7 +1243,7 @@ function passFunction(){
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore["emoteSearchDerivatives"])},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore.emoteSearchDerivatives)},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmotes(search, ret, ignoreDerivatives){
@@ -1450,39 +1309,31 @@ function passFunction(){
 			if(force){
 				showNotice = doRefresh = true;
 			}
-			getEmoteNames(getSubList(),confStore["nsfwDefunctEmotes"],function(){
-				confStore["shouldReset"] = false;
-				confStore["nextCacheUpdateTime"] = (new Date()).getTime()+14400000;
-				confStore["lastVersion"] = localVersion;
+			getEmoteNames(getSubList(),confStore.nsfwDefunctEmotes,function(){
+				confStore.shouldReset = false;
+				confStore.nextCacheUpdateTime = (new Date()).getTime()+14400000;
+				confStore.lastVersion = localVersion;
 			});
 		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
 		
-		//START DYNAMIC (using above functions) VARS//
-		var markdownConvert = isReddit;
-		var globalConvert = !isReddit&&confStore['emoteManagerEverywhere'];
-		var showNotice = false;
-		//END DYNAMIC VARS
+		var markdownConvert = isReddit, globalConvert = !isReddit&&confStore.emoteManagerEverywhere, showNotice = false;
 		
-		//Start script body!
+		//Start script body
 		//IF !extension
-		var updateTime = ((!confStore["updateCheck"]) || confStore["updateCheckWeekly"]) ? 604800000 : (86400000);
+		var updateTime = ((!confStore.updateCheck) || confStore.updateCheckWeekly) ? 604800000 : (86400000);
 		try //Thanks, Jarett! http://userscripts.org/scripts/show/20145
 		{
 			function updateCheck(forced){
-				if(forced || (!(/https?:\/\/nallar\.me\/scripts/).test(window.location) && (confStore['lastUpdate'] + updateTime) <= (new Date().getTime()))){
+				if(forced || (!(/https?:\/\/nallar\.me\/scripts/).test(window.location) && (confStore.lastUpdate + updateTime) <= (new Date().getTime()))){
 					setConf('lastUpdate',+(new Date()).getTime());
 					try{
 						GM_xmlhttpRequest({
 							method: 'GET',
 							url: '%^MUURL^%',
 							onload: function (resp){
-								var remote_version, rt, script_name;
-
-								rt = resp.responseText;
-								remote_version = (/@version\s*(.*?)\n/i).exec(rt);
-								remote_version = parseFloat(remote_version[1]);
-								if(remote_version > localVersion && ((confStore["updateCheck"] || ((remote_version - localVersion) > 0.2) || forced) && confirm('There is an update(v: '+remote_version+') available for GrEmB.\nClick ok to get it.'))){
+								var remote_version = parseFloat((/@version\s*(.*?)\n/i).exec(rt)[1]), rt = resp.responseText, script_name;
+								if(remote_version > localVersion && ((confStore.updateCheck || ((remote_version - localVersion) > 0.2) || forced) && confirm('There is an update(v: '+remote_version+') available for GrEmB.\nClick ok to get it.'))){
 									GM_openInTab('%^UURL^%');
 								} else if(forced){
 									alert('No update is available for GrEmB, version: ' + remote_version + "\nlocal: " + localVersion);
@@ -1498,7 +1349,7 @@ function passFunction(){
 			}
 			updateCheck(false);
 		} catch(err){
-			console.log(err);
+			console.log('An error occurred while checking for updates:\n' + err);
 		}
 		//ELSE
 		chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
@@ -1518,27 +1369,23 @@ function passFunction(){
 		});
 		//ENDIF
 		
-		var emoteNames = confStore['emoteNames'], subKeys = confStore['subKeys'];
-		if((emoteNames instanceof Array)){
-			emoteNames = defaultConfs['emoteNames'];
-		}
+		var emoteNames = confStore.emoteNames, subKeys = confStore.subKeys;
 		
 		if((/scripts\/\?allconfreset=1/).test(window.location.href)){
 			resetConf();
-		}else if(confStore["lastVersion"] != localVersion){
-			removeDefunctConfs();
+		}else if(confStore.lastVersion != localVersion){
 			updateGroups();
 			resetCache();
-		}else if(!emoteNames || confStore["shouldReset"] || confStore["nextCacheUpdateTime"] < (new Date()).getTime()){
+		}else if(!emoteNames || confStore.shouldReset || confStore.nextCacheUpdateTime < (new Date()).getTime()){
 			resetCache();
 		}
 		
-		if(window.top === window){
-			properOnLoadEvent_(function(){setTimeout(addConf,100);});
+		if(window.top === window && /\/scripts/.test(window.location.href)){
+			onLoad(addConf);
 		}
 		
 		//IF !extension
-		GM_registerMenuCommand('GrEmB - Open emote window', function (){
+		GM_registerMenuCommand('GrEmB - Open emote window', function (){0.
 			toggleEmoteWindow(false, 0, false);
 		});
 		GM_registerMenuCommand('GrEmB - Open settings', function (){
@@ -1561,31 +1408,31 @@ function passFunction(){
 		});
 		//ENDIF
 		
-		if(isReddit||globalConvert||confStore["defaultEmoteContainerEverywhere"]){
-			loadStyleSheet(mainStylesheet + confStore["cssKey"] + "&nsfw=" + (confStore["nsfwDefunctEmotes"]?"1":"0"), true);
+		if(isReddit||globalConvert||confStore.defaultEmoteContainerEverywhere){
+			loadStyleSheet(mainStylesheet + confStore.cssKey, true);
 		}
 		
 		if(true){
 			if((/\/r\/MLPLounge/i).test(window.location.href)){
 				cssStore += ('code{font-family: monospace !important;} ');
 			}
-			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
-			if(isReddit||confStore['emoteManagerEverywhere']){
+			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "";}');
+			if(isReddit||confStore.emoteManagerEverywhere){
 				cssStore += ("a.convertedEmote_[href*='-r-']{-moz-transform:scaleX(-1);-webkit-transform:scaleX(-1);-o-transform:scaleX(-1);}a.convertedEmote_[href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href*='-r-'][href*='-d-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'],a.convertedEmote_:hover[href*='-45-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-90-'],a.convertedEmote_:hover[href*='-90-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'],a.convertedEmote_:hover[href*='-135-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href*='-180-'],a.convertedEmote_:hover[href*='-180-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'],a.convertedEmote_:hover[href*='-225-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href*='-270-'],a.convertedEmote_:hover[href*='-270-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'],a.convertedEmote_:hover[href*='-315-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href*='-r-'],a.convertedEmote_:hover[href*='-d-'],a.convertedEmote_:hover[href*='-dancer-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href*='-180-'][href*='-r-'],a.convertedEmote_:hover[href*='-180-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href*='-270-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href*='-225-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-270-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-f-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href*='-90-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href*='-225-'][href*='-f-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-270-'][href*='-f-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href*='-f-'],a.convertedEmote_[href*='-fuckingcrazy-'],a.convertedEmote_:hover[href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-f-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90d-'],a.convertedEmote_:hover[href*='-90rd-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-180d-'],a.convertedEmote_:hover[href*='-fd-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270d-'],a.convertedEmote_:hover[href*='-270rd-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90r-'],a.convertedEmote_[href*='-90rd-'],a.convertedEmote_:hover[href*='-90d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-fd-'],a.convertedEmote_:hover[href*='-180d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270r-'],a.convertedEmote_[href*='-270rd-'],a.convertedEmote_:hover[href*='-270d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}body .G_sp_{display: inline-block !important;padding-right: 100% !important;}");
 			}
 
-			if(!confStore["disableEmoteSpin"]&&(isReddit||confStore['emoteManagerEverywhere'])){
+			if(!confStore.disableEmoteSpin&&(isReddit||confStore.emoteManagerEverywhere)){
 				cssStore += ('a.convertedEmote_[href*=-spin-],  a.convertedEmote_[href*=-spin-]{ -moz-transform-style: flat; -moz-animation: spin 2s infinite ease; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: spin 2s infinite ease; -webkit-transform: translateZ(-360px) rotateX(360deg);}a.convertedEmote_[href*=-ispin-], a.convertedEmote_[href*=-ispin-] { -moz-transform-style: flat; -moz-animation: ispin 2s infinite linear; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: ispin 2s infinite linear; -webkit-transform: translateZ(-360px) rotateX(360deg);} a.convertedEmote_[href*=-yspin-] {-moz-transform: translateZ(50px); -moz-transform-style: flat; -moz-animation: yspin 2s infinite linear; -webkit-transform: translateZ(50px); -webkit-transform-style: flat; -webkit-animation: yspin 2s infinite linear;} a.convertedEmote_[href*=-xspin-] {-moz-transform-style: flat; -moz-transform: rotateX(0deg); -moz-animation: xspin 2s infinite ease; -webkit-transform: rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: xspin 2s infinite ease;}a.convertedEmote_[href*=-rotate-], a.convertedEmote_[href*=-rotate-] { -moz-transform-style: flat; -moz-animation: rotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotate 2s infinite ease;}a.convertedEmote_[href*=-rrotate-] { -moz-transform-style: flat; -moz-animation: rrotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotater 2s infinite ease;}a.convertedEmote_[href*=-lrotate-] { -moz-transform-style: flat; -moz-animation: lrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatel 2s infinite linear;}a.convertedEmote_[href*=-lrrotate-] { -moz-transform-style: flat; -moz-animation: lrrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatelr 2s infinite linear;}@-moz-keyframes xspin { from { -moz-transform: rotateX(0deg);} to { -moz-transform: rotateX(360deg); } }@-webkit-keyframes spin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes ispin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-moz-keyframes spin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes xspin { from { -webkit-transform: rotateX(0deg);} to { -webkit-transform: rotateX(360deg); } }@-moz-keyframes ispin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes yspin { from { -webkit-transform: rotateY(0)} to { -webkit-transform: rotateY(360deg);} }@-moz-keyframes yspin { from { -moz-transform: rotateY(0)} to { -moz-transform: rotateY(360deg);} }@-moz-keyframes rotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes rrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-moz-keyframes lrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes lrrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-webkit-keyframes rotate { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotater { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } }@-webkit-keyframes rotatel { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotatelr { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } } @-moz-keyframes zspin{from{-moz-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-moz-transform:rotate(0deg)scaleX(1)rotatez(360deg)}}@-webkit-keyframes zspin{from{-webkit-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-webkit-transform:rotate(0deg)scaleX(1)rotatez(360deg)}} a.convertedEmote_[href*="-zspin-"]{-moz-animation:zspin 2s infinite linear;-webkit-animation:zspin 2s infinite linear;image-rendering:-moz-crisp-edges}');
 			}
 			cssStore += ("a.convertedEmote_[href*='-i-']{ -o-filter: hue-rotate(180deg) !important; filter: hue-rotate(180deg) !important; -webkit-filter: hue-rotate(180deg) !important;} a.convertedEmote_[href*='-inp-'], a.convertedEmote_[href*='-in-']{ float: none !important; display: inline-block !important;}");
 			
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
-			var redditSize = (confStore["wideReddit"] ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBtabs a{color: #369;}#emName{width:80%;}.GrEmBtabs li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + confStore["emoteManagerWindowStyle"] + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			var redditSize = (confStore.wideReddit ? 'max-width: none !important; width: auto !important;' : '');
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBtabs a{color: #369;}#emName{width:80%;}.GrEmBtabs li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + confStore.emoteManagerWindowStyle + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
-		properOnLoadEvent_(initialEmotePass);
+		onLoad(initialDocumentPass);
 	};
 
 function loadStyleSheet(filename,override){
@@ -1601,19 +1448,7 @@ function loadStyleSheet(filename,override){
 	}
 }
 
-function properOnLoadEvent(cb){
-	if(document.readyState === "complete" && document.getElementsByTagName("head")[0]){
-		cb();
-	} else {
-		document.addEventListener("readystatechange", function (){
-			if((document.readyState === "complete") && document.getElementsByTagName("head")[0]){
-				cb();
-			}
-		}, false);
-	}
-}
-
-function properOnLoadEvent_(cb){
+function onLoad(cb){
 	if((document.readyState === "complete" || document.readyState === "interactive") && document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
@@ -1625,7 +1460,7 @@ function properOnLoadEvent_(cb){
 	}
 }
 
-function properOnLoadEvent__(cb){
+function onHead(cb){
 	if(document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
@@ -1639,23 +1474,22 @@ function properOnLoadEvent__(cb){
 
 function fakeTimeout(callback){
 	if(window.top === window){
-		properOnLoadEvent__(callback);
+		onHead(callback);
 		return;
 	}
-	properOnLoadEvent__(function(){
-	document.head.addEventListener("timeoutEvent", function (){
-		properOnLoadEvent__(callback);
-	}, false);
-	var ev = document.createEvent("HTMLEvents");
-	ev.initEvent("timeoutEvent", true, false);
-	document.head.dispatchEvent(ev);});
+	onHead(function(){
+		document.head.addEventListener("timeoutEvent", function (){
+			onHead(callback);
+		}, false);
+		var ev = document.createEvent("HTMLEvents");
+		ev.initEvent("timeoutEvent", true, false);
+		document.head.dispatchEvent(ev);
+	});
 }
 
-if(!ranPassFunction){
-	var runScript = function(){fakeTimeout(passFunction);}
-	//IF extension
-	chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});
-	//ELSE
-	runScript();
-	//ENDIF
-}
+var runScript = function(){fakeTimeout(passFunction);}
+//IF extension
+chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});
+//ELSE
+runScript();
+//ENDIF

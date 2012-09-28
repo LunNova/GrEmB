@@ -57,7 +57,7 @@ if(location.protocol === "https:"){
 }
 
 if((/google\.com\/search/).test(window.location.href)||(inFrame&&(window.innerWidth < 200 ||  window.innerHeight < 200))){
-	ranPassFunction = true;
+	undefined.crashMe();
 }
 
 if(!console || !console.log){
@@ -74,31 +74,11 @@ function passFunction(){
 		
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, unsupported = false, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), superBundlePrefs,cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", setUpTabs = false, windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, tabs = {}, convertedEmotes = 0, settings = false;
-		
-		var flagFunctions = {
-			'rs_': function(flag,em){
-				em.style[cssPrefix+'transform']+=' scaleX('+flag+') scaleY('+flag+')';
-			},
-			
-			'rsx_': function(flag,em){
-			
-			},
-			
-			'rsy_': function(flag,em){
-			
-			},
-			
-			'or_': function(flag,em){
-			
-			},
-		};
+		var debug, sSection, sSSection, endSection, endSSection, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,
 			'defaultEmoteContainerSearch': true,
-			'defaultEmoteContainerMLAS1': true,
-			'defaultEmoteContainerILTBAT': true,
 			'defaultEmoteContainerMouseLeave': false,
 			'defaultEmoteContainerEverywhere': true,
 			'defaultEmoteContainerOnTop': true,
@@ -150,7 +130,7 @@ function passFunction(){
 		};
 		
 		
-		if(confStore == undefined || !confStore['alwaysTrue']){
+		if(confStore == undefined || !confStore.alwaysTrue){
 			confStore = defaultConfs;
 		}
 		
@@ -170,19 +150,13 @@ function passFunction(){
 			return temp[id];
 		};
 		
-		function getConfForm(id){
-			if(confStore[id]!==false){
-				return "checked='yes'";
+		function boolToChecked(b){
+			if(b!==false){
+				return " checked='yes'";
 			}
 			return "";
 		}
-		
-		function getConfForm2(id){
-			if(confStore[id]===false){
-				return "checked='yes'";
-			}
-			return "";
-		}
+
 		function cloneObject(thiss){
 			var newObj = (thiss instanceof Array) ? [] : {};
 			for(i in thiss) {
@@ -219,14 +193,6 @@ function passFunction(){
 			saveConf();
 		}
 
-		function getKeys(a){
-			var r = [];
-			for(var k in a){
-				r.push(k);
-			}
-			return r;
-		}
-		
 		function nrKeys(a){
 			var i = 0;
 			for(var key in a){
@@ -277,7 +243,7 @@ function passFunction(){
 			eHTML += "<input style='float:right;' id='Cclose' type='button' value='done'/>";
 			elem.innerHTML = eHTML;
 			document.body.appendChild(elem);
-			document.getElementById('Cedit').value = confStore["emoteBlacklist"].join(",");
+			document.getElementById('Cedit').value = confStore.emoteBlacklist.join(",");
 			var c = document.getElementById('Cclose');
 			c.addEventListener("click",function(evt){
 				setConf("emoteBlacklist",document.getElementById('Cedit').value.split(","));
@@ -304,7 +270,7 @@ function passFunction(){
 		}
 		
 		function updateGroups(){
-			var a, aa = confStore['lastDefaultEmoteGroups'], b, bb = defaultConfs['emoteGroups'], c, cc = confStore['emoteGroups'], toAdd = [], groupOrder = confStore["emoteGroupsOrder"];;
+			var a, aa = confStore.lastDefaultEmoteGroups, b, bb = defaultConfs['emoteGroups'], c, cc = confStore.emoteGroups, toAdd = [], groupOrder = confStore.emoteGroupsOrder;;
 			if(aa){
 				for(var g in bb){
 					a = aa[g]; b = bb[g].subs;
@@ -352,8 +318,8 @@ function passFunction(){
 					groupOrder.splice(i);
 				}
 			}
-			setConf('lastDefaultEmoteGroups',defaultConfs['emoteGroups']);
-			setConf('emoteGroups',cc);
+			confStore.lastDefaultEmoteGroups = defaultConfs['emoteGroups'];
+			confStore.emoteGroups = cc;
 			setConf("emoteGroupsOrder", groupOrder);
 		}
 		
@@ -361,7 +327,7 @@ function passFunction(){
 			closeEditGroup();
 			var elem = document.createElement("div");
 			elem.id = "editGroupWindow";
-			var groups = confStore["emoteGroups"];
+			var groups = confStore.emoteGroups;
 			var eHTML = "<h3 style='margin-bottom: 3px; margin-top: 3px;'>Edit subs in " + groups[group].name + "</h3>";
 			eHTML += "<textarea style='width: 95%; height: 40%;' id='Cedit'></textarea>";
 			eHTML += "<input id='Csave' type='button' value='save'/><input id='Ccancel' type='button' value='cancel'/>";
@@ -390,8 +356,8 @@ function passFunction(){
 		
 		function manageSubs(){
 			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
-			var groups = confStore["emoteGroups"];
-			var groupOrder = confStore["emoteGroupsOrder"];
+			var groups = confStore.emoteGroups;
+			var groupOrder = confStore.emoteGroupsOrder;
 			var nsfw = false;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
@@ -406,11 +372,11 @@ function passFunction(){
 			for(var i in groups){
 				var c = document.getElementById('C_'+i);
 				c.addEventListener("change",function(evt){
-					if(evt.target.checked && confStore['emoteGroups'][evt.target.name].nsfw && !confStore["nsfwDefunctEmotes"] && !confirm("Are you sure you want to enable this? It's NSFW!")){
+					if(evt.target.checked && confStore.emoteGroups[evt.target.name].nsfw && !confStore.nsfwDefunctEmotes && !confirm("Are you sure you want to enable this? It's NSFW!")){
 						evt.target.checked = false;
 						return;
 					}
-					confStore['emoteGroups'][evt.target.name].enabled = evt.target.checked;
+					confStore.emoteGroups[evt.target.name].enabled = evt.target.checked;
 					saveConf();
 					manageSubs();
 					setConf("shouldReset",true);
@@ -447,21 +413,21 @@ function passFunction(){
 		}
 		
 		function moveGroup(group, d){
-			var source = confStore['emoteGroupsOrder'].indexOf(group);
-			var destination = confStore['emoteGroupsOrder'].indexOf(group)+d;
-			if(source < 0 || source >= confStore['emoteGroupsOrder'].length || destination < 0 || destination >= confStore['emoteGroupsOrder'].length){
+			var source = confStore.emoteGroupsOrder.indexOf(group);
+			var destination = confStore.emoteGroupsOrder.indexOf(group)+d;
+			if(source < 0 || source >= confStore.emoteGroupsOrder.length || destination < 0 || destination >= confStore.emoteGroupsOrder.length){
 				return;
 			}
-			var temp = confStore['emoteGroupsOrder'][destination];
-			confStore['emoteGroupsOrder'][destination] = group;
-			confStore['emoteGroupsOrder'][source] = temp;
+			var temp = confStore.emoteGroupsOrder[destination];
+			confStore.emoteGroupsOrder[destination] = group;
+			confStore.emoteGroupsOrder[source] = temp;
 			saveConf();
 			manageSubs();
 			setConf("shouldReset",true);
 		}
 		
 		function getSubList(){
-			var groups = confStore["emoteGroups"];
+			var groups = confStore.emoteGroups;
 			var subs = [], grps = [];
 			for(var i in groups){
 				grps.unshift(i);
@@ -487,12 +453,9 @@ function passFunction(){
 				document.getElementById("yourVersion").innerHTML = localVersion;
 				
 			}
-			superBundlePrefs = document.getElementById("G_ConfAnchor");
-			if(superBundlePrefs){
-				var style = ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}";
-				addCSS(style);
+			if(document.getElementById("G_ConfAnchor")){
+				cssStore += ".confPanel input{padding: none; margin: 0 0 0 0;}.confPanel input[type='textarea']{height: 12px;}.confPanel br {line-height: 10px;}";
 				showCSS();
-				superBundlePrefs.setAttribute("class", "confPanel");
 				settings = {
 	unconfigureableProperties: {
 		"alwaysTrue": 1,
@@ -516,104 +479,112 @@ function passFunction(){
 			return iHTML;
 		}},
 		main: {
+			generator: function(tab){
+				return settings.defaultGenerator(tab) + "<div align='right' id='manageSubs'></div>";
+			},
 			settings: {
 				
+				wideReddit:{
+					description: "Make reddit comments use the full width",
+					help: "reddit normally limits comments not to use the full width of the screen. Some emotes are quite wide, and turning this on will allow them to fit",
+				},
+				revealAltText:{
+					description: "Show hover text",
+					help: "Shows hover text next to emotes, so you do not have to mouse over to check for it. This also allows you to hover over an emote to see the subreddit it's from",
+				},
+				emoteManagerEverywhere:{
+					description: "Globally display emotes",
+					help: "Displays reddit emotes on all websites.",
+				},
+				
+				disableEmoteSpin:{
+					description: "Disable 3D emote animations",
+					help: "3D emote animations can result in slowdowns, so this allows you to disable them."
+				},
 				defaultEmoteContainer: {
 					description: "Enable emote browser",
+					help: "A window which lets you easily find emotes",
 					children:{
 						defaultEmoteContainerEverywhere:{
 							description: "Enable emote browser globally",
 							help: "globally = all websites"
+						},
+						defaultEmoteContainerOnTop:{
+							description: "Display emote browser icon under reddit header",
+							help: "Makes the emote browser toggler button only show up after scrolling down when on reddit",
+						},
+						defaultEmoteContainerMouseLeave:{
+							description: "Close the emote browser if you move the mouse away",
+						},
+						_emoteContainerAuto:{
+							description: "Automatically open the emote browser",
+							help: "Opens the emote browser for you when you start typing in a textarea/form, and closes it when you are done."
+						},
+						defaultEmoteContainerSide:{
+							description: "Toggler icon side",
+							type: 'radio',
+							help: "Sets the side of the screen the icon used to open the emote browser is displayed on.",
+							radio1: "Left ",
+							radio2: "Right ",
+						},
+						smallToggler:{
+							description: "Use small toggler",
+							help: "Removes the word 'emotes' from the toggler, to make it smaller.",
+						},
+						emoteManagerWindowStyleType:{
+							description: "Use easy emotes style emote browser",
+							help: "By disabling this, you can use a custom CSS style",
+							negatedChildren: true,
+							children: {
+								emoteManagerWindowStyle:{
+									description: "",
+									help: "",
+									type: "text",
+								}
+							}
 						}
 					}
-				}
+				},
 			},
-			gen_erator: function(){
-				if(unsupported){
-					superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
-					return;
-				}
-				var dis = {'all':'','E':'','F':'','G':'','S':'','T': '','WK':' disabled=\'disabled\''};
-
-				if(!getConf("defaultEmoteContainer")){
-					dis.E = true;
-				}
-				if(!getConf("emoteManagerEverywhere")){
-					dis.F = dis.G = true;
-				}
-				if(getConf("emoteManagerWindowStyleType")){
-					dis.S = true;
-				}
-				if(getConf("_emoteContainerAuto")){
-					dis.T = true;
-				}
-				if(isWebKit){
-					dis.WK = true;
-				}
-				oldDis = dis;
-				var prefHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
-				
-				prefHTML += 'Include Emote Window/Search?' + settings.makeInput('defaultEmoteContainer', 'checkbox', dis.all);
-				prefHTML += '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + settings.makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Display emote window on top of reddit header?' + settings.makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + settings.makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Open emote window automatically when a text box is selected?' + settings.makeInput('_emoteContainerAuto', 'checkbox', dis.E);
-				prefHTML += (getConf('_emoteContainerAuto')?'':'<br />&#160;&#160;Which side of the screen should the toggler be displayed on?' + settings.makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + settings.makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:"));
-				prefHTML += settings.makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E) + '&#160;&#160;Include r/mylittleandysonic1 emotes? <br />' ;
-				prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + settings.makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + settings.makeInput('smallToggler', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + settings.makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + settings.makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
-				prefHTML += '<br /><br />Wide reddit - comments as wide as your screen will allow, so some large emotes can fit' + settings.makeInput('wideReddit', 'checkbox', dis.all);
-				prefHTML += '<br />Show hover text?' + settings.makeInput('revealAltText', 'checkbox', dis.all);
-				prefHTML += '<br />Show emotes on all websites?' + settings.makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
-				if(isFF){
-					prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + settings.makeInput("emoteCopy", "checkbox", dis.all);
-				}
-				prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + settings.makeInput('disableEmoteSpin', 'checkbox', dis.all);
-				prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
-				return prefHTML;
-			},
-			onDisplay: function(){
+			onUpdate: function(){
 				manageSubs();
 			}
 		}
 	},
 	
 	defaultGenerator: function(tab){
-		var iHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
 		function makeHtml(settingsList,space){
 			var rHTML = "";
 			for(var s in settingsList){
-				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
-				if(confStore[s] === true && settingsList[s].children){
-					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;");
+				if(settingsList[s].type == "radio"){
+					rHTML += space + settings.makeInput(s, "radio1", settingsList[s].radio1) + settings.makeInput(s, "radio2", settingsList[s].radio2) + " " + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
+				}else{
+					rHTML += space + settings.makeInput(s, settingsList[s].type) + " " + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
+				}
+				if(confStore[s] === (settingsList[s].negatedChildren?false:true) && settingsList[s].children){
+					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;") + "<br />";
 				}
 			}
 			return rHTML;
 		}
-		iHTML += makeHtml(tab.settings, "");
-		iHTML += "<div align='right' id='manageSubs'></div></form>";
-		return iHTML;
+		return "<form action='#' name='settingsForm' id='settingsForm'>" + makeHtml(tab.settings, "") + "</form>";
 	},
 	
-	makeInput: function(id, type, dis, q){
+	makeInput: function(id, type, q){
 		if(defaultConfs[id] === undefined){
 			debug(103, "makeInput(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
 		}
-		if(!q){
-			q = '';
+		q = q?q:'';
+		switch(type){
+			case 'text':
+				return '<input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + '"/>';
+			case 'radio2':
+				return q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio"' + boolToChecked(!confStore[id]) + '/>';
+			case 'radio1':
+				return q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio"' + boolToChecked(confStore[id]) + '/>';
+			default:
+				return '<input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox"' + boolToChecked(confStore[id]) + '/>';
 		}
-		dis = dis ? " disabled='disabled'" : "";
-		if(type == 'text'){
-			return '<span><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
-		}
-		if(type == 'radio2'){
-			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
-		}
-		if(type == 'radio1'){
-			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
-		}
-		return '<span><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
 	},
 	
 	init: function(){
@@ -630,9 +601,13 @@ function passFunction(){
 		if(typeof tab === 'string' && !(tab = settings.tabs[tab])){
 			return;
 		}
-		settings.elem.innerHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
-		if(tab.onDisplay){
-			tab.onDisplay();
+		var generatedHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
+		if(generatedHTML === false){//indicates that there's no change necessary
+			return;
+		}
+		settings.elem.innerHTML = generatedHTML;
+		if(tab.onUpdate){
+			tab.onUpdate();
 		}
 		settingsForm = document.getElementById('settingsForm');
 		settingsForm.addEventListener("change", settings.onChange);
@@ -644,7 +619,7 @@ function passFunction(){
 	},
 	
 	onChange: function(){
-		var oconf = cloneObject(confStore),refreshPage = false;
+		var oconf = cloneObject(confStore), refreshPage = false;
 		for(var i = 0, e; i < settingsForm.elements.length; i++){
 			e = settingsForm.elements[i];
 			if(e.className != "G_input"){
@@ -664,7 +639,7 @@ function passFunction(){
 			}
 		}
 		if(getConf("emoteManagerWindowStyleType")){
-			confStore["emoteManagerWindowStyle"] = defaultConfs["emoteManagerWindowStyle"];
+			confStore.emoteManagerWindowStyle = defaultConfs["emoteManagerWindowStyle"];
 		}
 		if(!compareObjects(confStore, oconf)){
 			saveConf();
@@ -676,10 +651,6 @@ function passFunction(){
 			}
 			madeConf = true;
 		};
-		
-		function addCSS(rule){
-			cssStore += ("\r\n \r\n" + rule + "\r\n \r\n");
-		}
 		
 		function showCSS(){
 			if(!cssElement){
@@ -762,68 +733,13 @@ function passFunction(){
 			currentForm.dispatchEvent(event);
 		}
 		
-		function addTabs(){
-			var containers = document.getElementsByClassName("GrEmBEmoteList");
-			var currentTab = 0;
-			for(var c = 0; c < containers.length; c++){
-				tabs[currentTab] = containers[c];
-				++currentTab;
-			}
-			updateTabs();
-		}
-		
-		function updateTabs(){
-			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
-			var h = confStore["emoteContainerHeight_"];
-			var w = confStore["emoteContainerWidth_"];
-			for(var t =0; t < tabHeaders.childNodes.length; t++){
-				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
-				var emoteList = tabs[tID].getElementsByClassName('GrEmBEmoteList_')[0];
-				emoteList.style.height = (h - (tID==0?65:39)) + 'px';
-				emoteList.style.width = (w - 2) + 'px';
-			}
-		}
-		
-		function openTab(evt){
-			evt.preventDefault();
-			evt.stopPropagation();
-			if(document.activeElement.id != "emName"){
-				currentForm.focus();
-			}
-			var tabID = evt.target.getAttribute('tabID');
-			if(tabID === undefined || tabID === false || tabID === null){
-				return false;
-			}
-			evt.target.setAttribute('class', 'GrEmBSelectedTab');
-			var tabHeaders = document.getElementById("GrEmBtablist").childNodes[0];
-			for(var t =0; t < tabHeaders.childNodes.length; t++){
-				var tID = tabHeaders.childNodes[t].firstChild.getAttribute('tabID');
-				if(tabID == tID){
-					tabs[tID].setAttribute("class", "GrEmBEmoteList");
-				}else{
-					tabs[tID].setAttribute("class", "GrEmBEmoteList closedTab");
-					tabHeaders.childNodes[t].firstChild.setAttribute("class", "");
-				}
-			}
-			return false;
-		}
 		function updateCurrentForm(evt){
-			if(!setUpTabs && (confStore["defaultEmoteContainerMLAS1"] || confStore["defaultEmoteContainerILTBAT"])){
-				if(document.getElementById("GrEmBtablist")){
-					document.getElementById("GrEmBtablist").addEventListener("click", function (evt){
-						openTab(evt);
-					}, false);
-					setUpTabs = true;
-				}
-			}
 			if(!/^(?:www\.)?google\.com$/i.test(window.location.host) && (document.activeElement.id != "emName")&&document.activeElement.id!="GrEmBEmoteWindow0"&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),document.activeElement)&&!isAChildOf(document.getElementById('GrEmBEmoteWindow0'),evt.toElement)){
-				
 				currentForm = document.activeElement;
-				if(confStore['_emoteContainerAuto']){
+				if(confStore._emoteContainerAuto){
 					var closed = (currentForm.getAttribute('role')=="search" || /(?:search|username|password)/i.test(currentForm.placeholder)) || !((/(?:TEXT)/i.test(currentForm.tagName)&&currentForm.form)||(/(?:INPUT)/i.test(currentForm.tagName)&&currentForm.type!="password")||currentForm.contentEditable=="true");
 					toggleEmoteWindow(false, 0, closed);
 				}
-				
 				if(currentForm.tagName == "IFRAME"){
 					if(document.activeElement.contentWindow || document.activeElement.contentDocument){
 						currentForm = document.activeElement.contentWindow.document.activeElement || document.activeElement.contentDocument.document.activeElement;
@@ -951,7 +867,7 @@ function passFunction(){
 			if(document.getElementById("GrEmBEmoteToggle" + id)){
 				return;
 			}
-			if(!confStore['_emoteContainerAuto']){
+			if(!confStore._emoteContainerAuto){
 				var windowToggler = document.createElement("div");
 				windowToggler.id = "GrEmBEmoteToggle" + id;
 				windowToggler.className = "GrEmBWindow";
@@ -998,7 +914,7 @@ function passFunction(){
 				document.getElementById("emNameDerivatives").addEventListener("change",emoteRegChange);
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
-				if(confStore["defaultEmoteContainerMouseLeave"]){
+				if(confStore.defaultEmoteContainerMouseLeave){
 					function closeFunc(evt){
 						if(!resizing){
 							toggleEmoteWindow(evt, id, 1);
@@ -1009,7 +925,6 @@ function passFunction(){
 					}
 					emoteWindow.addEventListener('mouseout', mouseEnter(closeFunc), false);
 				}
-				addTabs();
 				fixWindowSize();
 				drag(document.getElementById('GrEmBDrag'), emoteWindow, function(X, Y){
 					emoteWindow.style.left = X+'px';
@@ -1025,13 +940,11 @@ function passFunction(){
 				resize(confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, document.getElementById('GrEmBResize'), function(X, Y){
 					confStore.emoteContainerHeight_ = Y;
 					confStore.emoteContainerWidth_ = X;
-					updateTabs();
 					resizing = true;
 				}, function(X, Y){
 					confStore.emoteContainerHeight_ = Y;
 					confStore.emoteContainerWidth_ = X;
 					saveConf();
-					updateTabs();
 					fixWindowSize();
 					resizing = false;
 				});
@@ -1040,41 +953,8 @@ function passFunction(){
 			}
 		}
 
-		function getDefaultEmoteHTML(){
-			var emotes = "";
-			var search = "";
-			var mlas1 = "";
-			var iltbat = "";
-			var currentTabID = 0;
-			if(confStore['defaultEmoteContainerSearch']){
-				search = '<li><a class="GrEmBSelectedTab" href="#" tabID="' + currentTabID++ + '">find</a></li>';
-			}
-			var mlpTabID = currentTabID++;
-			if(confStore['defaultEmoteContainerMLAS1']){
-				mlas1 = '<li><a href="#" tabID="' + currentTabID++ + '">mlas</a></li>';
-			}
-			if(confStore['defaultEmoteContainerILTBAT']){
-				iltbat = '<li><a href="#" tabID="' + currentTabID++ + '">iltbat</a></li>';
-			}
-			
-			if(search || mlas1 || iltbat){
-				emotes = '<span id="GrEmBtablist"><ul class="GrEmBtabs">' + search + '<li><a tabID="'+mlpTabID+'" href="#">mlp</a></li>' + mlas1 + iltbat + '</ul></span>';
-			}
-			if(search != ""){
-				emotes += "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(confStore["emoteSearchDerivatives"]?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
-			}
-			emotes += "<div id='GrEmBdefaultcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-			emotes += "<div title='/flutterfear' class='G_flutterfear_'></div><div title='/ppboring' class='G_ppboring_'></div><div title='/rarityyell' class='G_rarityyell_'></div><div title='/fluttershy' class='G_fluttershy_'></div><div title='/ajcower' class='G_ajcower_'></div><div title='/ajsly' class='G_ajsly_'></div><div title='/eeyup' class='G_eeyup_'></div><div title='/rdsmile' class='G_rdsmile_'></div><div title='/fluttersrs' class='G_fluttersrs_'></div><div title='/raritydress' class='G_raritydress_'></div><div title='/takealetter' class='G_takealetter_'></div><div title='/rdwut' class='G_rdwut_'></div><div title='/ppshrug' class='G_ppshrug_'></div><div title='/spikenervous' class='G_spikenervous_'></div><div title='/noooo' class='G_noooo_'></div><div title='/dj' class='G_dj_'></div><div title='/fluttershh' class='G_fluttershh_'></div><div title='/flutteryay' class='G_flutteryay_'></div><div title='/squintyjack' class='G_squintyjack_'></div><div title='/spikepushy' class='G_spikepushy_'></div><div title='/ajugh' class='G_ajugh_'></div><div title='/raritywut' class='G_raritywut_'></div><div title='/dumbfabric' class='G_dumbfabric_'></div><div title='/raritywhy' class='G_raritywhy_'></div><div title='/trixiesmug' class='G_trixiesmug_'></div><div title='/flutterwink' class='G_flutterwink_'></div><div title='/rarityannoyed' class='G_rarityannoyed_'></div><div title='/soawesome' class='G_soawesome_'></div><div title='/ajwut' class='G_ajwut_'></div><div title='/twisquint' class='G_twisquint_'></div><div title='/raritywhine' class='G_raritywhine_'></div><div title='/rdcool' class='G_rdcool_'></div><div title='/abwut' class='G_abwut_'></div><div title='/manspike' class='G_manspike_'></div><div title='/cockatrice' class='G_cockatrice_'></div><div title='/facehoof' class='G_facehoof_'></div><div title='/rarityjudge' class='G_rarityjudge_'></div><div title='/rarityprimp' class='G_rarityprimp_'></div><div title='/twirage' class='G_twirage_'></div><div title='/ppseesyou' class='G_ppseesyou_'></div><div title='/ajlie' class='G_ajlie_'></div><div title='/priceless' class='G_priceless_'></div><div title='/flutterjerk' class='G_flutterjerk_'></div><div title='/twipride' class='G_twipride_'></div><div title='/celestiamad' class='G_celestiamad_'></div><div title='/twicrazy' class='G_twicrazy_'></div><div title='/lunateehee' class='G_lunateehee_'></div><div title='/lunawait' class='G_lunawait_'></div><div title='/derpwizard' class='G_derpwizard_'></div><div title='/ajhappy' class='G_ajhappy_'></div><div title='/pinkiefear' class='G_pinkiefear_'></div><div title='/twibeam' class='G_twibeam_'></div><div title='/raritydaww' class='G_raritydaww_'></div><div title='/scootacheer' class='G_scootacheer_'></div><div title='/swagintosh' class='G_swagintosh_'></div><div title='/ajsup' class='G_ajsup_'></div><div title='/flutterwhoa' class='G_flutterwhoa_'></div><div title='/rdsad' class='G_rdsad_'></div><div title='/ohcomeon' class='G_ohcomeon_'></div><div title='/ppcute' class='G_ppcute_'></div><div title='/abbored' class='G_abbored_'></div><div title='/raritynews' class='G_raritynews_'></div><div title='/sbbook' class='G_sbbook_'></div><div title='/scootaplease' class='G_scootaplease_'></div><div title='/twiright' class='G_twiright_'></div><div title='/celestiawut' class='G_celestiawut_'></div><div title='/grannysmith' class='G_grannysmith_'></div><div title='/shiningarmor' class='G_shiningarmor_'></div><div title='/chrysalis' class='G_chrysalis_'></div><div title='/cadence' class='G_cadence_'></div><div title='/rdsitting' class='G_rdsitting_'></div><div title='/rdhappy' class='G_rdhappy_'></div><div title='/rdannoyed' class='G_rdannoyed_'></div><div title='/twismug' class='G_twismug_'></div><div title='/twismile' class='G_twismile_'></div><div title='/twistare' class='G_twistare_'></div><div title='/ohhi' class='G_ohhi_'></div><div title='/party' class='G_party_'></div><div title='/hahaha' class='G_hahaha_'></div><div title='/flutterblush' class='G_flutterblush_'></div><div title='/gross' class='G_gross_'></div><div title='/derpyhappy' class='G_derpyhappy_'></div><div title='/ajfrown' class='G_ajfrown_'></div><div title='/hmmm' class='G_hmmm_'></div><div title='/joy' class='G_joy_'></div><div title='/raritysad' class='G_raritysad_'></div><div title='/fabulous' class='G_fabulous_'></div><div title='/derp' class='G_derp_'></div><div title='/louder' class='G_louder_'></div><div title='/lunasad' class='G_lunasad_'></div><div title='/derpyshock' class='G_derpyshock_'></div><div title='/pinkamina' class='G_pinkamina_'></div><div title='/loveme' class='G_loveme_'></div><div title='/lunagasp' class='G_lunagasp_'></div><div title='/scootaloo' class='G_scootaloo_'></div><div title='/celestia' class='G_celestia_'></div><div title='/angel' class='G_angel_'></div><div title='/allmybits' class='G_allmybits_'></div><div title='/zecora' class='G_zecora_'></div><div title='/photofinish' class='G_photofinish_'></div><div title='/fillytgap' class='G_fillytgap_'></div><div title='/rdhuh' class='G_rdhuh_'></div><div title='/snails' class='G_snails_'></div><div title='/lyra' class='G_lyra_'></div><div title='/bonbon' class='G_bonbon_'></div><div title='/spitfire' class='G_spitfire_'></div><div title='/cutealoo' class='G_cutealoo_'></div><div title='/happyluna' class='G_happyluna_'></div><div title='/sotrue' class='G_sotrue_'></div><div title='/wahaha' class='G_wahaha_'></div><div title='/sbstare' class='G_sbstare_'></div><div title='/punchdrunk' class='G_punchdrunk_'></div><div title='/huhhuh' class='G_huhhuh_'></div><div title='/absmile' class='G_absmile_'></div><div title='/dealwithit' class='G_dealwithit_'></div><div title='/nmm' class='G_nmm_'></div><div title='/whooves' class='G_whooves_'></div><div title='/rdsalute' class='G_rdsalute_'></div><div title='/octavia' class='G_octavia_'></div><div title='/colgate' class='G_colgate_'></div><div title='/cheerilee' class='G_cheerilee_'></div><div title='/ajbaffle' class='G_ajbaffle_'></div><div title='/abhuh' class='G_abhuh_'></div><div title='/thehorror' class='G_thehorror_'></div><div title='/twiponder' class='G_twiponder_'></div><div title='/spikewtf' class='G_spikewtf_'></div><div title='/awwyeah' class='G_awwyeah_'></div>";
-			if(mlas1 != ""){
-				emotes += "</div></div><div id='GrEmBMLAS1container' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "<div title='/z00' class='G_z00_'></div><div title='/z10' class='G_z10_'></div><div title='/z20' class='G_z20_'></div><div title='/z30' class='G_z30_'></div><div title='/z40' class='G_z40_'></div><div title='/z01' class='G_z01_'></div><div title='/z11' class='G_z11_'></div><div title='/z21' class='G_z21_'></div><div title='/z31' class='G_z31_'></div><div title='/z41' class='G_z41_'></div><div title='/z02' class='G_z02_'></div><div title='/z12' class='G_z12_'></div><div title='/z22' class='G_z22_'></div><div title='/z32' class='G_z32_'></div><div title='/z42' class='G_z42_'></div><div title='/z03' class='G_z03_'></div><div title='/z13' class='G_z13_'></div><div title='/z23' class='G_z23_'></div><div title='/z33' class='G_z33_'></div><div title='/z43' class='G_z43_'></div><div title='/z04' class='G_z04_'></div><div title='/z14' class='G_z14_'></div><div title='/z24' class='G_z24_'></div><div title='/z34' class='G_z34_'></div><div title='/z44' class='G_z44_'></div><div title='/z05' class='G_z05_'></div><div title='/z15' class='G_z15_'></div><div title='/z25' class='G_z25_'></div><div title='/z35' class='G_z35_'></div><div title='/z45' class='G_z45_'></div><div title='/z06' class='G_z06_'></div><div title='/z16' class='G_z16_'></div><div title='/z26' class='G_z26_'></div><div title='/z36' class='G_z36_'></div><div title='/z46' class='G_z46_'></div><div title='/z07' class='G_z07_'></div><div title='/z17' class='G_z17_'></div><div title='/z27' class='G_z27_'></div><div title='/z37' class='G_z37_'></div><div title='/z47' class='G_z47_'></div><div title='/y00' class='G_y00_'></div><div title='/y10' class='G_y10_'></div><div title='/y20' class='G_y20_'></div><div title='/y30' class='G_y30_'></div><div title='/y40' class='G_y40_'></div><div title='/y01' class='G_y01_'></div><div title='/y11' class='G_y11_'></div><div title='/y21' class='G_y21_'></div><div title='/y31' class='G_y31_'></div><div title='/y41' class='G_y41_'></div><div title='/y02' class='G_y02_'></div><div title='/y12' class='G_y12_'></div><div title='/y22' class='G_y22_'></div><div title='/y32' class='G_y32_'></div><div title='/y42' class='G_y42_'></div><div title='/y03' class='G_y03_'></div><div title='/y13' class='G_y13_'></div><div title='/y23' class='G_y23_'></div><div title='/y33' class='G_y33_'></div><div title='/y43' class='G_y43_'></div><div title='/y04' class='G_y04_'></div><div title='/y14' class='G_y14_'></div><div title='/y24' class='G_y24_'></div><div title='/y34' class='G_y34_'></div><div title='/y44' class='G_y44_'></div><div title='/y05' class='G_y05_'></div><div title='/y15' class='G_y15_'></div><div title='/y25' class='G_y25_'></div><div title='/y35' class='G_y35_'></div><div title='/y45' class='G_y45_'></div><div title='/y06' class='G_y06_'></div><div title='/y16' class='G_y16_'></div><div title='/y26' class='G_y26_'></div><div title='/y36' class='G_y36_'></div><div title='/y46' class='G_y46_'></div><div title='/y07' class='G_y07_'></div><div title='/y17' class='G_y17_'></div><div title='/y27' class='G_y27_'></div><div title='/y37' class='G_y37_'></div><div title='/y47' class='G_y47_'></div><div title='/x00' class='G_x00_'></div><div title='/x10' class='G_x10_'></div><div title='/x20' class='G_x20_'></div><div title='/x30' class='G_x30_'></div><div title='/x40' class='G_x40_'></div><div title='/x01' class='G_x01_'></div><div title='/x11' class='G_x11_'></div><div title='/x21' class='G_x21_'></div><div title='/x31' class='G_x31_'></div><div title='/x41' class='G_x41_'></div><div title='/x02' class='G_x02_'></div><div title='/x12' class='G_x12_'></div><div title='/x22' class='G_x22_'></div><div title='/x32' class='G_x32_'></div><div title='/x42' class='G_x42_'></div><div title='/x03' class='G_x03_'></div><div title='/x13' class='G_x13_'></div><div title='/x23' class='G_x23_'></div><div title='/x33' class='G_x33_'></div><div title='/x43' class='G_x43_'></div><div title='/x04' class='G_x04_'></div><div title='/x14' class='G_x14_'></div><div title='/x24' class='G_x24_'></div><div title='/x34' class='G_x34_'></div><div title='/x44' class='G_x44_'></div><div title='/v00' class='G_v00_'></div><div title='/v10' class='G_v10_'></div><div title='/v20' class='G_v20_'></div><div title='/v30' class='G_v30_'></div><div title='/v40' class='G_v40_'></div><div title='/v01' class='G_v01_'></div><div title='/v11' class='G_v11_'></div><div title='/v21' class='G_v21_'></div><div title='/v31' class='G_v31_'></div><div title='/v41' class='G_v41_'></div><div title='/v02' class='G_v02_'></div><div title='/v12' class='G_v12_'></div><div title='/v22' class='G_v22_'></div><div title='/v32' class='G_v32_'></div><div title='/v42' class='G_v42_'></div><div title='/v03' class='G_v03_'></div><div title='/v13' class='G_v13_'></div><div title='/v23' class='G_v23_'></div><div title='/v33' class='G_v33_'></div><div title='/v43' class='G_v43_'></div><div title='/w00' class='G_w00_'></div><div title='/w10' class='G_w10_'></div><div title='/w20' class='G_w20_'></div><div title='/w30' class='G_w30_'></div><div title='/w40' class='G_w40_'></div><div title='/w01' class='G_w01_'></div><div title='/w11' class='G_w11_'></div><div title='/w21' class='G_w21_'></div><div title='/w31' class='G_w31_'></div><div title='/w02' class='G_w02_'></div><div title='/w12' class='G_w12_'></div><div title='/w22' class='G_w22_'></div><div title='/w32' class='G_w32_'></div><div title='/w03' class='G_w03_'></div><div title='/w13' class='G_w13_'></div><div title='/w23' class='G_w23_'></div><div title='/w33' class='G_w33_'></div><div title='/w04' class='G_w04_'></div><div title='/w14' class='G_w14_'></div><div title='/w24' class='G_w24_'></div><div title='/w34' class='G_w34_'></div><div title='/clop00' class='G_clop00_'></div><div title='/clop10' class='G_clop10_'></div><div title='/clop20' class='G_clop20_'></div><div title='/clop30' class='G_clop30_'></div><div title='/clop40' class='G_clop40_'></div><div title='/clop01' class='G_clop01_'></div><div title='/clop11' class='G_clop11_'></div><div title='/clop21' class='G_clop21_'></div><div title='/clop31' class='G_clop31_'></div><div title='/clop41' class='G_clop41_'></div><div title='/clop02' class='G_clop02_'></div><div title='/clop12' class='G_clop12_'></div><div title='/clop22' class='G_clop22_'></div><div title='/clop32' class='G_clop32_'></div><div title='/clop42' class='G_clop42_'></div><div title='/clop03' class='G_clop03_'></div><div title='/clop13' class='G_clop13_'></div><div title='/clop23' class='G_clop23_'></div><div title='/clop33' class='G_clop33_'></div><div title='/clop43' class='G_clop43_'></div><div title='/clop04' class='G_clop04_'></div><div title='/clop14' class='G_clop14_'></div><div title='/clop24' class='G_clop24_'></div><div title='/clop34' class='G_clop34_'></div><div title='/clop44' class='G_clop44_'></div><div title='/clop05' class='G_clop05_'></div><div title='/clop15' class='G_clop15_'></div><div title='/clop25' class='G_clop25_'></div><div title='/clop35' class='G_clop35_'></div><div title='/clop45' class='G_clop45_'></div><div title='/zz00' class='G_zz00_'></div><div title='/zz10' class='G_zz10_'></div><div title='/zz20' class='G_zz20_'></div><div title='/zz30' class='G_zz30_'></div><div title='/zz40' class='G_zz40_'></div><div title='/zz01' class='G_zz01_'></div><div title='/zz11' class='G_zz11_'></div><div title='/zz21' class='G_zz21_'></div><div title='/zz31' class='G_zz31_'></div><div title='/zz41' class='G_zz41_'></div><div title='/zz02' class='G_zz02_'></div><div title='/zz12' class='G_zz12_'></div><div title='/zz22' class='G_zz22_'></div><div title='/zz32' class='G_zz32_'></div><div title='/zz42' class='G_zz42_'></div><div title='/zz03' class='G_zz03_'></div><div title='/zz13' class='G_zz13_'></div><div title='/zz23' class='G_zz23_'></div><div title='/zz33' class='G_zz33_'></div><div title='/zz43' class='G_zz43_'></div><div title='/lb00' class='G_lb00_'></div><div title='/lb10' class='G_lb10_'></div><div title='/lb20' class='G_lb20_'></div><div title='/lb30' class='G_lb30_'></div><div title='/lb40' class='G_lb40_'></div><div title='/lb01' class='G_lb01_'></div><div title='/lb11' class='G_lb11_'></div><div title='/lb21' class='G_lb21_'></div><div title='/lb31' class='G_lb31_'></div><div title='/lb41' class='G_lb41_'></div><div title='/lb02' class='G_lb02_'></div><div title='/lb12' class='G_lb12_'></div><div title='/lb22' class='G_lb22_'></div><div title='/lb32' class='G_lb32_'></div><div title='/lb42' class='G_lb42_'></div><div title='/lb03' class='G_lb03_'></div><div title='/lb13' class='G_lb13_'></div><div title='/lb23' class='G_lb23_'></div><div title='/lb33' class='G_lb33_'></div><div title='/lb43' class='G_lb43_'></div><div title='/lb04' class='G_lb04_'></div><div title='/lb14' class='G_lb14_'></div><div title='/lb24' class='G_lb24_'></div><div title='/lb34' class='G_lb34_'></div><div title='/lb44' class='G_lb44_'></div><div title='/lb05' class='G_lb05_'></div><div title='/lb15' class='G_lb15_'></div><div title='/lb25' class='G_lb25_'></div><div title='/lb35' class='G_lb35_'></div><div title='/lb45' class='G_lb45_'></div><div title='/yy00' class='G_yy00_'></div><div title='/yy10' class='G_yy10_'></div><div title='/yy20' class='G_yy20_'></div><div title='/yy30' class='G_yy30_'></div><div title='/yy40' class='G_yy40_'></div><div title='/yy01' class='G_yy01_'></div><div title='/yy11' class='G_yy11_'></div><div title='/yy21' class='G_yy21_'></div><div title='/yy31' class='G_yy31_'></div><div title='/yy41' class='G_yy41_'></div><div title='/yy02' class='G_yy02_'></div><div title='/yy12' class='G_yy12_'></div><div title='/yy22' class='G_yy22_'></div><div title='/yy32' class='G_yy32_'></div><div title='/yy42' class='G_yy42_'></div><div title='/ajhay' class='G_ajhay_'></div><div title='/ajsmile' class='G_ajsmile_'></div><div title='/ajsmug' class='G_ajsmug_'></div><div title='/ajstache' class='G_ajstache_'></div><div title='/gummy' class='G_gummy_'></div><div title='/ppfly' class='G_ppfly_'></div><div title='/tank' class='G_tank_'></div><div title='/ppforever' class='G_ppforever_'></div><div title='/ppfrown' class='G_ppfrown_'></div><div title='/ppstache' class='G_ppstache_'></div><div title='/pptoot' class='G_pptoot_'></div><div title='/rdsax' class='G_rdsax_'></div><div title='/rdwhat' class='G_rdwhat_'></div><div title='/who' class='G_who_'></div><div title='/scootachicken' class='G_scootachicken_'></div><div title='/cake' class='G_cake_'></div><div title='/bblove' class='G_bblove_'></div><div title='/guitar' class='G_guitar_'></div><div title='/lush' class='G_lush_'></div><div title='/raritux' class='G_raritux_'></div><div title='/twiflip' class='G_twiflip_'></div><div title='/sweetiestache' class='G_sweetiestache_'></div><div title='/ppmoney' class='G_ppmoney_'></div><div title='/creepybelle' class='G_creepybelle_'></div><div title='/creepymc' class='G_creepymc_'></div><div title='/twino' class='G_twino_'></div><div title='/dramaqueen' class='G_dramaqueen_'></div><div title='/rdawesome' class='G_rdawesome_'></div><div title='/lyou' class='G_lyou_'></div><div title='/bbyou' class='G_bbyou_'></div><div title='/ajwink' class='G_ajwink_'></div><div title='/ppahh' class='G_ppahh_'></div><div title='/scootie' class='G_scootie_'></div><div title='/ppgummy' class='G_ppgummy_'></div><div title='/ppfreakout' class='G_ppfreakout_'></div><div title='/rdlean' class='G_rdlean_'></div><div title='/flutterlean' class='G_flutterlean_'></div><div title='/radical' class='G_radical_'></div><div title='/awesome' class='G_awesome_'></div><div title='/ajdemon' class='G_ajdemon_'></div><div title='/trixwizard' class='G_trixwizard_'></div><div title='/rdwizard' class='G_rdwizard_'></div><div title='/evilenchantress' class='G_evilenchantress_'></div><div title='/flutterhug' class='G_flutterhug_'></div><div title='/forequestria' class='G_forequestria_'></div><div title='/scratch' class='G_scratch_'></div><div title='/lb06' class='G_lb06_'></div><div title='/worstpony' class='G_worstpony_'></div><div title='/rdgrin' class='G_rdgrin_'></div><div title='/flutterwhy' class='G_flutterwhy_'></div><div title='/ppwatching' class='G_ppwatching_'></div><div title='/rdstare' class='G_rdstare_'></div><div title='/rdwhy' class='G_rdwhy_'></div><div title='/rod' class='G_rod_'></div><div title='/spitwithit' class='G_spitwithit_'></div><div title='/lywithit' class='G_lywithit_'></div><div title='/hatwithit' class='G_hatwithit_'></div><div title='/gypsypie' class='G_gypsypie_'></div><div title='/discord' class='G_discord_'></div><div title='/discordsmile' class='G_discordsmile_'></div><div title='/scootanoms' class='G_scootanoms_'></div><div title='/telegram' class='G_telegram_'></div><div title='/twiwhy' class='G_twiwhy_'></div><div title='/sadtiara' class='G_sadtiara_'></div><div title='/tiara' class='G_tiara_'></div><div title='/spoon' class='G_spoon_'></div><div title='/pip' class='G_pip_'></div><div title='/sbevil' class='G_sbevil_'></div><div title='/sbsad' class='G_sbsad_'></div><div title='/abcute' class='G_abcute_'></div><div title='/abfreakout' class='G_abfreakout_'></div><div title='/abshocked' class='G_abshocked_'></div><div title='/fancypants' class='G_fancypants_'></div><div title='/dapper' class='G_dapper_'></div><div title='/zecorawat' class='G_zecorawat_'></div><div title='/disappoint' class='G_disappoint_'></div><div title='/macsmile' class='G_macsmile_'></div><div title='/pphello' class='G_pphello_'></div><div title='/sadtwi' class='G_sadtwi_'></div><div title='/spitflyer' class='G_spitflyer_'></div><div title='/elegance' class='G_elegance_'></div><div title='/ihaveyounow' class='G_ihaveyounow_'></div><div title='/puddinghead' class='G_puddinghead_'></div><div title='/twirobe' class='G_twirobe_'></div><div title='/vsguitar' class='G_vsguitar_'></div><div title='/braeburn' class='G_braeburn_'></div><div title='/liarmac' class='G_liarmac_'></div><div title='/ppquite' class='G_ppquite_'></div><div title='/mav' class='G_mav_'></div><div title='/dashdead' class='G_dashdead_'></div><div title='/derpyzap' class='G_derpyzap_'></div><div title='/heythere' class='G_heythere_'></div><div title='/manlytears' class='G_manlytears_'></div><div title='/scootidea' class='G_scootidea_'></div><div title='/fivewats' class='G_fivewats_'></div><div title='/onesquee' class='G_onesquee_'></div><div title='/ajwtf' class='G_ajwtf_'></div><div title='/ppscared' class='G_ppscared_'></div><div title='/moongusta' class='G_moongusta_'></div><div title='/surcookie' class='G_surcookie_'></div><div title='/sackflip' class='G_sackflip_'></div><div title='/darklewithit' class='G_darklewithit_'></div><div title='/darklefun' class='G_darklefun_'></div><div title='/ppohyou' class='G_ppohyou_'></div><div title='/spitfuck' class='G_spitfuck_'></div><div title='/twibook' class='G_twibook_'></div><div title='/twinuzzle' class='G_twinuzzle_'></div><div title='/goat' class='G_goat_'></div><div title='/yes' class='G_yes_'></div><div title='/emperorgummy' class='G_emperorgummy_'></div><div title='/fscrazy' class='G_fscrazy_'></div><div title='/macwink' class='G_macwink_'></div><div title='/gummyfez' class='G_gummyfez_'></div><div title='/raricute' class='G_raricute_'></div><div title='/rdcute' class='G_rdcute_'></div><div title='/twicute' class='G_twicute_'></div><div title='/ajcute' class='G_ajcute_'></div><div title='/fscute' class='G_fscute_'></div><div title='/dcute' class='G_dcute_'></div><div title='/flutterumm' class='G_flutterumm_'></div><div title='/flutterwhat' class='G_flutterwhat_'></div><div title='/queenawesome' class='G_queenawesome_'></div><div title='/rarigummy' class='G_rarigummy_'></div><div title='/pinkachu' class='G_pinkachu_'></div><div title='/bendover' class='G_bendover_'></div><div title='/pbf' class='G_pbf_'></div><div title='/scootasmile' class='G_scootasmile_'></div><div title='/sweetieww' class='G_sweetieww_'></div><div title='/thatswhatshysaid' class='G_thatswhatshysaid_'></div><div title='/twistparty' class='G_twistparty_'></div><div title='/brodyhover' class='G_brodyhover_'></div><div title='/cadancewat' class='G_cadancewat_'></div><div title='/chryswat' class='G_chryswat_'></div><div title='/cmcderp' class='G_cmcderp_'></div><div title='/discordwtf' class='G_discordwtf_'></div><div title='/doitfilly' class='G_doitfilly_'></div><div title='/flutalot' class='G_flutalot_'></div><div title='/gildafriendship' class='G_gildafriendship_'></div><div title='/QQfYQ' class='G_QQfYQ_'></div><div title='/raritywooo' class='G_raritywooo_'></div><div title='/ppteeth' class='G_ppteeth_'></div><div title='/ppwhat' class='G_ppwhat_'></div><div title='/gildafury' class='G_gildafury_'></div><div title='/ppchainsaw' class='G_ppchainsaw_'></div><div title='/rubysquee' class='G_rubysquee_'></div><div title='/eeveedash' class='G_eeveedash_'></div><div title='/rarizee' class='G_rarizee_'></div><div title='/applepuff' class='G_applepuff_'></div><div title='/shyduck' class='G_shyduck_'></div><div title='/twipoke' class='G_twipoke_'></div><div title='/xx00' class='G_xx00_'></div><div title='/xx10' class='G_xx10_'></div><div title='/xx20' class='G_xx20_'></div><div title='/xx30' class='G_xx30_'></div><div title='/xx01' class='G_xx01_'></div><div title='/xx11' class='G_xx11_'></div><div title='/xx21' class='G_xx21_'></div><div title='/xx31' class='G_xx31_'></div><div title='/xx02' class='G_xx02_'></div><div title='/xx12' class='G_xx12_'></div><div title='/xx22' class='G_xx22_'></div><div title='/xx32' class='G_xx32_'></div><div title='/xx03' class='G_xx03_'></div><div title='/xx13' class='G_xx13_'></div><div title='/xx23' class='G_xx23_'></div><div title='/xx33' class='G_xx33_'></div><div title='/xx04' class='G_xx04_'></div><div title='/xx14' class='G_xx14_'></div><div title='/xx24' class='G_xx24_'></div><div title='/xx34' class='G_xx34_'></div><div title='/xx05' class='G_xx05_'></div><div title='/xx15' class='G_xx15_'></div><div title='/xx25' class='G_xx25_'></div><div title='/xx35' class='G_xx35_'></div><div title='/xx06' class='G_xx06_'></div><div title='/xx16' class='G_xx16_'></div><div title='/xx26' class='G_xx26_'></div><div title='/xx36' class='G_xx36_'></div><div title='/xx07' class='G_xx07_'></div><div title='/xx17' class='G_xx17_'></div><div title='/xx27' class='G_xx27_'></div><div title='/xx37' class='G_xx37_'></div><div title='/xx08' class='G_xx08_'></div><div title='/xx18' class='G_xx18_'></div><div title='/xx28' class='G_xx28_'></div><div title='/xx38' class='G_xx38_'></div><div title='/xx09' class='G_xx09_'></div><div title='/xx19' class='G_xx19_'></div><div title='/xx29' class='G_xx29_'></div><div title='/xx39' class='G_xx39_'></div><div title='/twilight' class='G_twilight_'></div><div title='/twitrix' class='G_twitrix_'></div><div title='/trixmad' class='G_trixmad_'></div><div title='/bonbonlyra' class='G_bonbonlyra_'></div><div title='/crossfire' class='G_crossfire_'></div><div title='/lunam' class='G_lunam_'></div><div title='/mywings' class='G_mywings_'></div><div title='/yourhorn' class='G_yourhorn_'></div><div title='/twiokay' class='G_twiokay_'></div><div title='/wutpie' class='G_wutpie_'></div><div title='/wutjack' class='G_wutjack_'></div><div title='/eng' class='G_eng_'></div><div title='/what' class='G_what_'></div><div title='/twihat' class='G_twihat_'></div><div title='/heavy' class='G_heavy_'></div><div title='/hamsters' class='G_hamsters_'></div><div title='/pinkamena' class='G_pinkamena_'></div><div title='/flutterdash' class='G_flutterdash_'></div><div title='/bonbonlyra2' class='G_bonbonlyra2_'></div><div title='/brody' class='G_brody_'></div><div title='/brody2' class='G_brody2_'></div><div title='/roguedash' class='G_roguedash_'></div><div title='/roguewithit' class='G_roguewithit_'></div><div title='/dashmad' class='G_dashmad_'></div><div title='/cluna' class='G_cluna_'></div><div title='/cerealpie' class='G_cerealpie_'></div><div title='/gilda' class='G_gilda_'></div><div title='/sparklewithit' class='G_sparklewithit_'></div><div title='/dashwithit' class='G_dashwithit_'></div><div title='/shywithit' class='G_shywithit_'></div><div title='/pinkwithit' class='G_pinkwithit_'></div><div title='/jackwithit' class='G_jackwithit_'></div><div title='/rarwithit' class='G_rarwithit_'></div><div title='/derpwithit' class='G_derpwithit_'></div><div title='/discordwithit' class='G_discordwithit_'></div><div title='/hate' class='G_hate_'></div><div title='/surpriseparty' class='G_surpriseparty_'></div><div title='/spitfetish' class='G_spitfetish_'></div><div title='/hatefuck' class='G_hatefuck_'></div><div title='/twiread' class='G_twiread_'></div><div title='/wuna' class='G_wuna_'></div><div title='/ch00' class='G_ch00_'></div><div title='/ch10' class='G_ch10_'></div><div title='/ch20' class='G_ch20_'></div><div title='/ch30' class='G_ch30_'></div><div title='/ch01' class='G_ch01_'></div><div title='/ch11' class='G_ch11_'></div><div title='/ch21' class='G_ch21_'></div><div title='/ch31' class='G_ch31_'></div><div title='/ch02' class='G_ch02_'></div><div title='/ch12' class='G_ch12_'></div><div title='/ch22' class='G_ch22_'></div><div title='/ch32' class='G_ch32_'></div><div title='/ch03' class='G_ch03_'></div><div title='/ch13' class='G_ch13_'></div><div title='/ch23' class='G_ch23_'></div><div title='/ch33' class='G_ch33_'></div><div title='/ch04' class='G_ch04_'></div><div title='/ch14' class='G_ch14_'></div><div title='/ch24' class='G_ch24_'></div><div title='/ch34' class='G_ch34_'></div><div title='/ch05' class='G_ch05_'></div><div title='/ch15' class='G_ch15_'></div><div title='/ch25' class='G_ch25_'></div><div title='/ch35' class='G_ch35_'></div><div title='/ww00' class='G_ww00_'></div><div title='/ww10' class='G_ww10_'></div><div title='/ww20' class='G_ww20_'></div><div title='/ww30' class='G_ww30_'></div><div title='/ww01' class='G_ww01_'></div><div title='/ww11' class='G_ww11_'></div><div title='/ww21' class='G_ww21_'></div><div title='/ww31' class='G_ww31_'></div><div title='/ww02' class='G_ww02_'></div><div title='/ww12' class='G_ww12_'></div><div title='/ww22' class='G_ww22_'></div><div title='/ww32' class='G_ww32_'></div><div title='/fillyab' class='G_fillyab_'></div><div title='/fillyaj' class='G_fillyaj_'></div><div title='/fillybonbon' class='G_fillybonbon_'></div><div title='/fillycelestia' class='G_fillycelestia_'></div><div title='/fillycheerile' class='G_fillycheerile_'></div><div title='/fillydashready' class='G_fillydashready_'></div><div title='/fillyderpy' class='G_fillyderpy_'></div><div title='/fillydis' class='G_fillydis_'></div><div title='/fillykarma' class='G_fillykarma_'></div><div title='/fillyfluttershy' class='G_fillyfluttershy_'></div><div title='/fillyfluttershysing' class='G_fillyfluttershysing_'></div><div title='/fillyfritter' class='G_fillyfritter_'></div><div title='/fillyflirt' class='G_fillyflirt_'></div><div title='/fillyluna' class='G_fillyluna_'></div><div title='/fillylyra' class='G_fillylyra_'></div><div title='/fillyoctavia' class='G_fillyoctavia_'></div><div title='/fillypinkie' class='G_fillypinkie_'></div><div title='/fillyrd' class='G_fillyrd_'></div><div title='/fillyrose' class='G_fillyrose_'></div><div title='/fillysbstare' class='G_fillysbstare_'></div><div title='/fillyspitfire' class='G_fillyspitfire_'></div><div title='/fillystrudel' class='G_fillystrudel_'></div><div title='/fillytrixie' class='G_fillytrixie_'></div><div title='/fillytwidance' class='G_fillytwidance_'></div><div title='/fillyvinyl' class='G_fillyvinyl_'></div><div title='/rarityfilly' class='G_rarityfilly_'></div><div title='/fillydash' class='G_fillydash_'></div><div title='/lexcited' class='G_lexcited_'></div><div title='/llaugh' class='G_llaugh_'></div><div title='/lmad' class='G_lmad_'></div><div title='/lnotbad' class='G_lnotbad_'></div><div title='/lnotimpressed' class='G_lnotimpressed_'></div><div title='/lroyal' class='G_lroyal_'></div><div title='/lshady' class='G_lshady_'></div><div title='/lsquee' class='G_lsquee_'></div><div title='/lyes' class='G_lyes_'></div><div title='/ppfun' class='G_ppfun_'></div><div title='/ajfun' class='G_ajfun_'></div><div title='/rarfun' class='G_rarfun_'></div><div title='/dashfun' class='G_dashfun_'></div><div title='/twifun' class='G_twifun_'></div><div title='/shyfun' class='G_shyfun_'></div><div title='/cheerfun' class='G_cheerfun_'></div><div title='/bonfun' class='G_bonfun_'></div><div title='/lyrafun' class='G_lyrafun_'></div><div title='/derpfun' class='G_derpfun_'></div><div title='/trixfun' class='G_trixfun_'></div><div title='/rosefun' class='G_rosefun_'></div><div title='/celestiafun' class='G_celestiafun_'></div><div title='/lunafun' class='G_lunafun_'></div><div title='/faustfun' class='G_faustfun_'></div><div title='/fleurfun' class='G_fleurfun_'></div><div title='/sackfun' class='G_sackfun_'></div><div title='/carrotfun' class='G_carrotfun_'></div><div title='/abfun' class='G_abfun_'></div><div title='/sbfun' class='G_sbfun_'></div><div title='/scootafun' class='G_scootafun_'></div><div title='/braefun' class='G_braefun_'></div><div title='/speedyfun' class='G_speedyfun_'></div><div title='/thunderlanefun' class='G_thunderlanefun_'></div><div title='/esplinfun' class='G_esplinfun_'></div><div title='/parafun' class='G_parafun_'></div><div title='/artfun' class='G_artfun_'></div><div title='/bryvoodfun' class='G_bryvoodfun_'></div><div title='/dolcefun' class='G_dolcefun_'></div><div title='/orschfun' class='G_orschfun_'></div><div title='/pixelfun' class='G_pixelfun_'></div><div title='/rcrfun' class='G_rcrfun_'></div>";
-			}
-			if(iltbat != ""){
-				emotes += "</div></div><div id='GrEmBILTBATcontainer' class='GrEmBEmoteList closedTab'><div class='GrEmBEmoteList_'>";
-				emotes += "<div title='/d00' class='G_d00_'></div><div title='/d10' class='G_d10_'></div><div title='/d20' class='G_d20_'></div><div title='/d01' class='G_d01_'></div><div title='/d11' class='G_d11_'></div><div title='/d21' class='G_d21_'></div><div title='/d02' class='G_d02_'></div><div title='/d12' class='G_d12_'></div><div title='/d22' class='G_d22_'></div><div title='/d03' class='G_d03_'></div><div title='/d13' class='G_d13_'></div><div title='/d23' class='G_d23_'></div><div title='/d04' class='G_d04_'></div><div title='/d14' class='G_d14_'></div><div title='/d24' class='G_d24_'></div><div title='/d05' class='G_d05_'></div><div title='/d15' class='G_d15_'></div><div title='/d25' class='G_d25_'></div><div title='/d06' class='G_d06_'></div><div title='/d16' class='G_d16_'></div><div title='/d26' class='G_d26_'></div><div title='/d07' class='G_d07_'></div><div title='/d17' class='G_d17_'></div><div title='/d27' class='G_d27_'></div><div title='/d08' class='G_d08_'></div><div title='/d18' class='G_d18_'></div><div title='/d28' class='G_d28_'></div><div title='/d09' class='G_d09_'></div><div title='/d19' class='G_d19_'></div><div title='/d29' class='G_d29_'></div>";
-			}
-			emotes += "</div></div>";
-			return emotes;
+		function getEmoteBrowserHTML(){
+			return "<div id='GrEmBsearchcontainer' class='GrEmBEmoteList'><input autocomplete='on' role='search' placeholder='Search' type='text' name='search' id='emName'/><input title=\"Don't show reversed/banana derivative emotes?\" id=\"emNameDerivatives\" type=\"checkbox\""+(confStore.emoteSearchDerivatives?" checked=\"checked\"":"")+"/><div id='GrEmBSearchList' class='GrEmBEmoteList_'></div></div>";
 		}
 		
 		function showDebugWindow(){
@@ -1105,10 +985,9 @@ function passFunction(){
 			if(window.top === window && document.body && (showNotice || window.location.host == "nallar.me")){
 				var ln = document.getElementById("loadingNotice");
 				if(!ln){
-					var cssElem = document.createElement('div');
-					cssElem.id = 'loadingNotice';
-					document.body.appendChild(cssElem);
-					ln = document.getElementById("loadingNotice");
+					ln = document.createElement('div');
+					ln.id = 'loadingNotice';
+					document.body.appendChild(ln);
 				}
 				delete ln.style.display;
 				ln.innerHTML = "Reloading Emotes - this may take a while!";
@@ -1122,7 +1001,7 @@ function passFunction(){
 			}
 		}
 		
-		function getEmoteNames(subs,nsfw, onSuccess){
+		function getEmoteNames(subs, nsfw, onSuccess){
 			loadedStyles--;
 			incLoadedStyles();
 			GM_xmlhttpRequest({
@@ -1154,14 +1033,12 @@ function passFunction(){
 							resetCache();
 							return;
 					}
-					setConf("cssKey", emoteNames.cssKey);
-					setConf("subKeys", emoteNames.subKeys);
-					subKeys = emoteNames.subKeys;
+					confStore.cssKey = emoteNames.cssKey;
+					subKeys = confStore.subKeys = emoteNames.subKeys;
 					delete(emoteNames.cssKey);
 					delete(emoteNames.subKeys);
-					var bl = confStore["emoteBlacklist"];
-					for(var i = 0; i < bl.length; i++){
-						delete(emoteNames[bl[i]]);
+					for(var i = 0; i < confStore.emoteBlacklist.length; i++){
+						delete(emoteNames[confStore.emoteBlacklist[i]]);
 					}
 					onSuccess();
 					setConf('emoteNames', emoteNames);
@@ -1191,9 +1068,8 @@ function passFunction(){
 			}
 			while(node != null && converted < maxConvert){
 				if(node.nodeType == 3){
-					var text = node;
-					var v;
-					while(text.nodeValue && text.parentNode.className != "GlobalEmoteAltTextDisplay_Text" && (v = emoteMatchRegExp.exec(text.nodeValue)) && v[1] && converted < maxConvert){
+					var text = node, v;
+					while(text.nodeValue && text.parentNode.className != "SuperRedditAltTextDisplay_Text" && (v = emoteMatchRegExp.exec(text.nodeValue)) && v[1] && converted < maxConvert){
 						var pos = v['index'];
 						v[1] = v[1].toLowerCase();
 						if(!v[2] && v[3]){
@@ -1322,22 +1198,19 @@ function passFunction(){
 		
 		function clickBlock(evt){
 				var anchor = evt.target;
-				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == ""){
-					if(/convertedEmote_/.test(anchor.className)){
-						evt.cancelBubble = true;
-						evt.preventDefault();
-						evt.stopPropagation();
-						return false;
-					}
+				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == "" && /convertedEmote_/.test(anchor.className)){
+					evt.cancelBubble = true;
+					evt.preventDefault();
+					evt.stopPropagation();
 				}
 			}
 			
 		function youtubeInlineExpand(anchor,id,startTime){
-			anchor.className += 'ytExpand';
+			anchor.className += ' ytExpand';
 			var ytDiv = document.createElement("div");
 			ytDiv.className = "expando-button collapsed video expando-inline";
 			ytDiv.setAttribute('style','vertical-align:top !important;float:none;width:23px !important;height:23px !important; max-width: 23px !important; max-height: 23px !important;display:inline-block;margin-right:6px;cursor:pointer;padding:0px');
-			var videoFrame = false,br = false;
+			var videoFrame = false, br = false;
 			function onClick(){
 				if(ytDiv.className.indexOf('collapsed')==-1){
 					ytDiv.className = 'expando-button video expando-inline collapsed';
@@ -1371,7 +1244,7 @@ function passFunction(){
 				if(!isReddit){
 					convertDefaultGlobalEmotes(evt.target);
 				};
-				var dispUn = (!doRefresh), revAlt = confStore["revealAltText"], inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore['emoteCopy'], ytExpand = true, msgs = [];
+				var dispUn = (!doRefresh), revAlt = confStore.revealAltText, inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore.emoteCopy, ytExpand = true, msgs = [];
 				if(markdownConvert){
 					if((/(?:^|\s)(?:md|livePreview)(?:\s|$)/i.test(evt.target.className))){
 						msgs = [evt.target];
@@ -1478,7 +1351,7 @@ function passFunction(){
 			goFind = true;
 		};
 		
-		function initialEmotePass(){
+		function initialDocumentPass(){
 			if(ranInitial){
 				return;
 			} 
@@ -1489,10 +1362,9 @@ function passFunction(){
 			domInsertFunction({
 				target: document.body
 			});
-			if(confStore["defaultEmoteContainer"] && (isReddit||confStore["defaultEmoteContainerEverywhere"])){
+			if(confStore.defaultEmoteContainer && (isReddit||confStore.defaultEmoteContainerEverywhere)){
 				createDefWindow();
 			}
-			debug(100,"frm: "+window.location.href);
 			document.body.addEventListener("click", clickBlock, false);
 			if(wkMutation){
 				(new wkMutation(function(mutations, observer){
@@ -1511,7 +1383,7 @@ function passFunction(){
 			}
 		};
 		function createDefWindow(){
-			createEmoteWindow(0, confStore["defaultEmoteContainerSide"] ? "left" : "right", confStore["emoteContainerX_"], confStore["emoteContainerY_"], (confStore["defaultEmoteContainerOnTop"] || !isReddit) ? 99999 : 11, confStore["emoteContainerWidth_"], confStore["emoteContainerHeight_"], getDefaultEmoteHTML, confStore["smallToggler"]?"":"Emotes");
+			createEmoteWindow(0, confStore.defaultEmoteContainerSide ? "left" : "right", confStore.emoteContainerX_, confStore.emoteContainerY_, (confStore.defaultEmoteContainerOnTop || !isReddit) ? 99999 : 11, confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, getEmoteBrowserHTML, confStore.smallToggler?"":"Emotes");
 		};
 		
 		function debug(){};
@@ -1529,7 +1401,7 @@ function passFunction(){
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore["emoteSearchDerivatives"])},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore.emoteSearchDerivatives)},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmotes(search, ret, ignoreDerivatives){
@@ -1595,21 +1467,17 @@ function passFunction(){
 			if(force){
 				showNotice = doRefresh = true;
 			}
-			getEmoteNames(getSubList(),confStore["nsfwDefunctEmotes"],function(){
-				confStore["shouldReset"] = false;
-				confStore["nextCacheUpdateTime"] = (new Date()).getTime()+14400000;
-				confStore["lastVersion"] = localVersion;
+			getEmoteNames(getSubList(),confStore.nsfwDefunctEmotes,function(){
+				confStore.shouldReset = false;
+				confStore.nextCacheUpdateTime = (new Date()).getTime()+14400000;
+				confStore.lastVersion = localVersion;
 			});
 		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
 		
-		//START DYNAMIC (using above functions) VARS//
-		var markdownConvert = isReddit;
-		var globalConvert = !isReddit&&confStore['emoteManagerEverywhere'];
-		var showNotice = false;
-		//END DYNAMIC VARS
+		var markdownConvert = isReddit, globalConvert = !isReddit&&confStore.emoteManagerEverywhere, showNotice = false;
 		
-		//Start script body!
+		//Start script body
 		
 		chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 			switch(request.method){
@@ -1628,52 +1496,48 @@ function passFunction(){
 		});
 		
 		
-		var emoteNames = confStore['emoteNames'], subKeys = confStore['subKeys'];
-		if((emoteNames instanceof Array)){
-			emoteNames = defaultConfs['emoteNames'];
-		}
+		var emoteNames = confStore.emoteNames, subKeys = confStore.subKeys;
 		
 		if((/scripts\/\?allconfreset=1/).test(window.location.href)){
 			resetConf();
-		}else if(confStore["lastVersion"] != localVersion){
-			removeDefunctConfs();
+		}else if(confStore.lastVersion != localVersion){
 			updateGroups();
 			resetCache();
-		}else if(!emoteNames || confStore["shouldReset"] || confStore["nextCacheUpdateTime"] < (new Date()).getTime()){
+		}else if(!emoteNames || confStore.shouldReset || confStore.nextCacheUpdateTime < (new Date()).getTime()){
 			resetCache();
 		}
 		
-		if(window.top === window){
-			properOnLoadEvent_(function(){setTimeout(addConf,100);});
+		if(window.top === window && /\/scripts/.test(window.location.href)){
+			onLoad(addConf);
 		}
 		
 		
 		
-		if(isReddit||globalConvert||confStore["defaultEmoteContainerEverywhere"]){
-			loadStyleSheet(mainStylesheet + confStore["cssKey"] + "&nsfw=" + (confStore["nsfwDefunctEmotes"]?"1":"0"), true);
+		if(isReddit||globalConvert||confStore.defaultEmoteContainerEverywhere){
+			loadStyleSheet(mainStylesheet + confStore.cssKey, true);
 		}
 		
 		if(true){
 			if((/\/r\/MLPLounge/i).test(window.location.href)){
 				cssStore += ('code{font-family: monospace !important;} ');
 			}
-			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.GlobalEmoteAltTextDisplay_Text {color: gray; word-wrap: break-word; display:inline-block}.GlobalEmoteAltTextDisplay_Text a {color: gray; text-decoration:underline; display:inline-block}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "" !important;}');
-			if(isReddit||confStore['emoteManagerEverywhere']){
+			cssStore += ('#GrEmBSearchList div{float: none !important;display: inline-block !important;clear:none;}.G_small{max-width:95% !important; max-height: 300px !important;} .convertedEmote_{cursor: default;padding: 0 0 0 0 !important;margin: 0 0 0 0; border-radius: 0px !important;clear:none;}.closedWindow{visibility: hidden !important;}.closedTab{display: none !important;}.GrEmBEmoteList_{overflow-y: scroll !important; overflow-x: hidden;} .GrEmBEmoteList_ div{cursor: pointer;float: none !important;display: inline-block !important;clear: none;} .G_unknownEmote{font-family: monospace; font-size: small !important;word-break:break-all;word-wrap:break-word;color:rgb(255,255,255) !important;cursor:text !important;background-color:rgb(105,105,120) !important;display:block;clear:none;float:left;width:50px;height:50px;}.G_largeUnknown{width:70px;height:70px;}.GrEmBTitleText{font-size: 12.5pt; font-weight: bold;}.SuperRedditAltTextDisplay_Text {color: gray !important; word-break:break-all;word-wrap:break-word;} .SuperRedditAltTextDisplay_Text a {color: gray !important; text-decoration:underline !important;}.G_spoiler_:hover{background:#000; color: #fff;}.G_spoiler_::after{content: "";}');
+			if(isReddit||confStore.emoteManagerEverywhere){
 				cssStore += ("a.convertedEmote_[href*='-r-']{-moz-transform:scaleX(-1);-webkit-transform:scaleX(-1);-o-transform:scaleX(-1);}a.convertedEmote_[href*='-blink!']{text-decoration:blink !important}a.convertedEmote_[href*='-comicsans!']{font-family:'Comic-Sans MS',cursive}.convertedEmote_[href*='-impact!']{font-family:Impact,Charcoal,sans-serif}a.convertedEmote_[href*='-tahoma!']{font-family:Tahoma,Geneva,sans-serif}a.convertedEmote_:hover[href*='-r-'][href*='-d-'],a.convertedEmote_:hover[href*='-r-'][href*='-d-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'],a.convertedEmote_:hover[href*='-45-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-90-'],a.convertedEmote_:hover[href*='-90-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'],a.convertedEmote_:hover[href*='-135-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);}a.convertedEmote_[href*='-180-'],a.convertedEmote_:hover[href*='-180-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'],a.convertedEmote_:hover[href*='-225-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1);}a.convertedEmote_[href*='-270-'],a.convertedEmote_:hover[href*='-270-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'],a.convertedEmote_:hover[href*='-315-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);}a.convertedEmote_[href*='-r-'],a.convertedEmote_:hover[href*='-d-'],a.convertedEmote_:hover[href*='-dancer-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1);}a.convertedEmote_[href*='-180-'][href*='-r-'],a.convertedEmote_:hover[href*='-180-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-225-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1);}a.convertedEmote_[href*='-270-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1);}a.convertedEmote_[href*='-225-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(1);-webkit-transform:rotate(45deg)scaleX(1);-o-transform:rotate(45deg)scaleX(1)}a.convertedEmote_[href*='-270-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(1);-webkit-transform:rotate(135deg)scaleX(1);-o-transform:rotate(135deg)scaleX(1)}a.convertedEmote_[href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-f-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(1);-webkit-transform:rotate(225deg)scaleX(1);-o-transform:rotate(225deg)scaleX(1)}a.convertedEmote_[href*='-90-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'][href*='-r-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(1);-webkit-transform:rotate(315deg)scaleX(1);-o-transform:rotate(315deg)scaleX(1)}a.convertedEmote_[href*='-225-'][href*='-f-'],a.convertedEmote_:hover[href*='-225-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(45deg)scaleX(-1);-webkit-transform:rotate(45deg)scaleX(-1);-o-transform:rotate(45deg)scaleX(-1)}a.convertedEmote_[href*='-270-'][href*='-f-'],a.convertedEmote_:hover[href*='-270-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-315-'][href*='-f-'],a.convertedEmote_:hover[href*='-315-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(135deg)scaleX(-1);-webkit-transform:rotate(135deg)scaleX(-1);-o-transform:rotate(135deg)scaleX(-1)}a.convertedEmote_[href*='-f-'],a.convertedEmote_[href*='-fuckingcrazy-'],a.convertedEmote_:hover[href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-45-'][href*='-f-'],a.convertedEmote_:hover[href*='-45-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(225deg)scaleX(-1);-o-transform:rotate(225deg)scaleX(-1);-webkit-transform:rotate(225deg)scaleX(-1)}a.convertedEmote_[href*='-90-'][href*='-f-'],a.convertedEmote_:hover[href*='-90-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-135-'][href*='-f-'],a.convertedEmote_:hover[href*='-135-'][href*='-f-'][href*='-r-'][href*='-d-']{-moz-transform:rotate(315deg)scaleX(-1);-o-transform:rotate(315deg)scaleX(-1);-webkit-transform:rotate(315deg)scaleX(-1)}a.convertedEmote_:hover[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(1);-o-transform:rotate(0deg)scaleX(1);-webkit-transform:rotate(0deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90d-'],a.convertedEmote_:hover[href*='-90rd-']{-moz-transform:rotate(90deg)scaleX(1);-o-transform:rotate(90deg)scaleX(1);-webkit-transform:rotate(90deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-180d-'],a.convertedEmote_:hover[href*='-fd-']{-moz-transform:rotate(180deg)scaleX(1);-o-transform:rotate(180deg)scaleX(1);-webkit-transform:rotate(180deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270d-'],a.convertedEmote_:hover[href*='-270rd-']{-moz-transform:rotate(270deg)scaleX(1);-o-transform:rotate(270deg)scaleX(1);-webkit-transform:rotate(270deg)scaleX(1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-rd-']{-moz-transform:rotate(0deg)scaleX(-1);-o-transform:rotate(0deg)scaleX(-1);-webkit-transform:rotate(0deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-90r-'],a.convertedEmote_[href*='-90rd-'],a.convertedEmote_:hover[href*='-90d-']{-moz-transform:rotate(90deg)scaleX(-1);-o-transform:rotate(90deg)scaleX(-1);-webkit-transform:rotate(90deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-fd-'],a.convertedEmote_:hover[href*='-180d-']{-moz-transform:rotate(180deg)scaleX(-1);-o-transform:rotate(180deg)scaleX(-1);-webkit-transform:rotate(180deg)scaleX(-1);image-rendering:-moz-crisp-edges;}a.convertedEmote_[href*='-270r-'],a.convertedEmote_[href*='-270rd-'],a.convertedEmote_:hover[href*='-270d-']{-moz-transform:rotate(270deg)scaleX(-1);-o-transform:rotate(270deg)scaleX(-1);-webkit-transform:rotate(270deg)scaleX(-1);image-rendering:-moz-crisp-edges;}body .G_sp_{display: inline-block !important;padding-right: 100% !important;}");
 			}
 
-			if(!confStore["disableEmoteSpin"]&&(isReddit||confStore['emoteManagerEverywhere'])){
+			if(!confStore.disableEmoteSpin&&(isReddit||confStore.emoteManagerEverywhere)){
 				cssStore += ('a.convertedEmote_[href*=-spin-],  a.convertedEmote_[href*=-spin-]{ -moz-transform-style: flat; -moz-animation: spin 2s infinite ease; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: spin 2s infinite ease; -webkit-transform: translateZ(-360px) rotateX(360deg);}a.convertedEmote_[href*=-ispin-], a.convertedEmote_[href*=-ispin-] { -moz-transform-style: flat; -moz-animation: ispin 2s infinite linear; -moz-transform: translateZ(-360px) rotateX(360deg); -webkit-transform-style: flat; -webkit-animation: ispin 2s infinite linear; -webkit-transform: translateZ(-360px) rotateX(360deg);} a.convertedEmote_[href*=-yspin-] {-moz-transform: translateZ(50px); -moz-transform-style: flat; -moz-animation: yspin 2s infinite linear; -webkit-transform: translateZ(50px); -webkit-transform-style: flat; -webkit-animation: yspin 2s infinite linear;} a.convertedEmote_[href*=-xspin-] {-moz-transform-style: flat; -moz-transform: rotateX(0deg); -moz-animation: xspin 2s infinite ease; -webkit-transform: rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: xspin 2s infinite ease;}a.convertedEmote_[href*=-rotate-], a.convertedEmote_[href*=-rotate-] { -moz-transform-style: flat; -moz-animation: rotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotate 2s infinite ease;}a.convertedEmote_[href*=-rrotate-] { -moz-transform-style: flat; -moz-animation: rrotate 2s infinite ease; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotater 2s infinite ease;}a.convertedEmote_[href*=-lrotate-] { -moz-transform-style: flat; -moz-animation: lrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatel 2s infinite linear;}a.convertedEmote_[href*=-lrrotate-] { -moz-transform-style: flat; -moz-animation: lrrotate 2s infinite linear; -moz-transform: translateZ(0px) rotateX(0deg); -webkit-transform-style: flat; -webkit-animation: rotatelr 2s infinite linear;}@-moz-keyframes xspin { from { -moz-transform: rotateX(0deg);} to { -moz-transform: rotateX(360deg); } }@-webkit-keyframes spin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes ispin { from { -webkit-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -webkit-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-moz-keyframes spin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to {-moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes xspin { from { -webkit-transform: rotateX(0deg);} to { -webkit-transform: rotateX(360deg); } }@-moz-keyframes ispin { from { -moz-transform: rotateY(0) translateZ(0px) rotateX(0deg);} to { -moz-transform: rotateY(360deg) translateZ(100px) rotateX(360deg); } }@-webkit-keyframes yspin { from { -webkit-transform: rotateY(0)} to { -webkit-transform: rotateY(360deg);} }@-moz-keyframes yspin { from { -moz-transform: rotateY(0)} to { -moz-transform: rotateY(360deg);} }@-moz-keyframes rotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes rrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-moz-keyframes lrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(360deg); } }@-moz-keyframes lrrotate { from { -moz-transform: rotate(0deg);} to {-moz-transform: rotate(-360deg); } }@-webkit-keyframes rotate { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotater { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } }@-webkit-keyframes rotatel { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(360deg); } }@-webkit-keyframes rotatelr { from { -webkit-transform: rotate(0deg);} to {-webkit-transform: rotate(-360deg); } } @-moz-keyframes zspin{from{-moz-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-moz-transform:rotate(0deg)scaleX(1)rotatez(360deg)}}@-webkit-keyframes zspin{from{-webkit-transform:rotate(0deg)scaleX(1)rotatez(0deg)}to{-webkit-transform:rotate(0deg)scaleX(1)rotatez(360deg)}} a.convertedEmote_[href*="-zspin-"]{-moz-animation:zspin 2s infinite linear;-webkit-animation:zspin 2s infinite linear;image-rendering:-moz-crisp-edges}');
 			}
 			cssStore += ("a.convertedEmote_[href*='-i-']{ -o-filter: hue-rotate(180deg) !important; filter: hue-rotate(180deg) !important; -webkit-filter: hue-rotate(180deg) !important;} a.convertedEmote_[href*='-inp-'], a.convertedEmote_[href*='-in-']{ float: none !important; display: inline-block !important;}");
 			
 			cssStore += ('a.convertedEmote_[href="/sbf"], a.convertedEmote_[href="/rsbf"] {display: block; clear:none; float:left; background-image: url(http://i.imgur.com/baE1o.png); width: 80px; height: 66px;}');
 
-			var redditSize = (confStore["wideReddit"] ? 'max-width: none !important; width: auto !important;' : '');
-			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBtabs a{color: #369;}#emName{width:80%;}.GrEmBtabs li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}a.GrEmBSelectedTab{color: black !important;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + confStore["emoteManagerWindowStyle"] + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
+			var redditSize = (confStore.wideReddit ? 'max-width: none !important; width: auto !important;' : '');
+			cssStore += ('.commentNavSortType{display: inline-block !important;} .comment .md{overflow-y: hidden !important; ' + redditSize + '} .livePreview{'+redditSize+'} #loadingNotice {text-align: center; font-size: 30px;width: 500px;top:50px; margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; margin-top: 36px; z-index: 9999999999;left: 75%;margin-left: -250px;}#debugWindow {top: 5%;width: 80%;height: 90%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 10%;} #editGroupWindow,#editBlacklistWindow {top: 35%;width: 30%;height: 30%;margin: 0 auto; position: fixed;border: 1px solid blue; background-color: white; z-index: 9999999999;left: 35%;} .G_b {display: inline-block;zoom: 1;color: white;border-radius: 3px;padding: 3px;display: block;float: left;margin: 5px 7px 0 0px;background-color: whiteSmoke;border: 1px solid #DEDEDE;border-top: 1px solid #EEE;border-left: 1px solid #EEE;vertical-align: middle;font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;font-size: 12px;text-decoration: none;font-weight: bold;color: #565656;cursor: pointer;padding: 5px 10px 6px 7px;}.G_b:hover{background-color: #D1D1F1;color: #0E0E0E !important;}.G_Ce{cursor: pointer; color: blue; font-size: 18px !important; font-weight: bold;}#G_manageSubs td, #G_manageSubs tr, #G_manageSubs th{line-height:13px!important;padding: 2px !important;}.GrEmBtabs a{color: #369;}#emName{width:80%;}.GrEmBtabs li{font-size: 10pt; margin: 0; padding: 0; list-style: none !important;display: inline-block !important; border: solid; border-width: 1px 1px 0 1px; margin: 0 0.15em 0 0;}#GrEmBDrag{display: inline-block;background-image: url(data:image/png;base64,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); height: 24px; width: 24px; cursor: move;}#GrEmBResize{display: inline-block;position: absolute;bottom: 1px; height: 25px; width: 25px; background: rgba(255,253,204,0.7); right: 26px; cursor: se-resize; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAQAAABu4E3oAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAABdSURBVDjL3dTBDgAQDAPQ/v9P12mRobPeBLfNy4gBwp14n+zjTnLGJhoIUgFFYBM4VcgINUmcoUb5XpYwj9lL+X0HZcPM1eiSnGyS5agtYlehuzHZ2QVR7wcffRcDo8WcgJXHAZoAAAAASUVORK5CYII=);}.GrEmBtabs{padding:0;margin:0;}#G_manageSubs td a{cursor: pointer; color: blue;}.G_help{display:inline-block;background-color:rgb(100,100,255);border-radius:3px;width:10px;color:lightGray;text-align:center;font-size:small;}.G_help+div{display:none;position:absolute;margin-right:-100%;background-color:white;border:2px solid lightBlue;border-radius:3px;z-index:1;}.G_help+div div{margin-left:2px;margin-right:4px;}.G_help+div:hover,.G_help:hover+div{display:inline-block;}.GrEmBWindow{height: auto !important; width: auto !important;' + confStore.emoteManagerWindowStyle + "}\n\n"); //This is last so that broken user styles do not break the rest of the CSS.
 		}
 		showCSS();
-		properOnLoadEvent_(initialEmotePass);
+		onLoad(initialDocumentPass);
 	};
 
 function loadStyleSheet(filename,override){
@@ -1689,19 +1553,7 @@ function loadStyleSheet(filename,override){
 	}
 }
 
-function properOnLoadEvent(cb){
-	if(document.readyState === "complete" && document.getElementsByTagName("head")[0]){
-		cb();
-	} else {
-		document.addEventListener("readystatechange", function (){
-			if((document.readyState === "complete") && document.getElementsByTagName("head")[0]){
-				cb();
-			}
-		}, false);
-	}
-}
-
-function properOnLoadEvent_(cb){
+function onLoad(cb){
 	if((document.readyState === "complete" || document.readyState === "interactive") && document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
@@ -1713,7 +1565,7 @@ function properOnLoadEvent_(cb){
 	}
 }
 
-function properOnLoadEvent__(cb){
+function onHead(cb){
 	if(document.getElementsByTagName("head")[0]){
 		cb();
 	} else {
@@ -1727,19 +1579,18 @@ function properOnLoadEvent__(cb){
 
 function fakeTimeout(callback){
 	if(window.top === window){
-		properOnLoadEvent__(callback);
+		onHead(callback);
 		return;
 	}
-	properOnLoadEvent__(function(){
-	document.head.addEventListener("timeoutEvent", function (){
-		properOnLoadEvent__(callback);
-	}, false);
-	var ev = document.createEvent("HTMLEvents");
-	ev.initEvent("timeoutEvent", true, false);
-	document.head.dispatchEvent(ev);});
+	onHead(function(){
+		document.head.addEventListener("timeoutEvent", function (){
+			onHead(callback);
+		}, false);
+		var ev = document.createEvent("HTMLEvents");
+		ev.initEvent("timeoutEvent", true, false);
+		document.head.dispatchEvent(ev);
+	});
 }
 
-if(!ranPassFunction){
-	var runScript = function(){fakeTimeout(passFunction);}
-	chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});
-}
+var runScript = function(){fakeTimeout(passFunction);}
+chrome.extension.sendMessage({method: "getConf"},function(response){if(response.data){confStore = response.data;} runScript();});

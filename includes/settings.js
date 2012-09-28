@@ -21,116 +21,128 @@ settings = {
 			return iHTML;
 		}},
 		main: {
+			generator: function(tab){
+				return settings.defaultGenerator(tab) + "<div align='right' id='manageSubs'></div>";
+			},
 			settings: {
 				//IF !extension
 				internalUpdateCheck: {
 					description: "Use built-in update checker?",
+					help: "The script can automatically check for updates. With Scriptish, this is unnecessary as it does it automatically.",
 					children:{
 						updateCheckWeekly: {
-							description: "Use built-in update checker?",
+							description: "Check for updates weekly",
+							help: "Increases the time from daily to weekly, to reduce the frequency of update notices which may be annoying.",
 						}
 					}
 				},
 				//ENDIF
+				wideReddit:{
+					description: "Make reddit comments use the full width",
+					help: "reddit normally limits comments not to use the full width of the screen. Some emotes are quite wide, and turning this on will allow them to fit",
+				},
+				revealAltText:{
+					description: "Show hover text",
+					help: "Shows hover text next to emotes, so you do not have to mouse over to check for it. This also allows you to hover over an emote to see the subreddit it's from",
+				},
+				emoteManagerEverywhere:{
+					description: "Globally display emotes",
+					help: "Displays reddit emotes on all websites.",
+				},
+				//IF !extension
+				emoteCopy:{
+					description: "Make emotes copy and paste correctly.",
+					help: "This allows you to copy and paste from reddit without having to look at the source to get the emote codes",
+				},
+				//ENDIF
+				disableEmoteSpin:{
+					description: "Disable 3D emote animations",
+					help: "3D emote animations can result in slowdowns, so this allows you to disable them."
+				},
 				defaultEmoteContainer: {
 					description: "Enable emote browser",
+					help: "A window which lets you easily find emotes",
 					children:{
 						defaultEmoteContainerEverywhere:{
 							description: "Enable emote browser globally",
 							help: "globally = all websites"
+						},
+						defaultEmoteContainerOnTop:{
+							description: "Display emote browser icon under reddit header",
+							help: "Makes the emote browser toggler button only show up after scrolling down when on reddit",
+						},
+						defaultEmoteContainerMouseLeave:{
+							description: "Close the emote browser if you move the mouse away",
+						},
+						_emoteContainerAuto:{
+							description: "Automatically open the emote browser",
+							help: "Opens the emote browser for you when you start typing in a textarea/form, and closes it when you are done."
+						},
+						defaultEmoteContainerSide:{
+							description: "Toggler icon side",
+							type: 'radio',
+							help: "Sets the side of the screen the icon used to open the emote browser is displayed on.",
+							radio1: "Left ",
+							radio2: "Right ",
+						},
+						smallToggler:{
+							description: "Use small toggler",
+							help: "Removes the word 'emotes' from the toggler, to make it smaller.",
+						},
+						emoteManagerWindowStyleType:{
+							description: "Use easy emotes style emote browser",
+							help: "By disabling this, you can use a custom CSS style",
+							negatedChildren: true,
+							children: {
+								emoteManagerWindowStyle:{
+									description: "",
+									help: "",
+									type: "text",
+								}
+							}
 						}
 					}
-				}
+				},
 			},
-			gen_erator: function(){
-				if(unsupported){
-					superBundlePrefs.innerHTML = "<span style='text-color: red; text-style: bold;'>For some reason we can't seem to save configuration data - did you remember to install TamperMonkey if you're using Chrome? Make sure you did, remove this script from your extensions, and install it again, making sure to click ok when it asks you if you want to install it with TamperMonkey.</span><br />";
-					return;
-				}
-				var dis = {'all':'','E':'','F':'','G':'','S':'','T': '','WK':' disabled=\'disabled\''};
-
-				if(!getConf("defaultEmoteContainer")){
-					dis.E = true;
-				}
-				if(!getConf("emoteManagerEverywhere")){
-					dis.F = dis.G = true;
-				}
-				if(getConf("emoteManagerWindowStyleType")){
-					dis.S = true;
-				}
-				if(getConf("_emoteContainerAuto")){
-					dis.T = true;
-				}
-				if(isWebKit){
-					dis.WK = true;
-				}
-				oldDis = dis;
-				var prefHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
-				//IF !extension
-				prefHTML += 'Use script update checker?(set to off if you have GM/TM correctly configured for updating)' + settings.makeInput('internalUpdateCheck', 'checkbox', dis.all);
-				prefHTML += '<br />&#160;&#160;Check for updates weekly instead of every day?' + settings.makeInput('updateCheckWeekly', 'checkbox', dis.all) + '<br /><br />';
-				//ENDIF
-				prefHTML += 'Include Emote Window/Search?' + settings.makeInput('defaultEmoteContainer', 'checkbox', dis.all);
-				prefHTML += '<br />&#160;&#160;Display emote window everywhere instead of just reddit?' + settings.makeInput('defaultEmoteContainerEverywhere', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Display emote window on top of reddit header?' + settings.makeInput('defaultEmoteContainerOnTop', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Close the emote window when your mouse leaves it?' + settings.makeInput('defaultEmoteContainerMouseLeave', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Open emote window automatically when a text box is selected?' + settings.makeInput('_emoteContainerAuto', 'checkbox', dis.E);
-				prefHTML += (getConf('_emoteContainerAuto')?'':'<br />&#160;&#160;Which side of the screen should the toggler be displayed on?' + settings.makeInput('defaultEmoteContainerSide', 'radio2', dis.E, "Right:") + settings.makeInput('defaultEmoteContainerSide', 'radio1', dis.E, "Left:"));
-				prefHTML += settings.makeInput('defaultEmoteContainerMLAS1', 'checkbox', dis.E) + '&#160;&#160;Include r/mylittleandysonic1 emotes? <br />' ;
-				prefHTML += '<br />&#160;&#160;Include r/idliketobeatree emotes?' + settings.makeInput('defaultEmoteContainerILTBAT', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Use small emote window toggler?' + settings.makeInput('smallToggler', 'checkbox', dis.E);
-				prefHTML += '<br />&#160;&#160;Use Easy Emotes style emote window?' + settings.makeInput('emoteManagerWindowStyleType', 'checkbox', dis.E) + (getConf("emoteManagerWindowStyleType")?'':('<br />&#160;&#160;&#160;&#160;What custom CSS style should be used?' + settings.makeInput('emoteManagerWindowStyle', 'text', (dis.E || dis.S))));
-				prefHTML += '<br /><br />Wide reddit - comments as wide as your screen will allow, so some large emotes can fit' + settings.makeInput('wideReddit', 'checkbox', dis.all);
-				prefHTML += '<br />Show hover text?' + settings.makeInput('revealAltText', 'checkbox', dis.all);
-				prefHTML += '<br />Show emotes on all websites?' + settings.makeInput('emoteManagerEverywhere', 'checkbox', dis.all);
-				if(isFF){
-					prefHTML += '<br />&#160;&#160;Make copy-paste include emote text' + settings.makeInput("emoteCopy", "checkbox", dis.all);
-				}
-				prefHTML += '<br /><b>Disable spinning/3D emotes?</b> (recommended unless you have a fast computer)' + settings.makeInput('disableEmoteSpin', 'checkbox', dis.all);
-				prefHTML += '<br /><input id="saveSubmit" name="conf" type="submit" value="save"' + dis.all + '/>' + "</form>";
-				return prefHTML;
-			},
-			onDisplay: function(){
+			onUpdate: function(){
 				manageSubs();
 			}
 		}
 	},
 	
 	defaultGenerator: function(tab){
-		var iHTML = "<form action='#' name='settingsForm' id='settingsForm'>";
 		function makeHtml(settingsList,space){
 			var rHTML = "";
 			for(var s in settingsList){
-				rHTML += space + settings.makeInput(s, settingsList[s].type) + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
-				if(confStore[s] === true && settingsList[s].children){
-					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;");
+				if(settingsList[s].type == "radio"){
+					rHTML += space + settings.makeInput(s, "radio1", settingsList[s].radio1) + settings.makeInput(s, "radio2", settingsList[s].radio2) + " " + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
+				}else{
+					rHTML += space + settings.makeInput(s, settingsList[s].type) + " " + settingsList[s].description + (settingsList[s].help ? ("<a class='G_help'>?</a><div><div>" + settingsList[s].help + "</div></div>") : "")+"<br />";
+				}
+				if(confStore[s] === (settingsList[s].negatedChildren?false:true) && settingsList[s].children){
+					rHTML += makeHtml(settingsList[s].children, space + "&#160;&#160;") + "<br />";
 				}
 			}
 			return rHTML;
 		}
-		iHTML += makeHtml(tab.settings, "");
-		iHTML += "<div align='right' id='manageSubs'></div></form>";
-		return iHTML;
+		return "<form action='#' name='settingsForm' id='settingsForm'>" + makeHtml(tab.settings, "") + "</form>";
 	},
 	
-	makeInput: function(id, type, dis, q){
+	makeInput: function(id, type, q){
 		if(defaultConfs[id] === undefined){
 			debug(103, "makeInput(): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
 		}
-		if(!q){
-			q = '';
+		q = q?q:'';
+		switch(type){
+			case 'text':
+				return '<input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + '"/>';
+			case 'radio2':
+				return q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio"' + boolToChecked(!confStore[id]) + '/>';
+			case 'radio1':
+				return q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio"' + boolToChecked(confStore[id]) + '/>';
+			default:
+				return '<input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox"' + boolToChecked(confStore[id]) + '/>';
 		}
-		dis = dis ? " disabled='disabled'" : "";
-		if(type == 'text'){
-			return '<span><input class="G_input" id="' + id + '" name="conf" value="' + confStore[id] + '" type="textarea" ' + dis + '"/></span>';
-		}
-		if(type == 'radio2'){
-			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="right" type="radio" ' + getConfForm2(id) + dis + '/></span>';
-		}
-		if(type == 'radio1'){
-			return '<span>' + q + '<input class="G_input" id="' + id + '" name="conf" value="left" type="radio" ' + getConfForm(id) + dis + '/></span>';
-		}
-		return '<span><input class="G_input" id="' + id + '" name="conf" value="' + id + '" type="checkbox" ' + getConfForm(id) + dis + '/></span>';
 	},
 	
 	init: function(){
@@ -147,9 +159,13 @@ settings = {
 		if(typeof tab === 'string' && !(tab = settings.tabs[tab])){
 			return;
 		}
-		settings.elem.innerHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
-		if(tab.onDisplay){
-			tab.onDisplay();
+		var generatedHTML = (tab.generator ? tab.generator : settings.defaultGenerator)(tab);
+		if(generatedHTML === false){//indicates that there's no change necessary
+			return;
+		}
+		settings.elem.innerHTML = generatedHTML;
+		if(tab.onUpdate){
+			tab.onUpdate();
 		}
 		settingsForm = document.getElementById('settingsForm');
 		settingsForm.addEventListener("change", settings.onChange);
@@ -161,7 +177,7 @@ settings = {
 	},
 	
 	onChange: function(){
-		var oconf = cloneObject(confStore),refreshPage = false;
+		var oconf = cloneObject(confStore), refreshPage = false;
 		for(var i = 0, e; i < settingsForm.elements.length; i++){
 			e = settingsForm.elements[i];
 			if(e.className != "G_input"){
@@ -181,7 +197,7 @@ settings = {
 			}
 		}
 		if(getConf("emoteManagerWindowStyleType")){
-			confStore["emoteManagerWindowStyle"] = defaultConfs["emoteManagerWindowStyle"];
+			confStore.emoteManagerWindowStyle = defaultConfs["emoteManagerWindowStyle"];
 		}
 		if(!compareObjects(confStore, oconf)){
 			saveConf();
