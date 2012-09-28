@@ -24,7 +24,7 @@ if(document.mozSyntheticDocument){
 	return;
 }
 
-var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore, inFrame = (window.top != window);
+var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore, inFrame = (window.top !== window);
 var wkMutation = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 if(location.protocol === "https:"){
 	mainStylesheet = "https://nallar.me/css/css.php?key=";
@@ -40,20 +40,16 @@ if(!console || !console.log){
 }
 
 function passFunction(){
-		if(ranPassFunction||document.getElementById("noGlobalPonymotes")){
-			return (ranPassFunction = true&&false);
+		if(ranPassFunction){
+			return;
 		}
 		ranPassFunction = true;
 		
 		//IF !extension
-		if((!GM_getValue || (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") > -1))){
-			console.log("Unsupported browser :(");
+		if((!GM_getValue || (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") > -1))||document.getElementById("noGlobalPonymotes")){
 			return;
 		}
 		//ENDIF
-		
-		//START STATIC VARS
-		var madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,
@@ -94,7 +90,19 @@ function passFunction(){
 			'subKeys': {},
 			'emoteNames': false,
 		};
-		//END STATIC VARS
+		
+		//IF !extension
+		confStore = GM_getValue("confArray");
+		if(confStore){
+			confStore = JSON.parse(confStore);
+		}
+		if(!confStore || (confStore.alwaysTrue !== true)) {
+			confStore = defaultConfs;
+			GM_setValue('confArray', JSON.stringify(confStore));
+		}
+		//ENDIF
+		
+		var madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') !== -1, isChrome = navigator.userAgent.indexOf('Chrome/') !== -1, isFF = navigator.userAgent.indexOf('Firefox/') !== -1, isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), globalConvert = !isReddit&&confStore.emoteManagerEverywhere, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {}, timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false, showNotice = false;
 		
 		////////////////////////////START FUNCTIONS////////////////////////////
 		//IF extension
@@ -107,50 +115,22 @@ function passFunction(){
 		function trim(str){
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		}
-		
-		//IF !extension
-		function G_safeGetValue2(){
-			var ret = GM_getValue("confArray");
-			if(ret) {
-				ret = JSON.parse(ret);
-			}
-			if(!ret || (ret.alwaysTrue !== true)) {
-				ret = defaultConfs;
-				GM_setValue('confArray', JSON.stringify(ret));
-			}
-			return ret;
-		}
-		//ELSE
+
+		//IF extension
 		if(!confStore || !confStore.alwaysTrue){
 			confStore = defaultConfs;
 		}
 		//ENDIF
-		function G_safeGetValue(){
-			//IF extension
-			return confStore;
-			//ELSE
-			if(confStore === undefined) {
-				return (confStore = G_safeGetValue2());
-			} else {
-				return confStore;
-			}
-			//ENDIF
-		}
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
 				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
 			}
-			var temp;
-			temp = G_safeGetValue();
-			if(temp[id] === undefined) {
+			if(confStore[id] === undefined) {
 				setConf(id, defaultConfs[id]);
-				temp[id] = defaultConfs[id];
+				confStore[id] = defaultConfs[id];
 			}
-			return temp[id];
+			return confStore[id];
 		}
-		//IF !extension
-		G_safeGetValue();
-		//ENDIF
 		function boolToChecked(b){
 			if(b!==false){
 				return " checked='yes'";
@@ -1302,8 +1282,6 @@ function passFunction(){
 			});
 		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
-		
-		var markdownConvert = isReddit, globalConvert = !isReddit&&confStore.emoteManagerEverywhere, showNotice = false;
 		
 		//Start script body
 		//IF !extension

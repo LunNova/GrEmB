@@ -50,7 +50,7 @@ if(document.mozSyntheticDocument){
 	return;
 }
 
-var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore, inFrame = (window.top != window);
+var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore, inFrame = (window.top !== window);
 var wkMutation = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 if(location.protocol === "https:"){
 	mainStylesheet = "https://nallar.me/css/css.php?key=";
@@ -66,15 +66,12 @@ if(!console || !console.log){
 }
 
 function passFunction(){
-		if(ranPassFunction||document.getElementById("noGlobalPonymotes")){
-			return (ranPassFunction = true&&false);
+		if(ranPassFunction){
+			return;
 		}
 		ranPassFunction = true;
 		
 		
-		
-		//START STATIC VARS
-		var madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,
@@ -115,7 +112,10 @@ function passFunction(){
 			'subKeys': {},
 			'emoteNames': false,
 		};
-		//END STATIC VARS
+		
+		
+		
+		var madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') !== -1, isChrome = navigator.userAgent.indexOf('Chrome/') !== -1, isFF = navigator.userAgent.indexOf('Firefox/') !== -1, isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), globalConvert = !isReddit&&confStore.emoteManagerEverywhere, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {}, timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false, showNotice = false;
 		
 		////////////////////////////START FUNCTIONS////////////////////////////
 		
@@ -128,28 +128,22 @@ function passFunction(){
 		function trim(str){
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		}
-		
+
 		
 		if(!confStore || !confStore.alwaysTrue){
 			confStore = defaultConfs;
 		}
 		
-		function G_safeGetValue(){
-			return confStore;
-		}
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
 				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
 			}
-			var temp;
-			temp = G_safeGetValue();
-			if(temp[id] === undefined) {
+			if(confStore[id] === undefined) {
 				setConf(id, defaultConfs[id]);
-				temp[id] = defaultConfs[id];
+				confStore[id] = defaultConfs[id];
 			}
-			return temp[id];
+			return confStore[id];
 		}
-		
 		function boolToChecked(b){
 			if(b!==false){
 				return " checked='yes'";
@@ -1474,8 +1468,6 @@ function passFunction(){
 			});
 		}
 		/////////////////////////////END FUNCTIONS////////////////////////////
-		
-		var markdownConvert = isReddit, globalConvert = !isReddit&&confStore.emoteManagerEverywhere, showNotice = false;
 		
 		//Start script body
 		
