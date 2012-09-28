@@ -1385,7 +1385,7 @@ function passFunction(){
 		}
 		
 		//IF !extension
-		GM_registerMenuCommand('GrEmB - Open emote window', function (){0.
+		GM_registerMenuCommand('GrEmB - Open emote window', function (){
 			toggleEmoteWindow(false, 0, false);
 		});
 		GM_registerMenuCommand('GrEmB - Open settings', function (){
