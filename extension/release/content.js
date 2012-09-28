@@ -72,6 +72,10 @@ function passFunction(){
 		ranPassFunction = true;
 		
 		
+		if(document.getElementById("noGlobalPonymotes")){
+			return;
+		}
+		
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,

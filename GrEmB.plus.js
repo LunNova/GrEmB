@@ -49,6 +49,10 @@ function passFunction(){
 		if((!GM_getValue || (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") > -1))||document.getElementById("noGlobalPonymotes")){
 			return;
 		}
+		//ELSE
+		if(document.getElementById("noGlobalPonymotes")){
+			return;
+		}
 		//ENDIF
 		
 		var defaultConfs = {
