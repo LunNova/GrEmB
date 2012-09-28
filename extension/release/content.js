@@ -50,7 +50,7 @@ if(document.mozSyntheticDocument){
 	return;
 }
 
-var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore = undefined, inFrame = (window.top != window);
+var doNotUse = '', ranPassFunction = false, mainStylesheet = "http://nallar.me/css/css.php?key=", confStore, inFrame = (window.top != window);
 var wkMutation = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 if(location.protocol === "https:"){
 	mainStylesheet = "https://nallar.me/css/css.php?key=";
@@ -74,7 +74,7 @@ function passFunction(){
 		
 		
 		//START STATIC VARS
-		var debug, sSection, sSSection, endSection, endSSection, madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1,'b':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
+		var madeConf = false, isWebKit = navigator.userAgent.indexOf('WebKit/') != -1, isChrome = navigator.userAgent.indexOf('Chrome/') != -1, isFF = navigator.userAgent.indexOf('Firefox/') != -1, globalConvert = !isReddit, markdownConvert = isReddit, cssPrefix = (isWebKit?'-webkit-':(window.opera?'-o-':'-moz-')), cssStore='',currentForm = false, cssElement = false, windowClasses = "GrEmBWindow GrEmBEmoteWindow", closedWindowClasses = windowClasses + " closedWindow", windowCreators = {},isReddit = (/reddit\.com/i).test(window.location.host)||document.getElementById("redditPonymotes"), timeOutCounter = 60, initRefresh = false, doRefresh = false, requiredStyles = 1, loadedStyles = 0, doSave = 0, noGlobalTags = {"TEXTAREA":true, "INPUT":true, "CODE":true, "SCRIPT":true}, emoteMatchRegExp = /(?:^|[^\\])\[\]\(\/([_!a-zA-Z0-9\-]{1,60})(?:\s"([^"]*?)"|\s'([^']*?)')?\)/, goEmote = true, goExpand = true, stopExp = false, goFind = true, ranInitial = false, cssRun = true, linkRegex = /\b(?:(http(?:s?)\:\/\/)|(?:www\d{0,3}[.])|(?:[a-z0-9.\-]+[.][a-z]{2,4}\/))(?:\S*)\b/i, noExpandEmotes = {'/b':1, '/s':1, '/spoiler':1}, settingsForm = false, uncloneableProperties = {'emoteNames':1}, spoilers = {'s':1,'spoiler':1,'hhstatus_green':1,'hhstatus_red':1,'b':1,'spacer':1,'hhs':1,'g':1}, oldDis = false, convTimeout = false, convertedEmotes = 0, settings = false;
 		
 		var defaultConfs = {
 			'defaultEmoteContainer': true,
@@ -122,21 +122,21 @@ function passFunction(){
 		function GM_xmlhttpRequest(request){
 			var onComplete = request.onload;
 			delete(request.onload);
-			chrome.extension.sendMessage({method: "xhr", request: request},function(response){onComplete(response.data)});
+			chrome.extension.sendMessage({method: "xhr", request: request},function(response){onComplete(response.data);});
 		}
 		
 		function trim(str){
 			return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-		};
+		}
 		
 		
-		if(confStore == undefined || !confStore.alwaysTrue){
+		if(!confStore || !confStore.alwaysTrue){
 			confStore = defaultConfs;
 		}
 		
 		function G_safeGetValue(){
 			return confStore;
-		};
+		}
 		function getConf(id){//preprocessor macro used instead.
 			if(defaultConfs[id] === undefined) {
 				debug(103, "confStore[): Hmm... this id isn't in defaultConfs, something is wrong :( " + id);
@@ -148,7 +148,7 @@ function passFunction(){
 				temp[id] = defaultConfs[id];
 			}
 			return temp[id];
-		};
+		}
 		
 		function boolToChecked(b){
 			if(b!==false){
@@ -173,7 +173,7 @@ function passFunction(){
 			if(!nosave){
 				saveConf();
 			}
-		};
+		}
 		
 		function saveConf(){
 			chrome.extension.sendMessage({method: "setConf",data:confStore});
@@ -185,7 +185,7 @@ function passFunction(){
 					delete confStore[i];
 				}
 			}
-			for(var i in defaultConfs){
+			for(i in defaultConfs){
 				if(confStore[i] === undefined){
 					confStore[i] = defaultConfs[i];
 				}
@@ -202,14 +202,11 @@ function passFunction(){
 		}
 
 		function compareObjects(a, b, depth){
-			if(a === b){
-				return true;
-			}
-			if(nrKeys(a) !== nrKeys(b)){
-				return false;
+			if(a === b || nrKeys(a) !== nrKeys(b)){
+				return a === b;
 			}
 			if(depth === undefined){
-				var depth = 0;
+				depth = 0;
 			} else if(depth > 3){
 				return true; //hopefully they actually are the same... :p
 			}
@@ -270,7 +267,7 @@ function passFunction(){
 		}
 		
 		function updateGroups(){
-			var a, aa = confStore.lastDefaultEmoteGroups, b, bb = defaultConfs['emoteGroups'], c, cc = confStore.emoteGroups, toAdd = [], groupOrder = confStore.emoteGroupsOrder;;
+			var a, aa = confStore.lastDefaultEmoteGroups, b, bb = defaultConfs.emoteGroups, c, cc = confStore.emoteGroups, toAdd = [], groupOrder = confStore.emoteGroupsOrder, i, ii;
 			if(aa){
 				for(var g in bb){
 					a = aa[g]; b = bb[g].subs;
@@ -279,17 +276,17 @@ function passFunction(){
 					}
 					a = a.subs;
 					c = cc[g].subs.slice(0);
-					for (var i = 0; i < a.length; i++) {
+					for (i = 0; i < a.length; i++) {
 						if (b.indexOf(a[i]) == -1) {
-							var ii = c.indexOf(a[i]);
+							ii = c.indexOf(a[i]);
 							if (ii != -1) {
 								c.splice(ii, 1);
 							}
 						}
 					}
-					for (var i = 0; i < b.length; i++) {
+					for (i = 0; i < b.length; i++) {
 						if (a.indexOf(b[i]) == -1) {
-							var ii = c.indexOf(b[i + 1]);
+							ii = c.indexOf(b[i + 1]);
 							toAdd.push(b[i]);
 							if(ii != -1){
 								while (toAdd.length > 0) {
@@ -306,19 +303,19 @@ function passFunction(){
 						groupOrder.push(g);
 					}
 				}
-				for(var g in aa){
+				for(g in aa){
 					if(!bb[g] && cc[g]){
 						delete(cc[g]);
 						groupOrder.splice(groupOrder.indexOf(g));
 					}
 				}
 			}
-			for(var i = 0; i < groupOrder.length; i++){
+			for(i = 0; i < groupOrder.length; i++){
 				if(!cc[groupOrder[i]]){
 					groupOrder.splice(i);
 				}
 			}
-			confStore.lastDefaultEmoteGroups = defaultConfs['emoteGroups'];
+			confStore.lastDefaultEmoteGroups = defaultConfs.emoteGroups;
 			confStore.emoteGroups = cc;
 			setConf("emoteGroupsOrder", groupOrder);
 		}
@@ -338,7 +335,7 @@ function passFunction(){
 				closeEditGroup();
 			});
 			document.getElementById('Cedit').value = groups[group].subs.join(",");
-			var c = document.getElementById('Csave');
+			c = document.getElementById('Csave');
 			c.addEventListener("click",function(evt){
 				groups[group].subs = document.getElementById('Cedit').value.split(",");
 				closeEditGroup();
@@ -355,10 +352,7 @@ function passFunction(){
 		}
 		
 		function manageSubs(){
-			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>";
-			var groups = confStore.emoteGroups;
-			var groupOrder = confStore.emoteGroupsOrder;
-			var nsfw = false;
+			var msHTML = "<a href='#' id='editBlacklist' style='float:right;'>Edit emote blacklist</a><br /><table id='G_manageSubs'><tr><th>Group</th><th>NSFW</th><th>enabled</th></tr>", groups = confStore.emoteGroups, groupOrder = confStore.emoteGroupsOrder, nsfw = false, c;
 			for(var i = 0; i < groupOrder.length; i++){
 				var group = groups[groupOrder[i]];
 				msHTML += "<tr><td>"+group.name+"</td><td>"+(group.nsfw?"☑":"☐")+"</td><td><input type='checkbox' name='"+groupOrder[i]+"' id='C_"+groupOrder[i]+"'"+(group.enabled?" checked='checked'":"")+"/> <a class='G_Ce' id='Cu_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8593 </a><a class='G_Ce' id='Cd_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> &#8595; </a><a id='Ce_"+groupOrder[i]+"' name='"+groupOrder[i]+"'> edit</a></td></tr>";
@@ -369,8 +363,8 @@ function passFunction(){
 			setConf("nsfwDefunctEmotes",nsfw);
 			msHTML += "</table>";
 			document.getElementById('manageSubs').innerHTML = msHTML;
-			for(var i in groups){
-				var c = document.getElementById('C_'+i);
+			for(i in groups){
+				c = document.getElementById('C_'+i);
 				c.addEventListener("change",function(evt){
 					if(evt.target.checked && confStore.emoteGroups[evt.target.name].nsfw && !confStore.nsfwDefunctEmotes && !confirm("Are you sure you want to enable this? It's NSFW!")){
 						evt.target.checked = false;
@@ -432,7 +426,7 @@ function passFunction(){
 			for(var i in groups){
 				grps.unshift(i);
 			}
-			for(var i = 0; i < grps.length; i++){
+			for(i = 0; i < grps.length; i++){
 				var group = groups[grps[i]];
 				if(group.enabled){
 					for(var ii = 0; ii < group.subs.length; ii++){
@@ -650,7 +644,7 @@ function passFunction(){
 				settings.init();
 			}
 			madeConf = true;
-		};
+		}
 		
 		function showCSS(){
 			if(!cssElement){
@@ -665,7 +659,7 @@ function passFunction(){
 		}
 
 		function setCursor(node, pos){ //Thanks stack overflow! http://stackoverflow.com/questions/1865563/set-cursor-at-a-length-of-14-onfocus-of-a-textbox
-			var node = (typeof node == "string" || node instanceof String) ? document.getElementById(node) : node;
+			node = (typeof node == "string" || node instanceof String) ? document.getElementById(node) : node;
 			if(!node){
 				return false;
 			} else if(node.createTextRange){
@@ -705,7 +699,7 @@ function passFunction(){
 		}
 		
 		function addEmote(emoteID, alt){
-			var sub = "", links = '', unBlank = false
+			var sub = "", links = '', unBlank = false;
 			//(emoteNames[emoteID]!==2 && (/\/r\/(mylittlepony|mlplounge)/i.test(window.location.href) || (currentForm.name === "text" && ((links = currentForm.parentNode.parentNode.parentNode.parentNode.parentNode)&&(links = links.getElementsByClassName("noncollapsed")).length)&&(links = links[0].getElementsByClassName("head")).length&& (links = links[0].getElementsByTagName('A')).length) && (sub = links[Math.min(links.length-1,3)]) && (sub = sub.getAttribute('href').toLowerCase()) && (sub === "/r/mlplounge/" || sub === "/r/mylittlepony/")));
 			emoteID = "/" + emoteID;
 			var emote = "["+(unBlank?'Emote':'')+"](" + ((unBlank?("http://nallar.me/e.php?e="+emoteID):emoteID)) + " ";
@@ -765,7 +759,6 @@ function passFunction(){
 			} else {
 				emoteWindow.setAttribute("class", (emoteWindow.getAttribute("class") == windowClasses) ? closedWindowClasses : windowClasses);
 			}
-			updateTabs();
 			if(!evt){
 				return;
 			}
@@ -776,7 +769,7 @@ function passFunction(){
 
 		function drag(elem, draggedElem, onMove, onFinish) {
 			var oX, oY, lX, lY, moveFunction = function(evt) {
-				lX = evt.clientX, lY = evt.clientY
+				lX = evt.clientX, lY = evt.clientY;
 				onMove(evt.clientX+oX, evt.clientY+oY);
 			};
 			
@@ -797,9 +790,9 @@ function passFunction(){
 		}
 		
 		function resize(iX, iY, elem, onMove, onFinish) {
-			var oX, oY, lX = undefined, lY, moveFunction = function(evt) {
+			var oX, oY, lX, lY, moveFunction = function(evt) {
 				lX = Math.max(167,evt.clientX+oX), lY = Math.max(100,evt.clientY+oY);
-				if(Math.floor(Math.random()*3)==0){
+				if(Math.floor(Math.random()*3)===0){
 					onMove(lX, lY);
 				}
 			};
@@ -829,11 +822,11 @@ function passFunction(){
 					return;
 				}
 				_fn.call(this, evt);
-			}
+			};
 		}
 
 		function isAChildOf(_parent, _child){
-			if(_parent === _child || _parent == undefined){
+			if(_parent === _child || _parent === undefined){
 				return false;
 			}
 			var limit = 0;
@@ -915,14 +908,14 @@ function passFunction(){
 				document.getElementById("GrEmBSearchList").innerHTML = ""+document.getElementById("GrEmBdefaultcontainer").firstChild.innerHTML;
 				var resizing = false;
 				if(confStore.defaultEmoteContainerMouseLeave){
-					function closeFunc(evt){
+					var closeFunc = function(evt){
 						if(!resizing){
 							toggleEmoteWindow(evt, id, 1);
 							if(currentForm){
 								currentForm.focus();
 							}
 						}
-					}
+					};
 					emoteWindow.addEventListener('mouseout', mouseEnter(closeFunc), false);
 				}
 				fixWindowSize();
@@ -950,7 +943,7 @@ function passFunction(){
 				});
 				window.addEventListener('resize', fixWindowSize);
 				updateCurrentForm({toElement: document.body});
-			}
+			};
 		}
 
 		function getEmoteBrowserHTML(){
@@ -976,7 +969,7 @@ function passFunction(){
 			if(evt){
 				evt.cancelBubble = true;
 				evt.stopPropagation();
-				evt.preventDefault()
+				evt.preventDefault();
 			}
 		}
 		
@@ -1029,7 +1022,7 @@ function passFunction(){
 							setTimeout(function(){resetCache();}, 3000);
 							return;
 						case 'broken':
-							setConf('emoteGroups', defaultConfs['emoteGroups']);
+							setConf('emoteGroups', defaultConfs.emoteGroups);
 							resetCache();
 							return;
 					}
@@ -1066,11 +1059,11 @@ function passFunction(){
 			if(!node){
 				debug(100,"No firstChild? :S");
 			}
-			while(node != null && converted < maxConvert){
+			while(node && converted < maxConvert){
 				if(node.nodeType == 3){
 					var text = node, v;
 					while(text.nodeValue && text.parentNode.className != "SuperRedditAltTextDisplay_Text" && (v = emoteMatchRegExp.exec(text.nodeValue)) && v[1] && converted < maxConvert){
-						var pos = v['index'];
+						var pos = v.index;
 						v[1] = v[1].toLowerCase();
 						if(!v[2] && v[3]){
 							v[2] = v[3];
@@ -1100,7 +1093,7 @@ function passFunction(){
 								}
 							}else if((/^[\-a-zA-Z0-9_]+$/).test(emoteInfo[1])){
 								emoteElement.className += " G_" + emoteInfo[1] + "_";
-								if(emoteInfo[2]!=undefined) emoteElement.setAttribute('href',emoteElement.getAttribute('href') + '-');
+								if(emoteInfo[2]!==undefined) emoteElement.setAttribute('href',emoteElement.getAttribute('href') + '-');
 							}
 						}
 						emoteContainerElement.appendChild(emoteElement);
@@ -1115,7 +1108,7 @@ function passFunction(){
 				if (node.hasChildNodes()&&!(node.tagName && noGlobalTags[node.tagName])){
 					node = node.firstChild;
 				} else {
-					while (node.nextSibling == null){
+					while (!node.nextSibling){
 						node = node.parentNode;
 						if (node == root){
 							goEmote = true;
@@ -1140,31 +1133,24 @@ function passFunction(){
 			}
 			goExpand = false;
 			if(anchor.title && !noExpandEmotes[anchor.getAttribute('href')] && anchor.className.indexOf("emoteTextExpanded") == -1){
-				var altText = anchor.title;
-				var theDiv = document.createElement("div");
+				var altText = anchor.title, theDiv = document.createElement("div");
 				theDiv.className = "SuperRedditAltTextDisplay_Text";
 				theDiv.setAttribute("style", "display: inline-block !important;");
-				while(altText){
-					linkResult = linkRegex.exec(altText)
-					if(linkResult){
-						theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)))
-						var newLinkElement = document.createElement("a")
-						if(linkResult[1]){
-							newLinkElement.href = linkResult[0]
-						} else {
-							newLinkElement.href = "http://" + linkResult[0]
-						}
-						newLinkElement.appendChild(document.createTextNode(linkResult[0]))
-						theDiv.appendChild(newLinkElement)
-						altText = altText.substr(linkResult.index + linkResult[0].length)
+				while(linkResult = linkRegex.exec(altText)){
+					theDiv.appendChild(document.createTextNode(altText.substr(0, linkResult.index)));
+					var newLinkElement = document.createElement("a");
+					if(linkResult[1]){
+						newLinkElement.href = linkResult[0];
 					} else {
-						theDiv.appendChild(document.createTextNode(altText))
-						altText = ""
+						newLinkElement.href = "http://" + linkResult[0];
 					}
+					newLinkElement.appendChild(document.createTextNode(linkResult[0]));
+					theDiv.appendChild(newLinkElement);
+					altText = altText.substr(linkResult.index + linkResult[0].length);
 				}
-
-				var linkNextSibling = anchor.nextSibling
-				emoteContainerElement.appendChild(theDiv)
+				theDiv.appendChild(document.createTextNode(altText));
+				var linkNextSibling = anchor.nextSibling;
+				emoteContainerElement.appendChild(theDiv);
 				anchor.className += " emoteTextExpanded";
 			}
 			goExpand = true;
@@ -1191,14 +1177,14 @@ function passFunction(){
 					if(e.getElementsByClassName('thumbnail')[0]){
 						e.getElementsByClassName('thumbnail')[0].setAttribute('style', 'background-image: url(\'http://i.imgur.com/NS6ZH.png\'); background-size: 67px 57px; background-position: 0 0;width:67px; height: 57px; background-repeat: no-repeat;');
 					}
-				};
+				}
 
 			}
 		}
 		
 		function clickBlock(evt){
 				var anchor = evt.target;
-				if(anchor && anchor.getAttribute('href') && anchor.innerHTML == "" && /convertedEmote_/.test(anchor.className)){
+				if(anchor && anchor.getAttribute('href') && !anchor.innerHTML && /convertedEmote_/.test(anchor.className)){
 					evt.cancelBubble = true;
 					evt.preventDefault();
 					evt.stopPropagation();
@@ -1230,7 +1216,7 @@ function passFunction(){
 					videoFrame.parentNode.insertBefore((br =document.createElement("br")),videoFrame);
 					ytDiv.className = 'expando-button video expando-inline expanded';
 				}
-			};
+			}
 			anchor.parentNode.insertBefore(ytDiv, anchor.nextSibling);
 			ytDiv.addEventListener("click", onClick);
 		}
@@ -1243,7 +1229,7 @@ function passFunction(){
 			if(evt.target.getElementsByTagName){
 				if(!isReddit){
 					convertDefaultGlobalEmotes(evt.target);
-				};
+				}
 				var dispUn = (!doRefresh), revAlt = confStore.revealAltText, inSub = (/\.com\/r\//).test(window.location.href), imageAlt = confStore.emoteCopy, ytExpand = true, msgs = [];
 				if(markdownConvert){
 					if((/(?:^|\s)(?:md|livePreview)(?:\s|$)/i.test(evt.target.className))){
@@ -1280,26 +1266,26 @@ function passFunction(){
 							}
 							var href = hrefss[1], subKey = emoteNames[href];
 							emElem.className += " convertedEmote_";
-							if(dispUn && (!emElem.firstChild || emElem.firstChild.nodeValue == "") && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!subKey) && (!spoilers[href]) && (!inSub||(emElem.clientWidth == 0&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
-								emElem.textContent = hrefs + ((hrefss[2] != undefined) ? hrefss[2] : "");
+							if(dispUn && (!emElem.firstChild || !emElem.firstChild.nodeValue) && !(((/(?:^|\s)G_unknownEmote(?:\s|$)/).test(emElem.className))) && (!subKey) && (!spoilers[href]) && (!inSub||(!emElem.clientWidth&&window.getComputedStyle(emElem,':after').backgroundImage == "none" && window.getComputedStyle(emElem,':before').backgroundImage == "none"))){
+								emElem.textContent = hrefs + ((hrefss[2] !== undefined) ? hrefss[2] : "");
 								if(href.length > 20){
 									emElem.className += " G_unknownEmote G_largeUnknown";
 								}else{
 									emElem.className += " G_unknownEmote";
 								}
-								if(hrefss[2] != undefined){
+								if(hrefss[2] !== undefined){
 									emElem.href = "/" + href;
 								}
 							} else if((/^[\-a-zA-Z0-9_]+$/).test(href)){
 								emElem.className += " G_" + href + "_";
-								if(hrefss[2] != undefined)emElem.href = hrefs + '-';
+								if(hrefss[2] !== undefined)emElem.href = hrefs + '-';
 								if(subKey===-1){
 									emElem.innerText = "[DEPRECATED]";
 								}
 								convertedEmotes++;
 							}
 							if(revAlt && !spoilers[href]){
-								if(emElem.title!=""){//This block is derived from ArbitraryEntity's code.
+								if(emElem.title){//This block is derived from ArbitraryEntity's code.
 								//Get permission from ArbitraryEntity to include it if you are making a clone of this script.
 								//Or, code your own replacement for it!
 									var altText = emElem.title;
@@ -1339,7 +1325,7 @@ function passFunction(){
 							}
 							if(imageAlt){
 								var copyImage = document.createElement("img");
-								copyImage.alt = "[](/" + href + ((hrefss[2] != undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
+								copyImage.alt = "[](/" + href + ((hrefss[2] !== undefined) ? hrefss[2] : "") + ' "' + emElem.title + '")';
 								copyImage.style.fontSize = '0px';
 								emElem.parentNode.insertBefore(copyImage,emElem);
 							}
@@ -1349,7 +1335,7 @@ function passFunction(){
 				}
 			}
 			goFind = true;
-		};
+		}
 		
 		function initialDocumentPass(){
 			if(ranInitial){
@@ -1373,7 +1359,7 @@ function passFunction(){
 						mut.push(mutations[i].target);
 					}
 					mut = uniq(mut);
-					for(var i = 0, len = mut.length; i < len; i++){
+					for(i = 0, len = mut.length; i < len; i++){
 						domInsertFunction({target:mut[i]});
 					}
 				})).observe(document.body, {subtree: true, childList: true, characterData: true, attributes: false,});
@@ -1381,10 +1367,10 @@ function passFunction(){
 				document.body.addEventListener('DOMNodeInserted', domInsertFunction);
 				document.body.addEventListener('DOMNodeInsertedIntoDocument', domInsertFunction);
 			}
-		};
+		}
 		function createDefWindow(){
 			createEmoteWindow(0, confStore.defaultEmoteContainerSide ? "left" : "right", confStore.emoteContainerX_, confStore.emoteContainerY_, (confStore.defaultEmoteContainerOnTop || !isReddit) ? 99999 : 11, confStore.emoteContainerWidth_, confStore.emoteContainerHeight_, getEmoteBrowserHTML, confStore.smallToggler?"":"Emotes");
-		};
+		}
 		
 		function debug(){};
 		
@@ -1401,7 +1387,7 @@ function passFunction(){
 
 		function findEmotesChange(evt){
 			clearTimeout(timer);
-			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore.emoteSearchDerivatives)},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
+			timer=setTimeout(function(){findEmotes(evt.target.value,false,confStore.emoteSearchDerivatives);},evt.keyCode === 13 ? 10 : (evt.target.value.length < 4 ? 1000 : 200));
 		}
 		
 		function findEmotes(search, ret, ignoreDerivatives){
